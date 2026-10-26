@@ -1,0 +1,82 @@
+/* Admin-only type scale. Includes Element Plus overlays teleported to body. */
+html:has(.layout-container) {
+  &, body, #app { min-width: 0; }
+  --el-font-size-extra-large: 22px;
+  --el-font-size-large: 20px;
+  --el-font-size-medium: 18px;
+  --el-font-size-base: 18px;
+  --el-font-size-small: 18px;
+  --el-font-size-extra-small: 18px;
+  --el-component-size: 40px;
+  --el-component-size-small: 34px;
+
+  .layout-container { font-size: 18px; line-height: 1.65; }
+  .enterprise-menu :is(.el-menu-item, .el-sub-menu__title) {
+    font-size: 18px; min-height: 52px; height: auto; line-height: 1.45;
+    padding-top: 12px; padding-bottom: 12px;
+  }
+  .enterprise-menu:not(.el-menu--collapse) :is(.el-menu-item, .el-sub-menu__title) > span {
+    white-space: normal; overflow-wrap: anywhere; min-width: 0; flex: 1;
+  }
+  .enterprise-menu:not(.el-menu--collapse) .el-sub-menu__title { padding-right: 38px; }
+  .menu-caption { font-size: 18px; letter-spacing: .04em; }
+  .breadcrumb .el-breadcrumb__inner, .breadcrumb .el-breadcrumb__inner a { font-size: 18px; }
+  .user-meta strong { font-size: 18px; }
+  .user-meta small, .system-health { font-size: 18px; }
+  .el-table { font-size: 18px; }
+  .el-table th.el-table__cell { font-size: 18px; }
+  .el-table .cell { line-height: 1.65; padding-top: 4px; padding-bottom: 4px; }
+  .el-table .el-tag { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .el-pagination { flex-wrap: wrap; gap: 10px; white-space: normal; }
+  .el-pagination .el-pager { display: flex; flex-wrap: wrap; max-width: 100%; }
+  .el-form-item__label { font-size: 18px; height: auto; min-height: 40px; line-height: 1.6; align-items: center; }
+  :is(.el-input__inner, .el-textarea__inner, .el-select__placeholder, .el-select__selected-item,
+    .el-button, .el-radio__label, .el-checkbox__label, .el-tabs__item, .el-descriptions__cell) { font-size: 18px; }
+  .el-textarea__inner { line-height: 1.75; }
+  :is(.el-tag, .el-pagination, .el-pagination button, .el-pager li,
+    .el-select-dropdown__item, .el-dropdown-menu__item, .el-form-item__error) { font-size: 18px; }
+  .el-select-dropdown__item { min-height: 38px; height: auto; line-height: 38px; }
+  .el-card__header { font-size: 20px; line-height: 1.5; }
+  .el-dialog__title { font-size: 23px; }
+  .el-dialog__body { font-size: 18px; line-height: 1.7; }
+  .el-dialog {
+    display: flex;
+    flex-direction: column;
+    max-width: calc(100vw - 24px);
+    max-height: calc(100dvh - 32px);
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+  .el-dialog__header, .el-dialog__footer { flex-shrink: 0; }
+  .el-dialog__body { min-height: 0; overflow: auto; }
+  .el-dialog__title { overflow-wrap: anywhere; }
+  .dialog-footer { flex-wrap: wrap; gap: 10px; }
+  .el-message-box { max-width: calc(100vw - 24px); }
+  .content-stage .page-title { font-size: 26px; }
+
+  :is(.dashboard-page, .dashboard-container) {
+    :is(.chart-header strong, .card-title) { font-size: 20px; line-height: 1.5; }
+    :is(.gap-text, .gap-total, .emotion-label, .emotion-count, .emotion-total, .rec-item,
+      .report-period, .report-time, .metric-name, .metric-comment, .stat-title) { font-size: 18px; line-height: 1.7; }
+    :is(.gap-entities h4, .report-recommendations h4) { font-size: 18px; }
+    .report-summary { font-size: 18px; line-height: 1.85; }
+    .emotion-label { width: 48px; flex-shrink: 0; }
+    .emotion-fill { font-size: 18px; }
+    .emotion-rate { width: 66px; flex-shrink: 0; font-size: 18px; text-align: right; }
+    .stat-value { font-size: 30px; }
+    .report-meta { flex-wrap: wrap; }
+  }
+
+  @media (max-width: 600px) {
+    .content-stage { padding: 12px; }
+    .topbar { height: auto; min-height: 68px; flex-wrap: wrap; gap: 12px; padding: 12px; }
+    .topbar-actions { flex-wrap: wrap; gap: 12px; }
+    .topbar .breadcrumb { flex: 1; min-width: 0; }
+    .user-meta { display: none; }
+    .el-form-item { flex-direction: column; align-items: stretch; }
+    .el-form-item__label { width: auto !important; justify-content: flex-start; padding-bottom: 6px; }
+    .el-form-item__content { margin-left: 0 !important; min-width: 0; }
+    .el-form-item :is(.el-input, .el-select, .el-input-number) { max-width: 100%; }
+    .el-dialog .el-col { flex-basis: 100%; max-width: 100%; }
+  }
+}

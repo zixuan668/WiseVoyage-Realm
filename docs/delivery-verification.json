@@ -1,0 +1,22 @@
+{
+  "scope": [
+    "web-service-station",
+    "web-administrator",
+    "mobile-app"
+  ],
+  "database": {
+    "spots": 16,
+    "routes": 3,
+    "guides": 2,
+    "knowledge_documents": 24
+  },
+  "tests": {
+    "web": 160,
+    "app": 133,
+    "backend": 197
+  },
+  "native_resources_compiled": true,
+  "signed_mobile_package_produced": false,
+  "nginx_proxy_integration_passed": true,
+  "secret_files_excluded": true
+}

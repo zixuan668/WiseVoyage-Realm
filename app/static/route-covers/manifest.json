@@ -1,0 +1,20 @@
+{
+  "main_commit": "41480aa887d1034d380ebdddcb8c6d5898e5ec5e",
+  "routes": {
+    "皇家园林经典文化线": {
+      "asset": "/static/route-covers/royal-garden-culture.jpg",
+      "sha256": "5e0bdf464be375f9d0f04534057fad87341d1a3e2be94585d60919a47212f4b0",
+      "source": "tour_files/route_covers/royal-garden-culture.jpg"
+    },
+    "昆明湖摄影漫游线": {
+      "asset": "/static/route-covers/kunming-lake-photography.jpg",
+      "sha256": "918442c815a9af3f99568c696110f6188b662ecd131f8c76254913bc361a815f",
+      "source": "tour_files/route_covers/kunming-lake-photography.jpg"
+    },
+    "亲子湖山体验线": {
+      "asset": "/static/route-covers/family-lakeside.jpg",
+      "sha256": "1961578d74c523140247b601a5488350c8c6365792e53756cb918c320b4895e8",
+      "source": "tour_files/route_covers/family-lakeside.jpg"
+    }
+  }
+}

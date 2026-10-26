@@ -1,0 +1,64 @@
+{
+    "name": "智游知境",
+    "appid": "__UNI__57BB466",
+    "description": "AI数字人景区导览 App",
+    "versionName": "1.5.7",
+    "versionCode": "157",
+    "transformPx": false,
+    "app-plus": {
+        "usingComponents": true,
+        "nvueStyleCompiler": "uni-app",
+        "compilerVersion": 3,
+        "splashscreen": {
+            "alwaysShowBeforeRender": true,
+            "waiting": true,
+            "autoclose": true,
+            "delay": 0
+        },
+        "modules": {
+            "Camera": {},
+            "Geolocation": {},
+            "Speech": {},
+            "Recorder": {}
+        },
+        "distribute": {
+            "android": {
+                "schemes": [
+                    "zhiyouguide"
+                ],
+                "permissions": [
+                    "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.ACCESS_BACKGROUND_LOCATION\"/>",
+                    "<uses-permission android:name=\"android.permission.RECORD_AUDIO\"/>",
+                    "<uses-permission android:name=\"android.permission.CAMERA\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_EXTERNAL_STORAGE\"/>",
+                    "<uses-permission android:name=\"android.permission.READ_MEDIA_IMAGES\"/>",
+                    "<uses-permission android:name=\"android.permission.INTERNET\"/>"
+                ]
+            },
+            "ios": {
+                "dSYMs": false,
+                "privacyDescription": {
+                    "NSCameraUsageDescription": "拍照识景需要使用相机拍摄景点照片",
+                    "NSPhotoLibraryUsageDescription": "图片识景需要从相册选择景点照片",
+                    "NSLocationWhenInUseUsageDescription": "景区导览需要获取您的位置，在接近景点时自动触发讲解",
+                    "NSMicrophoneUsageDescription": "需要使用麦克风进行语音交互",
+                    "NSLocalNetworkUsageDescription": "连接同一 Wi-Fi 下的电脑，获取景点资料、路线和数字人导览服务"
+                },
+                "schemes": [
+                    "zhiyouguide"
+                ]
+            }
+        }
+    },
+    "h5": {
+        "title": "智游知境",
+        "router": {
+            "mode": "hash"
+        },
+        "devServer": {
+            "port": 8080
+        }
+    },
+    "vueVersion": "3"
+}

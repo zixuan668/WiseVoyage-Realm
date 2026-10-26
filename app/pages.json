@@ -1,0 +1,126 @@
+{
+  "pages": [
+    {
+      "path": "pages/onboarding/onboarding",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f6f2ff",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/tabs/tabs",
+      "style": {
+        "app-plus": {"softinputMode": "adjustNothing"},
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f8fafc",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/claim/claim",
+      "style": { "navigationBarTitleText": "领取电脑路线", "navigationBarTextStyle": "black", "navigationBarBackgroundColor": "#f8fafc" }
+    },
+    {
+      "path": "pages/auth/auth",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTitleText": "",
+        "navigationBarBackgroundColor": "#f8fafc",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f8fafc",
+        "backgroundTextStyle": "dark",
+        "disableScroll": false
+      }
+    },
+    {
+      "path": "pages/tour/tour",
+      "style": {
+        "app-plus": {"softinputMode": "adjustNothing"},
+        "navigationStyle": "custom",
+        "disableScroll": true,
+        "navigationBarBackgroundColor": "#f8fafc",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f8fafc",
+        "backgroundTextStyle": "dark"
+      }
+    },
+    {
+      "path": "pages/ai-chat/ai-chat",
+      "style": {
+        "app-plus": {"softinputMode": "adjustNothing"},
+        "navigationStyle": "custom",
+        "disableScroll": true,
+        "navigationBarBackgroundColor": "#f8fafc",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f8fafc",
+        "backgroundTextStyle": "dark"
+      }
+    },
+    {
+      "path": "pages/tour-guide/tour-guide",
+      "style": {
+        "navigationStyle": "custom",
+        "disableScroll": false,
+        "homeButton": false,
+        "navigationBarBackgroundColor": "#f8fafc",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f8fafc",
+        "backgroundTextStyle": "dark"
+      }
+    },
+    {
+      "path": "pages/mine/mine",
+      "style": {
+        "navigationStyle": "custom",
+        "disableScroll": false,
+        "navigationBarBackgroundColor": "#f8fafc",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f8fafc",
+        "backgroundTextStyle": "dark"
+      }
+    },
+    {
+      "path": "pages/mine/history",
+      "style": {
+        "navigationStyle": "custom",
+        "disableScroll": false,
+        "navigationBarBackgroundColor": "#f8fafc",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f8fafc",
+        "backgroundTextStyle": "dark"
+      }
+    },
+    {
+      "path": "pages/tour-summary/tour-summary",
+      "style": {
+        "navigationStyle": "custom",
+        "disableScroll": true,
+        "navigationBarBackgroundColor": "#f8fafc",
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f8fafc",
+        "backgroundTextStyle": "dark"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "",
+    "navigationBarBackgroundColor": "#f8fafc",
+    "backgroundColor": "#f8fafc",
+    "navigationStyle": "custom",
+    "backgroundTextStyle": "dark"
+  },
+	"condition" : { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [
+			{
+				"name": "", //模式名称
+				"path": "", //启动页面，必选
+				"query": "" //启动参数，在页面的onLoad函数里面得到
+			}
+		]
+	}
+}

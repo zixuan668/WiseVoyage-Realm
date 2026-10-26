@@ -1,0 +1,85 @@
+/* Shared minimum type scale, including dialogs and menus teleported to body.
+   Page styles keep their larger headings and terminal text sizes. */
+html {
+  --app-font-size: 20px;
+  --app-font-size-small: 18px;
+  --el-font-size-extra-large: 24px;
+  --el-font-size-large: 22px;
+  --el-font-size-medium: 20px;
+  --el-font-size-base: 18px;
+  --el-font-size-small: 18px;
+  --el-font-size-extra-small: 18px;
+  --el-component-size: 42px;
+  --el-component-size-small: 36px;
+}
+
+body {
+  font-size: var(--app-font-size);
+  line-height: 1.6;
+}
+
+button, input, textarea, select {
+  font-size: inherit;
+}
+
+small, .el-statistic__head, .el-input__count, .el-textarea__count,
+.el-form-item__error, .el-upload__tip, .el-empty__description p,
+.el-pagination__total, .el-pagination__jump, .el-breadcrumb,
+.el-tag, .el-tag--small, .el-tag--large,
+.el-tooltip__trigger, .el-popper, .el-tooltip__content,
+.el-radio__label, .el-checkbox__label, .el-descriptions__cell {
+  font-size: 18px;
+}
+
+.el-page-header__title, .el-step__icon-inner, .el-alert__title,
+.el-badge__content, .el-input .el-input__count .el-input__count-inner,
+.el-upload .el-upload__text,
+.el-descriptions .el-descriptions__body .el-descriptions__table .el-descriptions__cell {
+  font-size: 18px;
+}
+
+.el-button {
+  min-height: 42px;
+  height: auto;
+  padding: 9px 16px;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.el-button--small {
+  min-height: 36px;
+  padding: 7px 12px;
+  font-size: 18px;
+}
+
+.el-tag {
+  min-height: 28px;
+  height: auto;
+  padding: 3px 8px;
+  line-height: 1.4;
+}
+
+.el-table, .el-table--small, .el-table th.el-table__cell,
+.el-input__inner, .el-textarea__inner, .el-select__wrapper,
+.el-select-dropdown__item, .el-dropdown-menu__item,
+.el-message__content, .el-notification__content {
+  font-size: 18px;
+}
+
+.el-form-item__error {
+  line-height: 1.4;
+}
+
+.el-select-dropdown__item, .el-dropdown-menu__item {
+  height: auto;
+  min-height: 38px;
+  line-height: 1.5;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.el-pagination button, .el-pager li {
+  font-size: 18px;
+  min-width: 36px;
+  min-height: 36px;
+}

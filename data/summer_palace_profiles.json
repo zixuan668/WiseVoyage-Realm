@@ -1,0 +1,231 @@
+{
+  "basis": "景点特色人工标注；不使用游客画像或虚构热度。",
+  "source_urls": [
+    "https://gygl.beijing.gov.cn/mlgy/mlgy_lsmy/201911/t20191129_732237.html"
+  ],
+  "profiles": {
+    "仁寿殿": {
+      "affinities": {
+        "history": 5,
+        "nature": 1,
+        "photography": 2,
+        "family": 2
+      },
+      "stairs": false,
+      "reasons": {
+        "history": "宫廷理政空间与殿前陈设"
+      }
+    },
+    "长廊": {
+      "affinities": {
+        "history": 4,
+        "nature": 3,
+        "photography": 4,
+        "family": 5
+      },
+      "stairs": false,
+      "reasons": {
+        "history": "传统建筑彩画与人物故事",
+        "nature": "临湖廊道与湖山借景",
+        "photography": "连续廊柱的透视构图",
+        "family": "一起寻找彩画中的人物故事"
+      }
+    },
+    "佛香阁": {
+      "affinities": {
+        "history": 5,
+        "nature": 3,
+        "photography": 5,
+        "family": 1
+      },
+      "stairs": true,
+      "reasons": {
+        "history": "万寿山中轴与佛教建筑",
+        "nature": "登高观察湖山格局",
+        "photography": "高处俯瞰昆明湖"
+      }
+    },
+    "昆明湖": {
+      "affinities": {
+        "history": 2,
+        "nature": 5,
+        "photography": 5,
+        "family": 4
+      },
+      "stairs": false,
+      "reasons": {
+        "nature": "知春亭岸边观察湖面与水岸",
+        "photography": "湖面倒影与万寿山远景",
+        "family": "岸边观察桥、岛与水鸟，注意临水安全"
+      }
+    },
+    "十七孔桥": {
+      "affinities": {
+        "history": 3,
+        "nature": 4,
+        "photography": 5,
+        "family": 3
+      },
+      "stairs": false,
+      "reasons": {
+        "history": "传统石桥券洞与石栏",
+        "nature": "桥上观看湖面与南湖岛",
+        "photography": "连续桥洞、桥身曲线与倒影",
+        "family": "观察桥洞和石狮的不同形态"
+      }
+    },
+    "苏州街": {
+      "affinities": {
+        "history": 4,
+        "nature": 3,
+        "photography": 4,
+        "family": 2
+      },
+      "stairs": true,
+      "reasons": {
+        "history": "皇家园林中的江南街市意象",
+        "nature": "后湖水岸与街巷",
+        "photography": "水、桥与沿岸建筑组合"
+      }
+    },
+    "乐寿堂": {
+      "affinities": {
+        "history": 5,
+        "nature": 2,
+        "photography": 3,
+        "family": 3
+      },
+      "stairs": false,
+      "reasons": {
+        "history": "帝后生活区的院落与陈设",
+        "photography": "院落、庭树与建筑层次",
+        "family": "比较生活院落和理政院落"
+      }
+    },
+    "玉澜堂": {
+      "affinities": {
+        "history": 5,
+        "nature": 1,
+        "photography": 2,
+        "family": 2
+      },
+      "stairs": false,
+      "reasons": {
+        "history": "帝后生活区的历史与院落布局"
+      }
+    },
+    "排云殿": {
+      "affinities": {
+        "history": 5,
+        "nature": 2,
+        "photography": 4,
+        "family": 2
+      },
+      "stairs": true,
+      "reasons": {
+        "history": "前山礼仪建筑与中轴空间",
+        "photography": "建筑中轴与层层抬升的殿阁"
+      }
+    },
+    "谐趣园": {
+      "affinities": {
+        "history": 3,
+        "nature": 5,
+        "photography": 4,
+        "family": 5
+      },
+      "stairs": false,
+      "reasons": {
+        "history": "江南园林意象的再创造",
+        "nature": "池塘、廊桥与园中园景观",
+        "photography": "池水、廊桥和亭阁的小景构图",
+        "family": "辨认池、桥、亭的空间关系"
+      }
+    },
+    "石舫": {
+      "affinities": {
+        "history": 4,
+        "nature": 3,
+        "photography": 5,
+        "family": 3
+      },
+      "stairs": false,
+      "reasons": {
+        "history": "清晏舫的船形园林建筑",
+        "nature": "昆明湖北岸观景",
+        "photography": "船形建筑与湖岸倒影",
+        "family": "对比石舫与真正的船"
+      }
+    },
+    "玉带桥": {
+      "affinities": {
+        "history": 3,
+        "nature": 4,
+        "photography": 5,
+        "family": 1
+      },
+      "stairs": true,
+      "reasons": {
+        "history": "西堤桥梁的拱券形制",
+        "nature": "西堤水岸与桥景",
+        "photography": "高拱桥与水面倒影"
+      }
+    },
+    "南湖岛": {
+      "affinities": {
+        "history": 2,
+        "nature": 5,
+        "photography": 4,
+        "family": 4
+      },
+      "stairs": false,
+      "reasons": {
+        "nature": "湖中岛岸的开阔湖山视线",
+        "photography": "隔湖远望万寿山",
+        "family": "观察岛与桥如何连接"
+      }
+    },
+    "铜牛": {
+      "affinities": {
+        "history": 4,
+        "nature": 3,
+        "photography": 4,
+        "family": 5
+      },
+      "stairs": false,
+      "reasons": {
+        "history": "皇家园林中的铜铸动物与水文化",
+        "nature": "东堤湖岸观景",
+        "photography": "铜牛与湖山远景同框",
+        "family": "观察铜牛造型，认识传统水文化"
+      }
+    },
+    "德和园": {
+      "affinities": {
+        "history": 5,
+        "nature": 1,
+        "photography": 3,
+        "family": 4
+      },
+      "stairs": false,
+      "reasons": {
+        "history": "宫廷戏曲与大戏楼建筑",
+        "photography": "戏楼建筑的立面层次",
+        "family": "认识戏楼与传统舞台"
+      }
+    },
+    "文昌阁": {
+      "affinities": {
+        "history": 4,
+        "nature": 2,
+        "photography": 4,
+        "family": 2
+      },
+      "stairs": false,
+      "reasons": {
+        "history": "东岸城关式建筑形制",
+        "photography": "阁楼与湖岸构图"
+      }
+    }
+  }
+}

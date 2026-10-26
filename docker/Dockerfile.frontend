@@ -1,0 +1,14 @@
+FROM node:22-alpine AS builder
+WORKDIR /build/frontend
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+COPY frontend ./
+COPY shared /build/shared
+ARG VITE_PUBLIC_SERVER_ORIGIN=""
+ENV VITE_PUBLIC_SERVER_ORIGIN=$VITE_PUBLIC_SERVER_ORIGIN
+RUN npm run build
+
+FROM nginx:1.28-alpine
+COPY docker/nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /build/frontend/dist /usr/share/nginx/html
+EXPOSE 80

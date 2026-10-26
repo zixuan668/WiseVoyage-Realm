@@ -1,0 +1,401 @@
+/* Soft UI — shared with the Web palette. WXSS-compatible selectors. */
+page .auth-page .ambient-field > view,
+page .page .aurora-background > view {opacity:0;animation:none}
+page {
+  --app-font-family:"SimSun", "宋体", "Songti SC", "STSong", serif;
+  --ng-night:#f8fafc;
+  --ng-surface:#ffffff;
+  --ng-raised:#eef2ff;
+  --ng-soft-blue:#f2f7ff;
+  --ng-soft-blue-text:#36558f;
+  --ng-glass-blue-bg:linear-gradient(135deg,rgba(255,255,255,.92) 0%,rgba(235,245,255,.8) 48%,rgba(217,234,255,.7) 100%);
+  --ng-glass-blue-border:transparent;
+  --ng-glass-shadow:0 1rpx 2rpx rgba(70,105,170,.07),0 4rpx 10rpx -4rpx rgba(70,105,170,.14),0 10rpx 24rpx -12rpx rgba(70,105,170,.2);
+  --ng-border:#e2e8f0;
+  --ng-text:#1f2937;
+  --ng-secondary:#4b5563;
+  --ng-muted:#64748b;
+  --ng-accent:#4f46e5;
+  --ng-accent-text:#4338ca;
+  --ng-glass-shadow:0 10px 40px -10px rgba(30,41,59,.10);
+  background-color:#f8fafc;
+  background-image:none;
+  color:var(--ng-text);
+}
+
+page .page,
+page .page.aurora-page,
+page .auth-page {background:transparent!important;color:var(--ng-text)}
+
+page .page .aurora-background,
+page .auth-page .aurora-background,
+page .page .ambient-field,
+page .auth-page .ambient-field {
+  background-color:var(--ng-night);
+  background-image:none;
+}
+
+page .page .aurora-wave,
+page .auth-page .aurora-wave,
+page .page .aurora-shine,
+page .auth-page .aurora-shine,
+page .page .light-wave,
+page .auth-page .light-wave,
+page .page .light-orbit,
+page .auth-page .light-orbit,
+page .page .glass-panel,
+page .auth-page .glass-panel,
+page .page .flow-track,
+page .auth-page .flow-track,
+page .page .light-bars,
+page .auth-page .light-bars {opacity:0;animation:none}
+
+page .page .nav,
+page .auth-page .nav,
+page .page .aurora-page .nav,
+page .auth-page .aurora-page .nav {background:transparent!important;border-color:var(--ng-border)!important}
+
+page .page .nav-title,
+page .auth-page .nav-title,
+page .page .brand-name,
+page .auth-page .brand-name,
+page .page .dp-title,
+page .auth-page .dp-title,
+page .page .dp-name,
+page .auth-page .dp-name,
+page .page .pc-name,
+page .auth-page .pc-name,
+page .page .ce-title,
+page .auth-page .ce-title,
+page .page .bl-hd text,
+page .auth-page .bl-hd text {
+  font-family:var(--app-font-family);
+  color:var(--ng-text);
+}
+
+page .page .nav-title,
+page .auth-page .nav-title {letter-spacing:2rpx}
+
+page .page .block,
+page .auth-page .block,
+page .page .menu-group,
+page .auth-page .menu-group,
+page .page .map-card,
+page .auth-page .map-card,
+page .page .rank-block,
+page .auth-page .rank-block,
+page .page .card,
+page .auth-page .card,
+page .page .summary-card,
+page .auth-page .summary-card,
+page .page .display-console,
+page .auth-page .display-console,
+page .page .history-detail,
+page .auth-page .history-detail,
+page .page .ss-card,
+page .auth-page .ss-card,
+page .page .spot-card,
+page .auth-page .spot-card,
+page .page .guide-card,
+page .auth-page .guide-card,
+page .page .tl-card,
+page .auth-page .tl-card,
+page .page .msg-bubble.ai,
+page .auth-page .msg-bubble.ai,
+page .page .msg-bubble.guide,
+page .auth-page .msg-bubble.guide {
+  background-color:var(--ng-surface);
+  border-color:var(--ng-border);
+  border-radius:32rpx;
+  background-image:none;
+  box-shadow:var(--ng-glass-shadow);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Keep scenic photography and avatar textures intact. */
+page .page .guide-card {background-image:none;border-radius:32rpx}
+
+page .page .route-carousel-wrap,
+page .auth-page .route-carousel-wrap,
+page .page .map-wrap,
+page .auth-page .map-wrap {border-radius:32rpx;border:1rpx solid var(--ng-border)}
+
+page .page .drawer-panel,
+page .auth-page .drawer-panel,
+page .page .profile-dialog,
+page .auth-page .profile-dialog {
+  background:#ffffff;
+  background-image:none;
+  border:1rpx solid var(--ng-border);
+  border-radius:32rpx 48rpx 0 0;
+  box-shadow:var(--ng-glass-shadow);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+page .page .profile-dialog,
+page .auth-page .profile-dialog {border-radius:32rpx}
+
+page .page .drawer-mask,
+page .auth-page .drawer-mask,
+page .page .profile-overlay,
+page .auth-page .profile-overlay {background:rgba(30,41,59,0.28)}
+
+page .page .route-detail-panel .tl-card,
+page .auth-page .route-detail-panel .tl-card {background:var(--ng-surface)}
+
+page .page .route-detail-wash,
+page .auth-page .route-detail-wash {background:linear-gradient(to bottom,rgba(30,41,59,0.28),rgba(30,41,59,0.28) 25%,#ffffff 60%,#f8fafc)}
+
+page .page .scenic-veil,
+page .auth-page .scenic-veil {background:linear-gradient(to bottom,transparent 35%,rgba(30,41,59,0.28) 60%,#f8fafc)}
+
+page .page .tb-root,
+page .auth-page .tb-root,
+page .page .aurora-page .tb-root,
+page .auth-page .aurora-page .tb-root,
+page .page .bottom-fixed,
+page .auth-page .bottom-fixed,
+page .page .bottom-bar,
+page .auth-page .bottom-bar,
+page .page .input-bar,
+page .auth-page .input-bar,
+page .page .aurora-page .input-bar,
+page .auth-page .aurora-page .input-bar,
+page .page .aurora-page .bottom-fixed,
+page .auth-page .aurora-page .bottom-fixed {
+  background:#ffffff!important;
+  border-color:var(--ng-border)!important;
+  box-shadow:inset 0 1px 0 rgba(99,102,241,0.12);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+page .page .tb-label,
+page .auth-page .tb-label,
+page .page .tb-icon,
+page .auth-page .tb-icon {color:var(--ng-secondary)}
+
+page .page .tb-item.on .tb-label,
+page .auth-page .tb-item.on .tb-label,
+page .page .tb-item.on .tb-icon,
+page .auth-page .tb-item.on .tb-icon {color:var(--ng-accent-text);filter:none}
+
+page .page .tb-hl-ring,
+page .auth-page .tb-hl-ring {background:transparent;border-color:transparent;box-shadow:none}
+
+page .page .tb-hl-ring.on,
+page .auth-page .tb-hl-ring.on {background:rgba(99,102,241,0.112);border:1rpx solid rgba(99,102,241,0.25);box-shadow:inset 0 1px 0 rgba(99,102,241,0.12)}
+
+page .page .tb-dot,
+page .auth-page .tb-dot,
+page .page .bl-dot,
+page .auth-page .bl-dot,
+page .page .rh-bar,
+page .auth-page .rh-bar,
+page .page .sw-bar,
+page .auth-page .sw-bar,
+page .page .heading-light,
+page .auth-page .heading-light {background:var(--ng-accent)}
+
+page .page .msg-input,
+page .auth-page .msg-input,
+page .page .search-input,
+page .auth-page .search-input,
+page .page .nickname-input,
+page .auth-page .nickname-input {color:var(--ng-text);background:rgba(99,102,241,0.045);border-color:var(--ng-border)}
+
+page .page .msg-bubble.user,
+page .auth-page .msg-bubble.user {background:rgba(99,102,241,0.112);border:1rpx solid rgba(99,102,241,0.25);color:var(--ng-accent-text)}
+
+page .page .msg-bubble.user .msg-text,
+page .auth-page .msg-bubble.user .msg-text {color:var(--ng-accent-text)}
+
+page .page .qh-chip,
+page .auth-page .qh-chip,
+page .page .pref-chip,
+page .auth-page .pref-chip,
+page .page .tt-item,
+page .auth-page .tt-item,
+page .page .avatar-mode,
+page .auth-page .avatar-mode {background:rgba(99,102,241,0.045);border-color:var(--ng-border);border-radius:32rpx;color:var(--ng-secondary)}
+
+page .page .tt-item.on,
+page .auth-page .tt-item.on,
+page .page .pref-chip.on,
+page .auth-page .pref-chip.on,
+page .page .cat-tab.on,
+page .auth-page .cat-tab.on,
+page .page .avatar-mode.selected,
+page .auth-page .avatar-mode.selected,
+page .page .spot-card.on,
+page .auth-page .spot-card.on,
+page .page .primary,
+page .auth-page .primary,
+page .page .send-btn,
+page .auth-page .send-btn,
+page .page .rb-btn,
+page .auth-page .rb-btn,
+page .page .fab-btn,
+page .auth-page .fab-btn,
+page .page .dp-btn text,
+page .auth-page .dp-btn text,
+page .page .dpa-btn.start,
+page .auth-page .dpa-btn.start,
+page .page .selection-next,
+page .auth-page .selection-next,
+page .page .dpl-btn-star,
+page .auth-page .dpl-btn-star,
+page .page .retry,
+page .auth-page .retry,
+page .page .voice-btn.active,
+page .auth-page .voice-btn.active {
+  background:rgba(99,102,241,0.112);
+  border:1rpx solid rgba(99,102,241,0.25);
+  color:var(--ng-accent-text);
+  box-shadow:inset 0 1px 0 rgba(99,102,241,0.12),0 8px 24px -10px rgba(99,102,241,.18);
+}
+
+page .page .primary,
+page .auth-page .primary,
+page .page .send-btn,
+page .auth-page .send-btn,
+page .page .selection-next,
+page .auth-page .selection-next,
+page .page .dpa-btn,
+page .auth-page .dpa-btn {border-radius:32rpx}
+
+page .page .fab-icon,
+page .auth-page .fab-icon,
+page .page .fab-text,
+page .auth-page .fab-text,
+page .page .summary-title,
+page .auth-page .summary-title {color:var(--ng-accent-text)}
+
+page .page .logo,
+page .auth-page .logo,
+page .page .brand-ai,
+page .auth-page .brand-ai,
+page .page .pc-avatar-df,
+page .auth-page .pc-avatar-df {background:rgba(99,102,241,0.112);border:1rpx solid rgba(99,102,241,0.25);color:var(--ng-accent-text);box-shadow:var(--ng-glass-shadow)}
+
+page .page .console-bar,
+page .auth-page .console-bar {background:linear-gradient(#4f46e5,#818cf8)}
+
+page .page .guide-stage,
+page .auth-page .guide-stage,
+page .page .guide-preview-half,
+page .auth-page .guide-preview-half {background:var(--ng-surface);border:1rpx solid var(--ng-border);box-shadow:var(--ng-glass-shadow)}
+
+page .page .notice button,
+page .auth-page .notice button {background:rgba(99,102,241,0.06);border:1rpx solid var(--ng-border);border-radius:32rpx;color:var(--ng-accent-text)}
+page button::after {border-color:var(--ng-border)}
+
+page .page .tt-item,
+page .auth-page .tt-item,
+page .page .pref-chip,
+page .auth-page .pref-chip,
+page .page .primary,
+page .auth-page .primary,
+page .page .send-btn,
+page .auth-page .send-btn,
+page .page .guide-card,
+page .auth-page .guide-card {
+  transition:background-color .3s ease-in-out,border-color .3s ease-in-out,box-shadow .3s ease-in-out;
+}
+
+page .page .primary:active,
+page .auth-page .primary:active,
+page .page .send-btn:active,
+page .auth-page .send-btn:active,
+page .page .pref-chip:active,
+page .auth-page .pref-chip:active {background:rgba(99,102,241,0.165);border-color:rgba(99,102,241,0.25)}
+@media(prefers-reduced-motion:reduce) {page .page .logo,
+page .auth-page .logo,
+page .page .story-flow,
+page .auth-page .story-flow,
+page .page .story-shimmer,
+page .auth-page .story-shimmer,
+page .page .console-bar,
+page .auth-page .console-bar,
+page .page .ce-icon,
+page .auth-page .ce-icon,
+page .page .tl-pulse,
+page .auth-page .tl-pulse {animation:none}
+}
+
+/* Text controls inherit one font; iconfont keeps its own explicit family. */
+page, view, text, button, input, textarea, picker, scroll-view, rich-text {font-family:var(--app-font-family);}
+
+/* 全 App 主操作按钮统一为淡蓝色玻璃态（与选中态、玻璃蓝控件同一套视觉），不再用深紫/深蓝实心块。 */
+page .page .primary, page .auth-page .primary,
+page .page .send-btn, page .page .rb-btn, page .page .fab-btn,
+page .page .dpa-btn.start, page .page .selection-next, page .page .retry,
+page .page .dpa-btn.pick, page .page .repair-generate, page .page .repair-apply,
+page .page .dpl-btn, page .page .dpl-btn-star {
+  background:var(--ng-glass-blue-bg); color:var(--ng-soft-blue-text); border-color:transparent;
+  box-shadow:var(--ng-glass-shadow),inset 0 1rpx 0 rgba(255,255,255,.92);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+}
+/* 景点详情底部「加入选择 / 取消选择」也是主操作：未选淡蓝玻璃，已选低调收起。 */
+page .page .dp-btn:not(.added) text {
+  background:var(--ng-glass-blue-bg); color:var(--ng-soft-blue-text);
+  box-shadow:var(--ng-glass-shadow),inset 0 1rpx 0 rgba(255,255,255,.92);
+}
+page .page .dp-btn.added text {
+  background:rgba(54,85,143,.08); color:var(--ng-soft-blue-text);
+  box-shadow:none;
+}
+page .page .fab-icon, page .page .fab-text {color:var(--ng-soft-blue-text)}
+page .auth-page .primary[disabled] {background:#f1f5f9;color:#94a3b8;box-shadow:none}
+page .page .primary:active, page .auth-page .primary:active,
+page .page .send-btn:active, page .page .rb-btn:active,
+page .page .dpa-btn.pick:active, page .page .repair-generate:active, page .page .repair-apply:active,
+page .page .dpl-btn:active, page .page .dpl-btn-star:active {background:#e6f0ff;color:var(--ng-soft-blue-text);transform:scale(.97)}
+page .page .dp-btn:not(.added):active text {background:#e6f0ff;color:var(--ng-soft-blue-text)}
+page .page .hero-route-card {background:#fff;border-color:transparent;box-shadow:var(--ng-glass-shadow)}
+page .page .hrc-title, page .page .hrc-label, page .page .hrc-arrow {color:var(--ng-text)}
+page .page .route-detail-wash {background:linear-gradient(to bottom,rgba(248,250,252,.15),rgba(248,250,252,.85) 30%,#f8fafc 65%)}
+page .page .scenic-veil {background:linear-gradient(to bottom,transparent 25%,rgba(248,250,252,.7) 65%,#f8fafc)}
+page .page .gc-preview {background:#fff;color:#4338ca;box-shadow:var(--ng-glass-shadow)}
+page .page .hm-icon, page .page .hm-text, page .page .hb-unit {color:var(--ng-secondary)}
+
+/* Unified Web visitor design: restrained surfaces and consistent control states. */
+page {--ng-success:#059669;--ng-danger:#e11d48;--ng-control:#f1f5f9;}
+page .page .nav {border-bottom:1rpx solid var(--ng-border);}
+page .page .block, page .page .menu-group, page .page .card,
+page .page .summary-card, page .page .rank-block, page .page .history-detail,
+page .page .ss-card, page .page .spot-card, page .page .guide-card,
+page .page .map-card, page .page .tl-card {border:1rpx solid var(--ng-border);border-radius:32rpx;box-shadow:var(--ng-glass-shadow);}
+page .page .search-input, page .page .msg-input {background:var(--ng-night);border:1rpx solid var(--ng-border);border-radius:20rpx;}
+page .page .primary, page .auth-page .primary, page .page .selection-next,
+page .page .send-btn, page .page .planner-generate {border-radius:20rpx;background:var(--ng-accent);color:#fff;}
+page .page .primary[disabled], page .page .send-btn[disabled],
+page .page .selection-next[disabled] {background:#e2e8f0;color:#64748b;box-shadow:none;}
+page .page .tt-item, page .page .pref-chip, page .page .qh-chip {border-radius:18rpx;background:#fff;border:1rpx solid var(--ng-border);color:var(--ng-secondary);}
+page .page .tt-item.on, page .page .pref-chip.on, page .page .pref-chip.selected {background:var(--ng-raised);border-color:#a5b4fc;color:var(--ng-accent-text);box-shadow:none;}
+page .page .guide-card.on, page .page .spot-card.on {border-color:var(--ng-accent);box-shadow:0 0 0 2rpx #c7d2fe;}
+page .page .msg-bubble.ai, page .page .msg-bubble.guide {border-radius:8rpx 28rpx 28rpx 28rpx;box-shadow:0 8rpx 24rpx -12rpx rgba(30,41,59,.1);}
+page .page .msg-bubble.user {border-radius:28rpx 8rpx 28rpx 28rpx;background:var(--ng-raised);border-color:#c7d2fe;}
+page .page .drawer-panel {border-radius:32rpx 32rpx 0 0;}
+page .page .hrc-name {color:var(--ng-text);}
+/* Photo overlays need white text even in a light interface. */
+page .page .rc-tag, page .page .rc-time, page .page .rc-name,
+page .page .rc-meta, page .page .route-carousel .route-cover-note,
+page .page .route-arrow, page .page .route-arrow .iconfont {color:#fff;}
+page .page .tb-root {box-shadow:0 -8rpx 32rpx rgba(30,41,59,.04);}
+page .page .tb-hl-ring.on {background:var(--ng-raised);border:0;box-shadow:none;}
+
+/* Keep every page on the same fixed lavender background as the login screen. */
+page .page .top-tabs .tt-item{background:transparent;border:0;border-radius:0;box-shadow:none;color:var(--ng-secondary);}
+page .page .top-tabs .tt-item.on{background:transparent;border:0;box-shadow:none;color:var(--ng-accent-text);}
+page{background:#e5dcff;background-image:linear-gradient(135deg,#e5dcff 0%,#f8f9ff 52%,#dff4fb 100%);background-attachment:fixed;background-size:100vw 100vh;}
+page .page .aurora-background,
+page .auth-page .aurora-background,
+page .page .ambient-field,
+page .auth-page .ambient-field{background:linear-gradient(135deg,#e5dcff 0%,#f8f9ff 52%,#dff4fb 100%)!important;}
+/* Selected spots and the itinerary CTA use the same pale blue as the light action buttons. */
+page .page .spot-card.on{background:var(--ng-glass-blue-bg);border:2rpx solid transparent;box-shadow:var(--ng-glass-shadow),inset 0 1rpx 0 rgba(255,255,255,.92);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+page .page .dpa-btn.start{background:var(--ng-glass-blue-bg);color:var(--ng-soft-blue-text);border:0;box-shadow:var(--ng-glass-shadow),inset 0 1rpx 0 rgba(255,255,255,.92);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+page .page .dpa-btn.start:active{background:rgba(230,240,255,.8);color:var(--ng-soft-blue-text);}

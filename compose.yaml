@@ -1,0 +1,64 @@
+name: zhiyou-zhijing
+services:
+  database:
+    container_name: zhiyou-zhijing-database
+    image: postgres:16.4
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER:-postgres}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}"
+      POSTGRES_DB: "${POSTGRES_DB:-streamer_sales_db}"
+    ports:
+      - "127.0.0.1:${POSTGRES_PORT:-25432}:5432"
+    volumes:
+      - database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+    restart: unless-stopped
+
+  base:
+    container_name: zhiyou-zhijing-backend
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.web
+    env_file: .env
+    environment:
+      USING_DOCKER_COMPOSE: "true"
+      POSTGRES_SERVER: database
+      POSTGRES_PORT: "5432"
+      FILES_URL_BASE: "${PUBLIC_SERVER_ORIGIN:-http://localhost:18000}/api/v1"
+    volumes:
+      - ./static:/workspace/zhiyou-zhijing/static
+      - ./work_dirs:/workspace/zhiyou-zhijing/work_dirs
+    ports:
+      - "${BACKEND_PORT:-18000}:8000"
+    depends_on:
+      database:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/openapi.json', timeout=5)"]
+      interval: 20s
+      timeout: 8s
+      start_period: 30s
+      retries: 5
+    restart: unless-stopped
+
+  web:
+    container_name: zhiyou-zhijing-web
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+      args:
+        VITE_PUBLIC_SERVER_ORIGIN: "${PUBLIC_SERVER_ORIGIN:?Set the LAN backend origin for mobile pickup}"
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      base:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  database:
+    name: zhiyou-zhijing-postgres

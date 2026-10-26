@@ -1,0 +1,510 @@
+{
+  "checked_at": "2026-10-11",
+  "note": "Verified means evidence present in this repository; missing source requires follow-up, not proof of falsehood. Image origins, toilets and food venues are not verified.",
+  "spots": [
+    {
+      "name": "锦里古街",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "武侯祠",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "成都欢乐谷",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "西湖",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "灵山大照壁",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "五智门",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "五明桥",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "都江堰",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "九龙灌浴",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "阿育王柱",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "菩提大道",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "成都大熊猫繁育研究基地",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "宽窄巷子",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "黄山",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "佛教文化博览馆",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "无尽意斋",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "灵山大佛",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "张家界",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "九寨沟",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "杜甫草堂",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "文殊院",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "香月花街",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "拈花堂",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "鹿鸣谷",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "青城山",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "金沙遗址博物馆",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "佛足坛",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "降魔浮雕",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "鼓浪屿",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "长城(八达岭)",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "兵马俑",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "苏州园林",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "百子戏弥勒",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "祥符禅寺",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "曼飞龙塔",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "桂林漓江",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "故宫博物院",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "灵山梵宫",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "五印坛城",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "拈花广场",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "梵天花海",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "五灯湖",
+      "image_exists": true,
+      "coordinate_source": "",
+      "preference_basis": {},
+      "service_text": "",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "长廊",
+      "image_exists": true,
+      "coordinate_source": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=215738&y=99244&z=18",
+      "preference_basis": {
+        "history": "传统建筑彩画与人物故事",
+        "nature": "临湖廊道与湖山借景",
+        "photography": "连续廊柱的透视构图",
+        "family": "一起寻找彩画中的人物故事"
+      },
+      "service_text": "长廊沿线设有多处座椅和休息空间，附近主要游览节点可查找卫生间、商店与导览标识，位置以园内指示为准。",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "佛香阁",
+      "image_exists": true,
+      "coordinate_source": "https://www.openstreetmap.org/way/43977851",
+      "preference_basis": {
+        "history": "万寿山中轴与佛教建筑",
+        "nature": "登高观察湖山格局",
+        "photography": "高处俯瞰昆明湖"
+      },
+      "service_text": "佛香阁区域台阶较多，山下主要节点设有休息和导览设施；需要卫生间或商店时建议先在长廊沿线确认位置。",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "仁寿殿",
+      "image_exists": true,
+      "coordinate_source": "https://www.openstreetmap.org/way/43977911",
+      "preference_basis": {
+        "history": "宫廷理政空间与殿前陈设"
+      },
+      "service_text": "仁寿殿靠近东宫门入口服务区，附近可找到游客咨询、卫生间和短暂停留区域；具体开放位置以现场导览牌为准。",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "昆明湖",
+      "image_exists": true,
+      "coordinate_source": "https://www.openstreetmap.org/way/43977862",
+      "preference_basis": {
+        "nature": "知春亭岸边观察湖面与水岸",
+        "photography": "湖面倒影与万寿山远景",
+        "family": "岸边观察桥、岛与水鸟，注意临水安全"
+      },
+      "service_text": "昆明湖沿岸主要游览节点设有休息座椅、导览牌和游船服务点；卫生间、商店及开放中的码头位置请以现场指示为准。",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "十七孔桥",
+      "image_exists": true,
+      "coordinate_source": "https://www.openstreetmap.org/way/187196435",
+      "preference_basis": {
+        "history": "传统石桥券洞与石栏",
+        "nature": "桥上观看湖面与南湖岛",
+        "photography": "连续桥洞、桥身曲线与倒影",
+        "family": "观察桥洞和石狮的不同形态"
+      },
+      "service_text": "东堤与南湖岛方向均有休息空间和导览标识，卫生间与商店需根据现场开放情况沿东堤查找。",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    },
+    {
+      "name": "苏州街",
+      "image_exists": true,
+      "coordinate_source": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=215740&y=99240&z=18",
+      "preference_basis": {
+        "history": "皇家园林中的江南街市意象",
+        "nature": "后湖水岸与街巷",
+        "photography": "水、桥与沿岸建筑组合"
+      },
+      "service_text": "苏州街游览区设有导览和休息节点，周边卫生间、商店等设施是否开放请以现场公告为准。",
+      "toilet_exact_location_verified": false,
+      "food_venue_verified": false,
+      "image_original_source_verified": false
+    }
+  ]
+}

@@ -1,0 +1,466 @@
+[
+  {
+    "name": "皇家园林经典文化线",
+    "en": "Royal Garden Heritage Journey",
+    "theme": "history",
+    "audience": "初次到访、历史爱好者，愿意登高的游客",
+    "audience_en": "First-time visitors and history lovers comfortable with stairs",
+    "summary": "从宫廷礼制走向山水园林，串联理政、起居、戏曲、彩画与登高观景，完整读懂颐和园。",
+    "summary_en": "Connect court ceremony, royal living, theatre, painted galleries and hillside views for a fuller introduction to the Summer Palace.",
+    "highlights": [
+      "宫廷理政与皇家生活",
+      "长廊彩画与中轴建筑",
+      "登高后回看昆明湖"
+    ],
+    "highlights_en": [
+      "Court affairs and royal life",
+      "Painted galleries and axial architecture",
+      "Hilltop and lakeside perspectives"
+    ],
+    "tips": "佛香阁及万寿山登高区域台阶较多，建议穿防滑鞋；体力不足时，可在长廊后结束或调整行程。园中园开放、票务与排队情况以现场为准。",
+    "tips_en": "The hillside and Tower of Buddhist Incense involve stairs. Wear suitable shoes; shorten the route after the Long Corridor if needed. Check access, tickets and queues on site.",
+    "stops": [
+      [
+        "仁寿殿",
+        "从殿前陈设和院落轴线认识皇家理政空间。",
+        "Read the court axis and forecourt furnishings as a setting for state affairs."
+      ],
+      [
+        "德和园",
+        "观察大戏楼与庭院的关系，理解宫廷观演活动。",
+        "Explore the theatre building and its relationship with the surrounding courtyards."
+      ],
+      [
+        "玉澜堂",
+        "结合院落布局了解帝后驻园时期的生活空间。",
+        "Use the courtyard layout to understand royal residential life."
+      ],
+      [
+        "乐寿堂",
+        "从生活起居转入临湖园林，留意庭院陈设。",
+        "Notice how residential courtyards connect to the lakeside garden."
+      ],
+      [
+        "长廊",
+        "选择几间彩画细看，再以廊柱框取湖景。",
+        "Study selected painted bays and frame lake views between the columns."
+      ],
+      [
+        "排云殿",
+        "沿院落与台阶认识前山建筑中轴。",
+        "Follow courtyards and steps to understand the front-hill architectural axis."
+      ],
+      [
+        "佛香阁",
+        "辨认登高后的湖、堤、桥与建筑层次。",
+        "Look for the lake, causeways, bridges and building layers from higher ground."
+      ],
+      [
+        "昆明湖",
+        "回到湖岸休整，以湖山关系收束游览。",
+        "Return to the shore and reflect on the relationship between lake and hill."
+      ]
+    ],
+    "key": "summer-palace-1",
+    "sources": [
+      "https://www.summerpalace.net.cn/scenic.html"
+    ],
+    "cover_spot": "佛香阁"
+  },
+  {
+    "name": "昆明湖摄影漫游线",
+    "en": "Kunming Lake Photography Trail",
+    "theme": "photography",
+    "audience": "摄影爱好者、希望慢看湖岸风景的游客",
+    "audience_en": "Photographers and visitors who enjoy an extended lakeside walk",
+    "summary": "以廊柱、石舫、拱桥和湖岸为画面线索，沿西侧湖岸转向桥岛与东岸，体验远景、倒影和建筑细节的变化。",
+    "summary_en": "Follow gallery frames, the Marble Boat and arched bridges around the lake, moving from western shores to the island and eastern waterfront.",
+    "highlights": [
+      "廊柱取景与石舫细节",
+      "西堤桥影与水面倒影",
+      "桥岛景观与东岸收尾"
+    ],
+    "highlights_en": [
+      "Gallery frames and boat details",
+      "West-bank bridges and reflections",
+      "Island views and eastern waterfront"
+    ],
+    "tips": "这是步行较长的摄影路线，建议预留半天并分段休息；南湖岛为往返支线，需要经十七孔桥返回。日照、倒影和拍摄条件受天气影响，不保证特定光影效果。",
+    "tips_en": "Allow a half day with breaks for this longer photography walk. South Lake Island requires returning across the Seventeen-Arch Bridge. Light and reflections depend on conditions.",
+    "stops": [
+      [
+        "长廊",
+        "利用柱列透视拍摄人物或框取湖面。",
+        "Use column perspectives for portraits and framed lake views."
+      ],
+      [
+        "石舫",
+        "观察船形建筑的层次与临水倒影。",
+        "Study the boat-shaped building and its waterside reflections."
+      ],
+      [
+        "玉带桥",
+        "从岸边安全位置拍摄高拱与倒影。",
+        "Photograph the high arch and reflection from a safe shore position."
+      ],
+      [
+        "十七孔桥",
+        "在桥岸两端比较桥孔节奏与湖面背景。",
+        "Compare the rhythm of the arches and lake backdrop from the shore."
+      ],
+      [
+        "南湖岛",
+        "转向万寿山方向，寻找湖山远景层次。",
+        "Look toward Longevity Hill for layered views across the water."
+      ],
+      [
+        "铜牛",
+        "以铜牛与湖岸为前景，避免倚靠或触碰文物。",
+        "Use the ox and lakeshore as foreground elements without touching the sculpture."
+      ],
+      [
+        "文昌阁",
+        "以楼阁、岸线和水面关系结束摄影行程。",
+        "Finish with the pavilion, shoreline and water in one composition."
+      ]
+    ],
+    "key": "summer-palace-2",
+    "sources": [
+      "https://www.summerpalace.net.cn/scenic.html"
+    ],
+    "cover_spot": "玉带桥"
+  },
+  {
+    "name": "亲子湖山体验线",
+    "en": "Family Garden Discovery Trail",
+    "theme": "family",
+    "audience": "亲子家庭、偏好院落与湖岸体验的游客",
+    "audience_en": "Families and visitors who prefer courtyards and lakeside experiences",
+    "summary": "以看建筑、找图案、听故事为主，串联东部宫廷生活区和长廊湖岸，减少集中登高，把游览变成可停可看的观察游戏。",
+    "summary_en": "Turn royal courtyards and the lakeside gallery into an observation trail, with stories, decorative patterns and pauses instead of a concentrated hill climb.",
+    "highlights": [
+      "院落里的建筑观察",
+      "戏楼、窗棂与彩画寻趣",
+      "湖岸休息与亲子交流"
+    ],
+    "highlights_en": [
+      "Courtyard observation",
+      "Theatre, latticework and painted bays",
+      "Lakeside pauses together"
+    ],
+    "tips": "可让孩子每站挑选一种图案并说出发现；长廊之后留出休息时间。不把路线视为无障碍认证，推车通过、院落开放与现场拥挤情况仍需确认。",
+    "tips_en": "Invite children to spot a motif at each stop and leave time for a lakeside break. This is not a certified accessible route; check stroller access, opening and crowd conditions locally.",
+    "stops": [
+      [
+        "仁寿殿",
+        "一起寻找殿前陈设，分辨建筑的正面与轴线。",
+        "Spot forecourt objects and identify the main building axis together."
+      ],
+      [
+        "德和园",
+        "看看戏楼有几层，讨论古人在哪里看戏。",
+        "Observe the theatre levels and discuss how an audience watched performances."
+      ],
+      [
+        "玉澜堂",
+        "观察窗棂和院落，比较不同空间的用途。",
+        "Compare lattice patterns and the uses of different courtyard spaces."
+      ],
+      [
+        "乐寿堂",
+        "从庭院陈设发现皇家生活的细节。",
+        "Discover details of royal daily life through courtyard furnishings."
+      ],
+      [
+        "长廊",
+        "挑选几间画面清楚的彩画，寻找花鸟山水。",
+        "Choose clear painted bays and look for flowers, birds and landscapes."
+      ],
+      [
+        "昆明湖",
+        "在允许停留的湖岸休息，复述今天最喜欢的发现。",
+        "Pause at an appropriate shore location and share favourite discoveries."
+      ]
+    ],
+    "key": "summer-palace-3",
+    "sources": [
+      "https://www.summerpalace.net.cn/scenic.html"
+    ],
+    "cover_spot": "长廊"
+  },
+  {
+    "name": "后湖江南寻趣线",
+    "en": "Back Lake and Jiangnan Gardens",
+    "theme": "nature",
+    "audience": "喜欢园林构景、水街与慢游的游客",
+    "audience_en": "Visitors interested in waterside streets and intimate garden scenes",
+    "summary": "从苏州街的水镇意象出发，比较谐趣园的小尺度园景、宫廷院落与长廊湖景，最后在石舫收束由静到阔的游览。",
+    "summary_en": "Start with Suzhou Street, contrast intimate garden scenes with palace courtyards, then move into broad lakeside views and finish at the Marble Boat.",
+    "highlights": [
+      "后湖水街的江南意象",
+      "园中园与庭院尺度对比",
+      "长廊到石舫的湖岸过渡"
+    ],
+    "highlights_en": [
+      "Jiangnan-style waterside streets",
+      "Intimate gardens and palace courtyards",
+      "Gallery-to-boat lakeside transition"
+    ],
+    "tips": "后湖及部分院落有台阶、水岸高差和较窄通道，雨后注意脚下；苏州街经营、入内游览与票务条件以现场为准。",
+    "tips_en": "Expect steps, waterside level changes and narrow passages in parts of the Back Lake area. Take care after rain and check local access and ticket conditions.",
+    "stops": [
+      [
+        "苏州街",
+        "观察桥、水、街和铺面如何形成水镇场景。",
+        "See how bridges, water, streets and shopfronts create a waterside town scene."
+      ],
+      [
+        "谐趣园",
+        "比较小桥、亭廊与水面的近距离构景。",
+        "Compare intimate compositions of bridges, pavilions and water."
+      ],
+      [
+        "乐寿堂",
+        "从较私密的庭院过渡到皇家生活区。",
+        "Move from intimate garden scenes into royal residential courtyards."
+      ],
+      [
+        "长廊",
+        "在廊道中观察视线怎样不断转向湖面。",
+        "Notice how the gallery repeatedly opens views toward the lake."
+      ],
+      [
+        "石舫",
+        "以临水建筑和开阔水面结束观察。",
+        "Finish by comparing a waterside building with the open lake."
+      ]
+    ],
+    "key": "summer-palace-4",
+    "sources": [
+      "https://www.summerpalace.net.cn/scenic.html"
+    ],
+    "cover_spot": "谐趣园"
+  },
+  {
+    "name": "皇家建筑登高线",
+    "en": "Royal Architecture and Hill Views",
+    "theme": "history",
+    "audience": "古建筑爱好者、体力较好的游客",
+    "audience_en": "Architecture enthusiasts comfortable with a sustained hill walk",
+    "summary": "沿东部宫廷、长廊和前山中轴逐层展开，比较院落、殿堂与楼阁的空间变化，兼顾建筑细读与登高远眺。",
+    "summary_en": "Trace a progression from palace courtyards through the Long Corridor to the front-hill axis, combining architectural observation with elevated views.",
+    "highlights": [
+      "宫廷与居住院落对比",
+      "排云殿前山中轴",
+      "佛香阁登高与后段园景"
+    ],
+    "highlights_en": [
+      "Court and residential courtyards",
+      "Front-hill axis at Paiyun Hall",
+      "Tower ascent and garden contrasts"
+    ],
+    "tips": "包含连续台阶与登高段，建议按体力安排停留，不适合追求少走路的行程；可通过调整路线跳过登高景点，开放及登临条件以现场为准。",
+    "tips_en": "This route includes sustained steps and climbing. Adjust stops to your stamina; use itinerary adjustments to skip the ascent if necessary, and check on-site access.",
+    "stops": [
+      [
+        "仁寿殿",
+        "从理政院落理解皇家建筑的秩序感。",
+        "Read spatial order in the administrative courtyard."
+      ],
+      [
+        "乐寿堂",
+        "比较生活院落与理政院落的尺度和陈设。",
+        "Compare the scale and furnishings of residential and administrative courtyards."
+      ],
+      [
+        "长廊",
+        "观察廊柱、梁枋与湖山构景的关系。",
+        "Study columns and beams in relation to framed landscape views."
+      ],
+      [
+        "排云殿",
+        "沿门、院、殿的递进辨认建筑中轴。",
+        "Follow the sequence of gates, courtyards and halls along the axis."
+      ],
+      [
+        "佛香阁",
+        "从不同高度比较楼阁、台基与湖面关系。",
+        "Compare the tower, platform and lake from changing elevations."
+      ],
+      [
+        "谐趣园",
+        "以小尺度园中园对比前山的大尺度建筑。",
+        "Contrast an intimate garden with the monumental front-hill architecture."
+      ]
+    ],
+    "key": "summer-palace-5",
+    "sources": [
+      "https://www.summerpalace.net.cn/scenic.html"
+    ],
+    "cover_spot": "排云殿"
+  },
+  {
+    "name": "西堤桥影慢游线",
+    "en": "West Causeway Bridges and Reflections",
+    "theme": "nature",
+    "audience": "湖景爱好者、愿意长距离慢走的游客",
+    "audience_en": "Lake-view enthusiasts comfortable with a longer, unhurried walk",
+    "summary": "沿长廊与西侧湖岸展开，以石舫、玉带桥和桥岛为连续观察对象，适合把时间留给水面、桥景和岸边停留。",
+    "summary_en": "Take an extended waterfront walk from the gallery toward the Marble Boat, Jade Belt Bridge and island, leaving time for bridges, water and shore-side pauses.",
+    "highlights": [
+      "西侧湖岸连续漫步",
+      "高拱桥与临水建筑",
+      "东岸铜牛到桥岛支线"
+    ],
+    "highlights_en": [
+      "Extended western waterfront walk",
+      "High arches and waterside buildings",
+      "Eastern shore and island branch"
+    ],
+    "tips": "“慢游”指观察节奏，并不代表步行距离短。西堤与东岸之间步行较长，应预留休息；本方案按步道计算，不包含游船捷径，南湖岛需原桥返回。",
+    "tips_en": "Unhurried does not mean short: allow breaks for the longer transfer between western and eastern shores. Distances follow footpaths and exclude boat shortcuts. Return from the island over the same bridge.",
+    "stops": [
+      [
+        "长廊",
+        "先认识湖岸与万寿山的整体关系。",
+        "Begin with the overall relationship between lakeshore and hill."
+      ],
+      [
+        "石舫",
+        "停看船形建筑与沿岸视角的变化。",
+        "Pause to study the boat-shaped building from shore-side viewpoints."
+      ],
+      [
+        "玉带桥",
+        "比较高拱、堤岸与水面倒影的轮廓。",
+        "Compare the outlines of the high arch, causeway and reflections."
+      ],
+      [
+        "铜牛",
+        "回到东岸，以铜牛为观察湖山的前景。",
+        "On the eastern shore, use the ox as foreground for lake and hill views."
+      ],
+      [
+        "十七孔桥",
+        "沿桥感受桥孔、栏杆与开阔水面的节奏。",
+        "Observe the rhythm of arches, balustrades and open water."
+      ],
+      [
+        "南湖岛",
+        "从岛岸回望万寿山，停留后返回桥岸。",
+        "Look back toward Longevity Hill before returning across the bridge."
+      ]
+    ],
+    "key": "summer-palace-6",
+    "sources": [
+      "https://www.summerpalace.net.cn/scenic.html"
+    ],
+    "cover_spot": "石舫"
+  },
+  {
+    "name": "宫廷生活细读线",
+    "en": "Royal Life and Courtyard Stories",
+    "theme": "history",
+    "audience": "偏好人文故事、希望减少登高的游客",
+    "audience_en": "Visitors who prefer court stories and less climbing",
+    "summary": "围绕理政、戏曲、起居与日常生活深入游览东部宫廷区，再到长廊对照园林中的休憩与赏景活动。",
+    "summary_en": "Explore government, theatre and residential life in the eastern palace area before contrasting formal courtyards with leisure along the gallery.",
+    "highlights": [
+      "理政、观演、起居三种功能",
+      "院落陈设与建筑细节",
+      "从宫廷秩序走入湖岸园林"
+    ],
+    "highlights_en": [
+      "Government, theatre and residence",
+      "Courtyard furnishings and details",
+      "From court order to garden leisure"
+    ],
+    "tips": "路线重点在建筑功能与院落观察，资料中的人物活动要区分历史时期；殿内开放、演出与票务并非本路线承诺内容，请查看现场说明。",
+    "tips_en": "Focus on building functions and courtyard observation, distinguishing different historical periods. Interior access, performances and tickets are not guaranteed by this plan.",
+    "stops": [
+      [
+        "仁寿殿",
+        "梳理理政与接见功能，观察殿前空间。",
+        "Explore administrative and reception functions through the forecourt."
+      ],
+      [
+        "德和园",
+        "理解宫廷戏曲与观演空间的关系。",
+        "Explore how court theatre related to its audience spaces."
+      ],
+      [
+        "玉澜堂",
+        "从院落、窗棂与通道观察居住空间。",
+        "Study residential space through courtyards, latticework and passages."
+      ],
+      [
+        "乐寿堂",
+        "比较居住、陈设与临湖园景的联系。",
+        "Compare residential furnishings with the adjoining lakeside garden."
+      ],
+      [
+        "长廊",
+        "以彩画和廊外湖景结束宫廷生活主题。",
+        "Finish with painted scenes and the lake beyond the gallery."
+      ]
+    ],
+    "key": "summer-palace-7",
+    "sources": [
+      "https://www.summerpalace.net.cn/scenic.html"
+    ],
+    "cover_spot": "仁寿殿"
+  },
+  {
+    "name": "东岸湖光精华线",
+    "en": "Eastern Shore and Island Highlights",
+    "theme": "photography",
+    "audience": "半日游客、首次到访且偏好湖岸取景的人群",
+    "audience_en": "Half-day visitors and first-timers interested in eastern-shore views",
+    "summary": "从东部宫廷空间转入文昌阁与铜牛湖岸，再经十七孔桥抵达南湖岛，把建筑、地标与开阔湖景连成一段完整体验。",
+    "summary_en": "Move from the eastern palace area past Wenchang Pavilion and the Bronze Ox, then cross the Seventeen-Arch Bridge for island and lake views.",
+    "highlights": [
+      "宫廷建筑与城式楼阁",
+      "铜牛与十七孔桥地标",
+      "南湖岛回望湖山"
+    ],
+    "highlights_en": [
+      "Palace and pavilion architecture",
+      "Bronze Ox and iconic bridge",
+      "Island perspectives across the lake"
+    ],
+    "tips": "南湖岛没有在本方案中假定额外出口，游览后需返回十七孔桥；桥上风较大或人多时不要停留堵路，湖岸拍摄请与水边保持安全距离。",
+    "tips_en": "The island is not treated as an extra park exit: return across the bridge after visiting. Avoid blocking the bridge and keep a safe distance from the waterfront.",
+    "stops": [
+      [
+        "仁寿殿",
+        "以宫廷理政建筑建立游园的历史背景。",
+        "Begin with royal administrative architecture as historical context."
+      ],
+      [
+        "文昌阁",
+        "观察城式楼阁与东岸岸线的关系。",
+        "Observe how the fortified pavilion relates to the eastern shoreline."
+      ],
+      [
+        "铜牛",
+        "以湖岸地标引入皇家园林的水景主题。",
+        "Use this shore-side landmark to explore the role of water in the garden."
+      ],
+      [
+        "十七孔桥",
+        "比较桥孔节奏、石雕细节与开阔水景。",
+        "Compare the rhythm of arches, carved details and open lake views."
+      ],
+      [
+        "南湖岛",
+        "从岛岸回望万寿山与前山建筑。",
+        "Look across the lake toward Longevity Hill and its architecture."
+      ]
+    ],
+    "key": "summer-palace-8",
+    "sources": [
+      "https://www.summerpalace.net.cn/scenic.html"
+    ],
+    "cover_spot": "十七孔桥"
+  }
+]

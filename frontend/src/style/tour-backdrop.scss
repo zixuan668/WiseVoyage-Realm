@@ -1,0 +1,42 @@
+/* The landscape belongs to the page backdrop; all content stays above it. */
+html[data-ui-theme='soft-ui'] {
+  :is(.tour-interaction-container, .mt-root) {
+    isolation: isolate;
+    background:
+      radial-gradient(ellipse at 0% 8%, rgba(149, 184, 210, .24), transparent 58%),
+      radial-gradient(ellipse at 100% 88%, rgba(139, 200, 179, .22), transparent 56%),
+      linear-gradient(135deg, #e8eff5 0%, #edf3f5 46%, #e3f0ed 100%) !important;
+
+    &::before, &::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    &::before {
+      background:
+        radial-gradient(ellipse at 8% 100%, rgba(116, 177, 166, .12), transparent 40%),
+        radial-gradient(ellipse at 94% 0%, rgba(174, 183, 219, .12), transparent 42%);
+    }
+
+    &::after {
+      background-image: url('/images/tour-landscape-outline.svg'), url('/images/tour-landscape-outline.svg');
+      background-repeat: no-repeat;
+      background-position: left -130px bottom -100px, right -160px top -220px;
+      background-size: clamp(560px, 52vw, 1000px) auto, clamp(480px, 44vw, 840px) auto;
+      opacity: .065;
+    }
+  }
+
+  .tour-interaction-container { position: relative; }
+
+  @media (max-width: 600px) {
+    :is(.tour-interaction-container, .mt-root)::after {
+      background-position: left -180px bottom -60px, right -260px top -180px;
+      background-size: 580px auto, 520px auto;
+      opacity: .045;
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "长廊": {
+    "url": "/scenic/enhanced/long-corridor.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2a97956509.jpg",
+    "source": "https://www.summerpalace.net.cn/gallery_detail/369.html"
+  },
+  "昆明湖": {
+    "url": "/scenic/enhanced/kunming-lake.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2a028d9662.jpg",
+    "source": "https://www.summerpalace.net.cn/laka_spot/detail/355.html"
+  },
+  "十七孔桥": {
+    "url": "/scenic/enhanced/seventeen-arch-bridge.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2a285a4be7.jpg",
+    "source": "https://www.summerpalace.net.cn/laka_spot/detail/362.html"
+  },
+  "南湖岛": {
+    "url": "/scenic/enhanced/south-lake-island.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2a1f31940f.jpg",
+    "source": "https://www.summerpalace.net.cn/laka_spot/detail/360.html"
+  },
+  "铜牛": {
+    "url": "/scenic/enhanced/bronze-ox.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2a24891614.jpg",
+    "source": "https://www.summerpalace.net.cn/laka_spot/detail/361.html"
+  },
+  "石舫": {
+    "url": "/scenic/enhanced/marble-boat.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2bb156b8e5.jpg",
+    "source": "https://www.summerpalace.net.cn/laka_spot/detail/413.html"
+  },
+  "仁寿殿": {
+    "url": "/scenic/enhanced/renshou-hall.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b299d58a43c.jpg",
+    "source": "https://www.summerpalace.net.cn/court_life/detail/346.html",
+    "position": "50% 65%"
+  },
+  "德和园": {
+    "url": "/scenic/enhanced/dehe-garden.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2994a79afe.jpg",
+    "source": "https://www.summerpalace.net.cn/court_life/detail/344.html",
+    "position": "center top"
+  },
+  "玉澜堂": {
+    "url": "/scenic/enhanced/yulan-hall.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b29a124201c.jpg",
+    "source": "https://www.summerpalace.net.cn/court_life/detail/347.html",
+    "position": "50% 85%"
+  },
+  "乐寿堂": {
+    "url": "/scenic/enhanced/leshou-hall.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b29ba209a1b.jpg",
+    "source": "https://www.summerpalace.net.cn/court_life/detail/350.html",
+    "position": "50% 70%"
+  },
+  "排云殿": {
+    "url": "/scenic/enhanced/paiyun-hall.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2ada2133d2.jpg",
+    "source": "https://www.summerpalace.net.cn/longevity/detailqianshan/381.html"
+  },
+  "佛香阁": {
+    "url": "/scenic/enhanced/buddhist-incense-tower.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2ae16e5183.jpg",
+    "source": "https://www.summerpalace.net.cn/longevity/detailqianshan/382.html"
+  },
+  "谐趣园": {
+    "url": "/scenic/enhanced/harmonious-interests-garden.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2aabd25637.jpg",
+    "source": "https://www.summerpalace.net.cn/longevity/detailhouhu/372.html"
+  },
+  "苏州街": {
+    "url": "/scenic/enhanced/suzhou-street.jpg",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2ab09556fd.jpg",
+    "source": "https://www.summerpalace.net.cn/longevity/detailhouhu/373.html"
+  },
+  "玉带桥": {
+    "url": "/scenic/enhanced/jade-belt-bridge.jpg",
+    "original_url": "/scenic/jade-belt-bridge.jpg",
+    "source": "User-supplied original photograph"
+  },
+  "文昌阁": {
+    "url": "/scenic/enhanced/wenchang-pavilion.jpg",
+    "original_url": "/scenic/wenchang-pavilion.jpg",
+    "source": "User-supplied original photograph",
+    "position": "70% center"
+  }
+}

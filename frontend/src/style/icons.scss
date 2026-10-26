@@ -1,0 +1,32 @@
+/* One functional icon family, with inherited state colors and restrained feedback. */
+.ui-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: -.125em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: var(--ui-icon-stroke, 1.5px);
+  overflow: visible;
+}
+.el-button .ui-icon,
+.enterprise-menu .is-active .ui-icon { --ui-icon-stroke: 2px; }
+.el-icon > .ui-icon { vertical-align: middle; }
+.collapse-trigger { min-width: 40px; min-height: 40px; }
+.collapse-icon { position: relative; }
+.collapse-icon > .ui-icon {
+  position: absolute; inset: 0; opacity: 0; transform: scale(.25); filter: blur(4px);
+  transition: opacity 150ms cubic-bezier(.2,0,0,1), transform 150ms cubic-bezier(.2,0,0,1), filter 150ms cubic-bezier(.2,0,0,1);
+}
+.collapse-icon > .icon-current { opacity: 1; transform: scale(1); filter: blur(0); }
+.el-button.is-circle { min-width: 40px; min-height: 40px; }
+.station-remove-stop { min-width: 44px; min-height: 44px; }
+button:disabled .ui-icon,
+.el-button.is-disabled .ui-icon { opacity: .45; }
+button:focus-visible .ui-icon,
+.el-button:focus-visible .ui-icon { opacity: 1; }
+[dir='rtl'] .ui-icon[data-icon='arrow-left'],
+[dir='rtl'] .ui-icon[data-icon='arrow-right'],
+[dir='rtl'] .ui-icon[data-icon^='chevron-'] { transform: scaleX(-1); }
+@media (prefers-reduced-motion: reduce) {
+  .ui-icon { transition: none !important; animation: none !important; }
+}

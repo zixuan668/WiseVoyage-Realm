@@ -1,0 +1,360 @@
+{
+  "coordinate_system": "WGS84",
+  "verified_on": "2026-10-12",
+  "source": "AMap named POIs (GCJ02) and zoom-18 basemap landmarks/bridge deck; inverse-converted to WGS84 for storage. Suzhou Street keeps the verified north-bank entrance, Seventeen-Arch Bridge keeps the OSM bridge-deck midpoint (ODbL). Map-symbol calibration, not surveyed GPS control points.",
+  "spots": {
+    "仁寿殿": {
+      "latitude": 39.99651945140004,
+      "longitude": 116.27401085613386,
+      "location": "东宫门内，仁寿殿建筑中心",
+      "source_url": "https://www.amap.com/place/B000A9PIS4",
+      "anchor": "高德同名景点 POI；GCJ02 反算为 WGS84，放大底图复核",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.99775,
+        "longitude": 116.280059,
+        "tile": {
+          "x": 215744,
+          "y": 99244,
+          "z": 18
+        },
+        "pixel": {
+          "x": 142.07039715349674,
+          "y": 100.72856172174215
+        }
+      },
+      "spot_number": 1
+    },
+    "长廊": {
+      "latitude": 39.99664657302224,
+      "longitude": 116.26594853732067,
+      "location": "昆明湖北岸，秋水亭西侧长廊廊道",
+      "source_url": "https://www.amap.com/place/B000AA848H",
+      "anchor": "高德同名景点 POI；GCJ02 反算为 WGS84，放大底图复核",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.997871,
+        "longitude": 116.271991,
+        "tile": {
+          "x": 215738,
+          "y": 99244,
+          "z": 18
+        },
+        "pixel": {
+          "x": 174.0861895158887,
+          "y": 71.28469352424145
+        }
+      },
+      "spot_number": 2
+    },
+    "佛香阁": {
+      "latitude": 39.997863246445554,
+      "longitude": 116.26790228574914,
+      "location": "万寿山前山，佛香阁建筑中心",
+      "source_url": "https://www.amap.com/place/B000A9PJ20",
+      "anchor": "高德同名景点 POI；GCJ02 反算为 WGS84，放大底图复核",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.999089,
+        "longitude": 116.273946,
+        "tile": {
+          "x": 215740,
+          "y": 99243,
+          "z": 18
+        },
+        "pixel": {
+          "x": 26.524603739380836,
+          "y": 30.896403659135103
+        }
+      },
+      "spot_number": 3
+    },
+    "昆明湖": {
+      "latitude": 39.99545462592561,
+      "longitude": 116.27331384860567,
+      "location": "昆明湖东岸，知春亭观景点（非湖心）",
+      "source_url": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=215744&y=99245&z=18",
+      "anchor": "高德 zoom-18 底图：知春亭地标中心，可步行湖景讲解点；GCJ02 反算为 WGS84",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.99668451103781,
+        "longitude": 116.27936124801636,
+        "tile": {
+          "x": 215744,
+          "y": 99245,
+          "z": 18
+        },
+        "pixel": {
+          "x": 12,
+          "y": 104
+        }
+      },
+      "spot_number": 4
+    },
+    "十七孔桥": {
+      "latitude": 39.98948920000001,
+      "longitude": 116.2714667,
+      "location": "十七孔桥桥面中点，连接东堤与南湖岛",
+      "source_url": "https://www.openstreetmap.org/way/187196435",
+      "anchor": "桥面两端节点 266116276、266116275 的中点",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.99071727697728,
+        "longitude": 116.27751184164715,
+        "tile": {
+          "x": 215742,
+          "y": 99251,
+          "z": 18
+        },
+        "pixel": {
+          "x": 179.24566524475813,
+          "y": 19.965957075357437
+        }
+      },
+      "spot_number": 5
+    },
+    "苏州街": {
+      "latitude": 40.00083990174718,
+      "longitude": 116.26792322723945,
+      "location": "后湖北岸，苏州街入口（长桥北侧）",
+      "source_url": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=215740&y=99240&z=18",
+      "anchor": "高德底图苏州街地标中心，北岸入口；由底图 GCJ02 反算 WGS84，替换原河面旅游节点",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 40.00206579681979,
+        "longitude": 116.27396732568741,
+        "tile": {
+          "x": 215740,
+          "y": 99240,
+          "z": 18
+        },
+        "pixel": {
+          "x": 30.5,
+          "y": 74.5
+        }
+      },
+      "spot_number": 6
+    },
+    "乐寿堂": {
+      "latitude": 39.99746905357182,
+      "longitude": 116.27232737197028,
+      "location": "东部生活区，乐寿堂院落",
+      "source_url": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=215743&y=99243&z=18",
+      "anchor": "高德 zoom-18 底图：乐寿堂建筑地标中心；GCJ02 反算为 WGS84",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.998698176601366,
+        "longitude": 116.27837419509888,
+        "tile": {
+          "x": 215743,
+          "y": 99243,
+          "z": 18
+        },
+        "pixel": {
+          "x": 84,
+          "y": 126
+        }
+      },
+      "spot_number": 7
+    },
+    "玉澜堂": {
+      "latitude": 39.996634058358396,
+      "longitude": 116.27326546325602,
+      "location": "仁寿殿西侧，玉澜堂院落",
+      "source_url": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=215744&y=99244&z=18",
+      "anchor": "高德 zoom-18 底图：玉澜堂建筑地标中心；GCJ02 反算为 WGS84",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.997863950929236,
+        "longitude": 116.27931296825409,
+        "tile": {
+          "x": 215744,
+          "y": 99244,
+          "z": 18
+        },
+        "pixel": {
+          "x": 3,
+          "y": 73
+        }
+      },
+      "spot_number": 8
+    },
+    "排云殿": {
+      "latitude": 39.997189218524326,
+      "longitude": 116.26798431967906,
+      "location": "万寿山前山中轴，排云殿",
+      "source_url": "https://www.amap.com/place/B000A9LFS3",
+      "anchor": "高德同名景点 POI；GCJ02 反算为 WGS84，放大底图复核",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.998415,
+        "longitude": 116.274028,
+        "tile": {
+          "x": 215740,
+          "y": 99243,
+          "z": 18
+        },
+        "pixel": {
+          "x": 41.81051164120436,
+          "y": 194.9083109535277
+        }
+      },
+      "spot_number": 9
+    },
+    "谐趣园": {
+      "latitude": 39.99881811267071,
+      "longitude": 116.27554299385653,
+      "location": "万寿山东麓，谐趣园宫门入口",
+      "source_url": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=215745&y=99242&z=18",
+      "anchor": "高德 zoom-18 底图：谐趣园宫门入口，替换原池塘内的区域平均点；GCJ02 反算为 WGS84",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 40.000050175875195,
+        "longitude": 116.28159284591675,
+        "tile": {
+          "x": 215745,
+          "y": 99242,
+          "z": 18
+        },
+        "pixel": {
+          "x": 172,
+          "y": 53
+        }
+      },
+      "spot_number": 10
+    },
+    "石舫": {
+      "latitude": 39.99680090972297,
+      "longitude": 116.26361359094493,
+      "location": "昆明湖北岸，清晏舫（石舫）",
+      "source_url": "https://www.amap.com/place/B000AA21D1",
+      "anchor": "高德同名景点 POI；GCJ02 反算为 WGS84，放大底图复核",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.998024,
+        "longitude": 116.269655,
+        "tile": {
+          "x": 215736,
+          "y": 99244,
+          "z": 18
+        },
+        "pixel": {
+          "x": 250.62422755360603,
+          "y": 34.053942516446114
+        }
+      },
+      "spot_number": 11
+    },
+    "玉带桥": {
+      "latitude": 39.99216687605355,
+      "longitude": 116.26109576654326,
+      "location": "昆明湖西堤，玉带桥桥面",
+      "source_url": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=215735&y=99248&z=18",
+      "anchor": "高德 zoom-18 底图：玉带桥桥面中点，未使用文字标签中心；GCJ02 反算为 WGS84",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.99338854662101,
+        "longitude": 116.26713573932648,
+        "tile": {
+          "x": 215735,
+          "y": 99248,
+          "z": 18
+        },
+        "pixel": {
+          "x": 37,
+          "y": 138
+        }
+      },
+      "spot_number": 12
+    },
+    "南湖岛": {
+      "latitude": 39.99053820872204,
+      "longitude": 116.26998577131857,
+      "location": "南湖岛北侧观景点",
+      "source_url": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=215741&y=99250&z=18",
+      "anchor": "高德 zoom-18 底图：南湖岛北侧观景建筑地标中心；GCJ02 反算为 WGS84",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.99176516403643,
+        "longitude": 116.27602994441986,
+        "tile": {
+          "x": 215741,
+          "y": 99250,
+          "z": 18
+        },
+        "pixel": {
+          "x": 159,
+          "y": 21
+        }
+      },
+      "spot_number": 13
+    },
+    "铜牛": {
+      "latitude": 39.98947099070137,
+      "longitude": 116.27339499160784,
+      "location": "昆明湖东堤，铜牛",
+      "source_url": "https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x=215744&y=99251&z=18",
+      "anchor": "高德 zoom-18 底图：铜牛地标中心；GCJ02 反算为 WGS84",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.99070069729598,
+        "longitude": 116.2794417142868,
+        "tile": {
+          "x": 215744,
+          "y": 99251,
+          "z": 18
+        },
+        "pixel": {
+          "x": 27,
+          "y": 23.99999999627471
+        }
+      },
+      "spot_number": 14
+    },
+    "德和园": {
+      "latitude": 39.997396689462,
+      "longitude": 116.2737030194281,
+      "location": "仁寿殿北侧，德和园",
+      "source_url": "https://www.amap.com/place/B000A96EN1",
+      "anchor": "高德同名景点 POI；GCJ02 反算为 WGS84，放大底图复核",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.998627,
+        "longitude": 116.279751,
+        "tile": {
+          "x": 215744,
+          "y": 99243,
+          "z": 18
+        },
+        "pixel": {
+          "x": 84.65503574162722,
+          "y": 143.32017041370273
+        }
+      },
+      "spot_number": 15
+    },
+    "文昌阁": {
+      "latitude": 39.99532853294191,
+      "longitude": 116.27397603587181,
+      "location": "昆明湖东岸，文昌阁",
+      "source_url": "https://www.amap.com/place/B000A9LFPG",
+      "anchor": "高德同名景点 POI；GCJ02 反算为 WGS84，放大底图复核",
+      "map_reference": {
+        "coordinate_system": "GCJ02",
+        "latitude": 39.996559,
+        "longitude": 116.280024,
+        "tile": {
+          "x": 215744,
+          "y": 99245,
+          "z": 18
+        },
+        "pixel": {
+          "x": 135.54592426866293,
+          "y": 134.54104235768318
+        }
+      },
+      "spot_number": 16
+    }
+  },
+  "catalog_source_url": "https://zyk.bjhd.gov.cn/kjhd/lyhd/201810/t20181023_4530788_hd.shtml"
+}

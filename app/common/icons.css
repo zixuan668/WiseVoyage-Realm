@@ -1,0 +1,52 @@
+/* Functional icons retain the surrounding text color and a stable optical box. */
+page .page .nav-back,
+page .page .nav-end,
+page .page .ss-arrow,
+page .page .nav-history,
+page .page .hp-close,
+page .page .about-close,
+page .page .stop-remove,
+page .page .drag-handle,
+page .page .select-close { min-width:44px;min-height:44px;box-sizing:border-box; }
+page .page .nav-scan,
+page .page .route-arrow,
+page .page .msg-voice-btn { min-width:44px;min-height:44px; }
+page .page .mi-icon.iconfont { font-size:20px; }
+page .page .nav-back.iconfont,
+page .page .nav-back .iconfont,
+page .page .nav-end .iconfont,
+page .page .ss-arrow .iconfont,
+page .page .about-close .iconfont,
+page .page .hp-close .iconfont,
+page .page .photo-add .iconfont,
+page .page .stop-remove .iconfont { font-size:22px; }
+page .page .mi-arrow.iconfont { font-size:18px; }
+page .page .playback-glyph { font-size:22px;vertical-align:middle; }
+page .page .msg-speaker .playback-glyph { margin:4px; }
+page .page .c-like.liked .iconfont { color:var(--ng-accent-text); }
+page .page .liquid-pop .tb-icon { animation:none; }
+page .page .iconfont { pointer-events:none; }
+page .page .nav-back.iconfont,
+page .page .dp-close.iconfont { pointer-events:auto; }
+page .page [role='button']:focus-visible { outline:2px solid currentColor;outline-offset:3px; }
+@media(prefers-reduced-motion:reduce){page .page .iconfont{animation:none!important;transition:none!important}}
+
+/* Text actions need the same touch area as icon actions, without resizing their text. */
+page .page .sc-btn,
+page .page .sc-body,
+page .page .lang-btn,
+page .page .nav-clear,
+page .page .hp-clear,
+page .page .planning-back,
+page .page .voice-btn,
+page .page .history-rating-link { min-height:44px;min-width:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:center; }
+page .page .sc-btn {flex-shrink:0;touch-action:manipulation}
+page .page .sc-body {justify-content:flex-start}
+page .page .lang-btn {height:44px}
+page .page .hp-head {gap:8px;flex-wrap:wrap}
+page .page .hp-actions {margin-left:auto}
+page .page .planning-back {top:0}
+page .auth-page .auth-lang,
+page .auth-page .register-row {min-height:44px;min-width:44px;box-sizing:border-box}
+page .auth-page .auth-lang {width:44px;height:44px}
+page .auth-page .register-row {align-items:center}

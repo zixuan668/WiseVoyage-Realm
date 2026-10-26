@@ -1,0 +1,12 @@
+{
+  "name": "tour-guide-app",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@dcloudio/uni-app": "latest",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "playwright-core": "1.56.1"
+  }
+}

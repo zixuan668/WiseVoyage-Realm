@@ -1,0 +1,6 @@
+/* The service station owns its responsive canvas. */
+html:has(.station-app), body:has(.station-app), #app:has(.station-app) {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+html:has(.station-app) { scrollbar-gutter: stable; }

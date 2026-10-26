@@ -1,0 +1,3 @@
+# Resource manifests and the reviewed SDK hash use the exact repository bytes.
+/static/** -text
+/app/static/sdk/*.js -text

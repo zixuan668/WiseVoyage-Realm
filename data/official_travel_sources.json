@@ -1,0 +1,688 @@
+{
+  "checked_at": "2026-10-11",
+  "policy": "按事实和适用范围引用；来源覆盖不等于全部内容核实；不计算无坐标的最近设施。",
+  "sources": [
+    {
+      "spots": [
+        "仁寿殿",
+        "长廊",
+        "佛香阁",
+        "昆明湖",
+        "十七孔桥",
+        "苏州街"
+      ],
+      "publisher": "颐和园",
+      "url": "https://www.summerpalace.net.cn/guide_map.html",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "park_level",
+      "verified_claims": {
+        "toilet": "官方导览地图可查看卫生间和第三卫生间标识。地图中的具体点位未在本项目提取，不能计算最近厕所。",
+        "service": "官方导览地图包含游客服务中心、码头及无障碍线路。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "仁寿殿",
+        "长廊",
+        "佛香阁",
+        "昆明湖",
+        "十七孔桥",
+        "苏州街"
+      ],
+      "publisher": "北京市公园管理中心",
+      "url": "https://gygl.beijing.gov.cn/mlgy/mlgy_lsmy/201911/t20191129_732237.html",
+      "checked_at": "2026-10-11",
+      "published_at": "2019-11-29",
+      "scope": "park_level",
+      "verified_claims": {
+        "history": "颐和园由清漪园发展而来，是北京海淀的皇家园林。",
+        "transport": "官方介绍列出地铁4号线等到园交通。旧页面中的公交线路需出行前重新确认。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "故宫博物院"
+      ],
+      "publisher": "故宫博物院",
+      "url": "https://www.dpm.org.cn/Visit.html",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "specific",
+      "verified_claims": {
+        "transport": "参观入口为午门，参观结束由神武门或东华门离开；没有专用停车场，建议公共交通。",
+        "toilet": "官方服务设施地图提供卫生间和母婴室类别，具体最近位置需在地图确认。",
+        "food": "官方服务设施地图提供餐饮类别，未提取具体商户。",
+        "photography": "展厅通常限制闪光灯及三脚架，是否允许摄影应服从具体展厅标识。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "兵马俑"
+      ],
+      "publisher": "秦始皇帝陵博物院",
+      "url": "https://bmy.com.cn/guide/",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "specific",
+      "verified_claims": {
+        "history": "博物院包含兵马俑博物馆与秦始皇陵考古遗址公园两部分。",
+        "transport": "两处参观区域可乘免费摆渡车往返；外部交通请查官方交通路线栏目。",
+        "service": "官方便民服务栏目提供轮椅、母婴室、饮水处及医务室信息。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "成都大熊猫繁育研究基地"
+      ],
+      "publisher": "成都大熊猫繁育研究基地",
+      "url": "https://www.panda.org.cn/yd/service/notice/",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "specific",
+      "verified_claims": {
+        "service": "西大门和南大门游客中心提供寄存、母婴室和便民设施借用，园内设有饮水点。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "成都大熊猫繁育研究基地"
+      ],
+      "publisher": "成都大熊猫繁育研究基地",
+      "url": "https://www.panda.org.cn/cn/service/",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "specific",
+      "verified_claims": {
+        "location": "地址为成都市成华区熊猫大道1375号。",
+        "food": "官网有餐饮购物和出行方式服务入口，具体餐厅及最近位置未在本项目核实。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "成都欢乐谷"
+      ],
+      "publisher": "成都欢乐谷",
+      "url": "https://cd.happyvalley.cn/traffic.aspx",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "specific",
+      "verified_claims": {
+        "transport": "地铁6号线西华大道站D出口可步行前往；官网列出停车场入口为2号和3号门。",
+        "location": "成都市金牛区西华大道16号。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "金沙遗址博物馆"
+      ],
+      "publisher": "成都金沙遗址博物馆",
+      "url": "https://www.jinshasitemuseum.com/site-75/node/300",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "specific",
+      "verified_claims": {
+        "food": "馆内餐饮吧位于陈列馆负一层出口处，提供套餐、茶饮和咖啡；营业安排需当日确认。",
+        "service": "南门游客中心提供导览服务；官方列明南门地址为金沙遗址路2号。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "杜甫草堂"
+      ],
+      "publisher": "成都杜甫草堂博物馆",
+      "url": "https://www.cddfct.cn/",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "specific",
+      "verified_claims": {
+        "location": "成都市青羊区青华路37号。",
+        "history": "官网提供杜甫诗歌、园林展览及基本陈列介绍。",
+        "service": "官网有交通路线、地图导览和便民服务入口，具体厕所位置未提取。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "都江堰",
+        "青城山"
+      ],
+      "publisher": "联合国教科文组织世界遗产中心",
+      "url": "https://whc.unesco.org/zh/list/1001",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "heritage_property",
+      "verified_claims": {
+        "history": "都江堰灌溉工程始建于公元前3世纪，至今发挥水利作用；青城山与道教及古庙建筑有关。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "苏州园林"
+      ],
+      "publisher": "苏州市园林和绿化管理局",
+      "url": "https://ylj.suzhou.gov.cn/szsylj/ylgk/nav_wztt.shtml",
+      "checked_at": "2026-10-11",
+      "published_at": "2026-04-02",
+      "scope": "destination_level",
+      "verified_claims": {
+        "history": "拙政园、留园等九座古典园林分批列入世界遗产名录。",
+        "planning": "苏州园林是多个园林的集合，交通、厕所和购票需指定实际园林，不能按单一景点回答。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "苏州园林"
+      ],
+      "publisher": "苏州市园林和绿化管理局",
+      "url": "https://ylj.suzhou.gov.cn/szsylj/ryxz/nav_list.shtml",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "destination_level",
+      "verified_claims": {
+        "service": "官方分别提供拙政园、留园、狮子林等园林的入园须知。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "黄山"
+      ],
+      "publisher": "黄山市人民政府／黄山市交通运输局",
+      "url": "https://www.huangshan.gov.cn/zwgk/public/6615714/12046082.html",
+      "checked_at": "2026-10-11",
+      "published_at": "2026-04-28",
+      "scope": "specific",
+      "verified_claims": {
+        "transport": "可通过黄山旅游官方平台的交通预订入口查询与购买交通客票；具体班次需实时查询。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "九寨沟"
+      ],
+      "publisher": "九寨沟景区管理方",
+      "url": "https://en.jiuzhai.com/index.php/plan-your-trip/getting-around-the-park",
+      "checked_at": "2026-10-11",
+      "published_at": "2015-07-27",
+      "scope": "specific",
+      "verified_claims": {
+        "transport": "官方介绍园内观光巴士与步行栈道两种游览方式。旧页面的时刻不能作为当前班次。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "张家界"
+      ],
+      "publisher": "湖南省文化和旅游厅",
+      "url": "https://whhlyt.hunan.gov.cn/whhlyt/wldh2022jt/202208/t20220823_27716245.html",
+      "checked_at": "2026-10-11",
+      "published_at": "2022-08-26",
+      "scope": "wulingyuan_only",
+      "verified_claims": {
+        "transport": "武陵源核心景区有东、南、北、东南和西等入口，需按实际游线选择门票站。",
+        "planning": "此页面针对武陵源，不应套用于天门山等其他张家界景区。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "张家界"
+      ],
+      "publisher": "湖南省交通运输厅",
+      "url": "https://jtt.hunan.gov.cn/xxgk/gzdt/szdt1/202506/t20250610_33706127.html",
+      "checked_at": "2026-10-11",
+      "published_at": "2025-06-06",
+      "scope": "wulingyuan_only",
+      "verified_claims": {
+        "transport": "2025年6月报道开通武陵源汽车站东门至森林公园南门环景巴士；当前班次需另查。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "张家界"
+      ],
+      "publisher": "湖南省文化和旅游厅",
+      "url": "https://whhlyt.hunan.gov.cn/whhlyt/wldhchzn/wldh_zhinan.html",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "regional_cuisine",
+      "verified_claims": {
+        "food": "官方旅游指南列出三下锅、土家粉蒸肉等地域菜品；这不是具体店铺推荐或供餐保证。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "桂林漓江"
+      ],
+      "publisher": "桂林漓江景区",
+      "url": "https://www.liriver.org.cn/",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "specific",
+      "verified_claims": {
+        "transport": "官网按精华游、分时分段游和排筏游提供线路及交通服务，需先确认购票线路和码头。",
+        "food": "官网介绍部分游船的套餐及餐厅配置，是否包含餐饮需看所选产品，不可推断所有船都有同样服务。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "鼓浪屿"
+      ],
+      "publisher": "厦门轮渡有限公司",
+      "url": "https://www.xmferry.com/wybm/wshlk/xchgpp/index.htm",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "specific",
+      "verified_claims": {
+        "transport": "游客航线与居民航线区分；外地游客白天可从东渡前往三丘田或内厝澳，夜间乘船安排不同。请以出行当天官方公告及票面码头为准。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "长城(八达岭)"
+      ],
+      "publisher": "北京旅游网",
+      "url": "https://www.visitbeijing.com.cn/article/4CWpVxOwpqX",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "reference_guide",
+      "verified_claims": {
+        "transport": "该页面提供八达岭长城交通及官方预约入口；公交、铁路时刻需向运营方确认。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "西湖"
+      ],
+      "publisher": "杭州西湖风景名胜区管理委员会",
+      "url": "https://westlake.hangzhou.gov.cn/attach/-1/2010091025032014399.pdf",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "planning_only",
+      "verified_claims": {
+        "toilet": "官方标识规划讨论公厕导向牌；规划文件不证明某个厕所已建成或正在开放。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "灵山大照壁",
+        "五智门",
+        "五明桥",
+        "九龙灌浴",
+        "阿育王柱",
+        "菩提大道",
+        "佛教文化博览馆",
+        "无尽意斋",
+        "灵山大佛",
+        "佛足坛",
+        "降魔浮雕",
+        "百子戏弥勒",
+        "祥符禅寺",
+        "曼飞龙塔",
+        "灵山梵宫",
+        "五印坛城"
+      ],
+      "publisher": "灵山集团",
+      "url": "https://www.chinalingshan.com/member/scenic/1",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "park_level",
+      "verified_claims": {
+        "overview": "集团介绍灵山胜境为太湖畔的综合文化景区，并列举九龙灌浴、大照壁、五明桥、五智门、佛足坛、菩提大道、降魔浮雕、阿育王柱、梵宫、五印坛城、曼飞龙塔等。",
+        "limits": "所属景区介绍不证明每个子景点的具体相邻关系、厕所和餐饮位置。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "香月花街",
+        "拈花堂",
+        "鹿鸣谷",
+        "拈花广场",
+        "梵天花海",
+        "五灯湖"
+      ],
+      "publisher": "灵山集团",
+      "url": "https://www.chinalingshan.com/member/scenic/2",
+      "checked_at": "2026-10-11",
+      "published_at": null,
+      "scope": "park_level",
+      "verified_claims": {
+        "overview": "集团介绍拈花湾为太湖畔的禅意小镇。",
+        "limits": "集团简介未核验各子景点的精确位置和设施。"
+      },
+      "limits": "仅支持列出的事实；未核实最近距离、实时开放状态、商家价格或服务坐标。"
+    },
+    {
+      "spots": [
+        "武侯祠",
+        "锦里古街"
+      ],
+      "publisher": "成都武侯祠博物馆",
+      "url": "https://wuhouci.net.cn/about",
+      "checked_at": "2026-10-11",
+      "scope": "destination_overview",
+      "verified_claims": {
+        "history": "馆方介绍将景区分为三国历史遗迹区、西区和锦里民俗区；锦里体现川西民风民俗。"
+      },
+      "limits": "不能据此确认锦里商户、厕所位置或营业时间。"
+    },
+    {
+      "spots": [
+        "文殊院"
+      ],
+      "publisher": "四川省民族宗教事务委员会",
+      "url": "https://mzw.sc.gov.cn/scsmzw/huy/2023/9/26/3bcc3cd4866a4f44b698ee503b358c32.shtml",
+      "checked_at": "2026-10-11",
+      "scope": "identity_only",
+      "verified_claims": {
+        "identity": "2023年调研报道提及文殊院宗教场所。"
+      },
+      "limits": "仅支持场所身份，不支持详细历史、交通、餐饮或厕所资料。"
+    },
+    {
+      "spots": [
+        "宽窄巷子"
+      ],
+      "publisher": "人民网四川频道",
+      "url": "https://sc.people.com.cn/n2/2026/0515/c379469-41581817.html",
+      "checked_at": "2026-10-11",
+      "scope": "destination_overview",
+      "verified_claims": {
+        "culture": "报道介绍宽窄巷子的院落、街巷演艺与老成都文化体验。"
+      },
+      "limits": "报道活动不能视为常设演出承诺；未核实设施位置和商户。"
+    },
+    {
+      "spots": [
+        "长廊",
+        "佛香阁",
+        "仁寿殿",
+        "昆明湖",
+        "十七孔桥",
+        "苏州街"
+      ],
+      "publisher": "北京市园林绿化局",
+      "url": "https://yllhj.beijing.gov.cn/ztxx/cy/ypsx/202509/t20250925_4210861.shtml",
+      "published_at": "2025-09-25",
+      "checked_at": "2026-10-11",
+      "scope": "park_dining",
+      "verified_claims": {
+        "dining": "公园餐饮目录将听鹂馆列为颐和园中华老字号餐饮点。"
+      },
+      "limits": "园区级餐饮点，不表示位于每个子景点旁；没有核实当日营业、菜单、价格及坐标。"
+    },
+    {
+      "spots": [
+        "故宫博物院"
+      ],
+      "publisher": "故宫博物院",
+      "url": "https://www.dpm.org.cn/classify_detail/261772.html",
+      "published_at": null,
+      "checked_at": "2026-10-11",
+      "scope": "dated_dining_report",
+      "verified_claims": {
+        "dining": "馆方零废弃餐饮活动报道点名故宫餐厅景运门店、冰窖餐厅、冰窖咖啡。"
+      },
+      "limits": "活动报道支持当时的餐饮点名称，不证明当前营业、预约要求、菜单或价格。"
+    },
+    {
+      "spots": [
+        "故宫博物院"
+      ],
+      "publisher": "故宫博物院",
+      "url": "https://www.dpm.org.cn/classify_detail/248572.html",
+      "published_at": "2019-01-28",
+      "checked_at": "2026-10-11",
+      "scope": "dated_facility_report",
+      "verified_claims": {
+        "toilets": "2019年改造报道明确提及御花园西卫生间和紫禁书院东卫生间。"
+      },
+      "limits": "旧改造报道，不可将当年卫生间总数用作当前状态；未获得坐标，也未确认当日开放。"
+    },
+    {
+      "spots": [
+        "灵山大佛",
+        "祥符禅寺",
+        "九龙灌浴",
+        "灵山梵宫",
+        "五印坛城"
+      ],
+      "publisher": "无锡市滨湖区人民政府",
+      "url": "https://www.wxbh.gov.cn/doc/2024/03/06/4187725.shtml",
+      "published_at": "2024-03-06",
+      "checked_at": "2026-10-11",
+      "scope": "named_attractions",
+      "verified_claims": {
+        "culture": "政府介绍灵山大佛、祥符禅寺、梵宫及五印坛城等景观；梵宫为世界佛教论坛会址，五印坛城展示藏族传统装饰艺术。"
+      },
+      "limits": "原文九龙观浴与项目九龙灌浴名称存在字形差异，需人工对照；不提供厕所、餐饮或实时表演时刻。"
+    },
+    {
+      "spots": [
+        "鹿鸣谷",
+        "拈花广场"
+      ],
+      "publisher": "灵山文化旅游集团",
+      "url": "https://www.chinalingshan.com/newsAndInformation/group/983",
+      "published_at": null,
+      "checked_at": "2026-10-11",
+      "scope": "named_attractions",
+      "verified_claims": {
+        "culture": "集团报道提到拈花广场远望高塔、闻塔铃，以及鹿鸣谷的诗词文化体验。"
+      },
+      "limits": "报道活动不保证每日开展；不支持营业时间、最近设施或无障碍保证。"
+    },
+    {
+      "spots": [
+        "五灯湖"
+      ],
+      "publisher": "人民日报海外版／人民网",
+      "url": "https://travel.people.com.cn/n1/2020/1106/c41570-31921218.html",
+      "published_at": "2020-11-06",
+      "checked_at": "2026-10-11",
+      "scope": "dated_culture_report",
+      "verified_claims": {
+        "culture": "报道将五灯湖列为拈花湾夜间演艺所涉及的地点之一。"
+      },
+      "limits": "历史报道不代表当前演出内容、时间或是否开放；没有坐标。"
+    },
+    {
+      "spots": [
+        "无尽意斋"
+      ],
+      "publisher": "人民政协网",
+      "url": "https://www.rmzxw.com.cn/c/2021-04-08/2824434.shtml?n2m=1",
+      "published_at": "2021-04-08",
+      "checked_at": "2026-10-11",
+      "scope": "named_attraction_history",
+      "verified_claims": {
+        "history": "报道介绍无尽意斋位于灵山大佛脚下西侧，是纪念赵朴初的场所。"
+      },
+      "limits": "相对方位不等于导航坐标；未核实开放时间及周边服务设施。"
+    },
+    {
+      "spots": [
+        "长廊",
+        "佛香阁",
+        "仁寿殿",
+        "昆明湖",
+        "十七孔桥",
+        "苏州街"
+      ],
+      "publisher": "北京市城市管理委员会",
+      "url": "https://csglw.beijing.gov.cn/hjwsbz/hjwsjc/hysz/202501/P020250107538323729038.pdf",
+      "published_at": "2025-01",
+      "checked_at": "2026-10-11",
+      "scope": "dated_facility_inspection",
+      "verified_claims": {
+        "toilets": "2025年第Ⅴ-003期检查资料的搜索索引列出颐和园新建宫门码头南侧10米公厕、文昌阁电瓶船码头南侧20米公厕。"
+      },
+      "limits": "搜索索引可见具体方位，PDF全文和截图本轮未成功提取；需复核原表。距离为资料所述相对位置，不是用户到厕所距离；无坐标及当前开放确认。"
+    },
+    {
+      "spots": [
+        "长廊",
+        "佛香阁",
+        "仁寿殿",
+        "昆明湖",
+        "十七孔桥",
+        "苏州街"
+      ],
+      "publisher": "北京市人民政府门户网站",
+      "url": "https://www.beijing.gov.cn/fuwu/bmfw/sy/jrts/202111/t20211129_2547066.html",
+      "published_at": "2021-11-29",
+      "checked_at": "2026-10-11",
+      "scope": "official_lookup_channel",
+      "verified_claims": {
+        "toilets": "报道介绍颐和园官方公众号的颐和导览栏目可查询园内卫生间分布，并结合游客位置查询最近卫生间。"
+      },
+      "limits": "证明官方查询渠道曾提供此功能，不表示本项目已经接入，也未核实当前公众号菜单。"
+    },
+    {
+      "spots": [
+        "九寨沟"
+      ],
+      "publisher": "九寨沟风景名胜区管理局",
+      "url": "https://www.jiuzhai.com/dynamic/public/10409-2025-05-17-05-36-38",
+      "published_at": "2025-05-17",
+      "checked_at": "2026-10-11",
+      "scope": "facility_maintenance_notice",
+      "verified_claims": {
+        "toilets": "官网发布诺日朗瀑布厕所维修改造项目承包单位公告。"
+      },
+      "limits": "维修采购不是竣工或开放证明；没有精确坐标。"
+    },
+    {
+      "spots": [
+        "黄山"
+      ],
+      "publisher": "黄山风景区管理委员会",
+      "url": "https://hsgwh.huangshan.gov.cn/zwgk/public/6617641/11997092.html",
+      "published_at": "2026-02-06",
+      "checked_at": "2026-10-11",
+      "scope": "planned_facility",
+      "verified_claims": {
+        "toilets": "2026年预算工作安排提及建成始信峰公厕并谋划玉屏片区改造。"
+      },
+      "limits": "工作计划不能视为已经建成开放，不可用作可用厕所导航点。"
+    },
+    {
+      "spots": [
+        "西湖"
+      ],
+      "publisher": "杭州网",
+      "url": "https://ori.hangzhou.com.cn/ornews/content/2019-11/12/content_7302555.htm",
+      "published_at": "2019-11-12",
+      "checked_at": "2026-10-11",
+      "scope": "dated_named_toilet_report",
+      "verified_claims": {
+        "toilets": "实地报道介绍苏堤三桥公厕，并明确位于锁澜桥与望山桥之间。"
+      },
+      "limits": "2019年报道，仅支持当时名称和相对方位；无经纬度，当前开放及设施配置未经复核。"
+    },
+    {
+      "spots": [
+        "灵山梵宫"
+      ],
+      "publisher": "我苏网（来源：无锡发布）",
+      "url": "https://www.ourjiangsu.com/a/20190218/1550475548533.shtml",
+      "published_at": "2019-02-18",
+      "checked_at": "2026-10-11",
+      "scope": "dated_named_toilet_report",
+      "verified_claims": {
+        "toilets": "报道点名梵宫圣坛前厅西厕所，说明其位于梵宫圣坛西侧。"
+      },
+      "limits": "2019年报道，仅支持当时名称和相对方位；无经纬度，当前开放及设施配置未经复核。"
+    },
+    {
+      "spots": [
+        "杜甫草堂"
+      ],
+      "publisher": "成都杜甫草堂博物馆",
+      "url": "https://www.cddfct.cn/go-a947.htm",
+      "published_at": "2025-06-19",
+      "checked_at": "2026-10-11",
+      "scope": "dated_facility_use_report",
+      "verified_claims": {
+        "toilets": "馆方拾金不昧报道明确记载2025年6月11日在南门厕所开展日常保洁巡检。"
+      },
+      "limits": "支持2025年6月南门厕所有使用及保洁记录；不证明当前开放，没有坐标。"
+    },
+    {
+      "spots": [
+        "杜甫草堂"
+      ],
+      "publisher": "成都杜甫草堂博物馆",
+      "url": "https://www.cddfct.com/webapp/accessory/ueditor/www.cddfct.com/upload/file/2025-03-20/1742440661262040344.pdf",
+      "published_at": "2025-03-20",
+      "checked_at": "2026-10-11",
+      "scope": "facility_renovation_plan",
+      "verified_claims": {
+        "toilets": "2025年单位概况列有南门、北门厕所改造工程。"
+      },
+      "limits": "改造计划不等于已经竣工开放；北门厕所仅列为计划线索，不加入可用设施名单。"
+    },
+    {
+      "spots": [
+        "鼓浪屿"
+      ],
+      "publisher": "厦门网／海西晨报",
+      "url": "https://news.xmnn.cn/xmxw/202404/t20240429_140393.html",
+      "published_at": "2024-04-29",
+      "checked_at": "2026-10-11",
+      "scope": "dated_holiday_facility_report",
+      "verified_claims": {
+        "toilets": "报道点名鼓浪屿琴岛公厕，并介绍当年五一期间在其附近及海底世界旁城管亭等点位配置移动公厕。"
+      },
+      "limits": "固定名称与临时设施必须区分；不将假期移动公厕视为长期开放，未取得坐标。"
+    },
+    {
+      "spots": [
+        "鼓浪屿"
+      ],
+      "publisher": "鼓浪屿管委会",
+      "url": "https://gly.xm.gov.cn/zfxxgk/xxgkml/04/202503/t20250317_2922196.htm",
+      "published_at": "2025-03-17",
+      "checked_at": "2026-10-11",
+      "scope": "park_facility_overview",
+      "verified_claims": {
+        "toilets": "建议办理答复提及完成国有景点旅游公厕改造、持续推进社区公厕提升工程。"
+      },
+      "limits": "总体工作说明未列逐个名称、位置与开放状态，不能据此生成厕所点位。"
+    },
+    {
+      "spots": [
+        "长城(八达岭)"
+      ],
+      "publisher": "北京市城市管理委员会",
+      "url": "https://csglw.beijing.gov.cn/hjwsbz/hjwsjc/hysz/202508/P020250813401699211686.pdf",
+      "published_at": "2025-08",
+      "checked_at": "2026-10-11",
+      "scope": "dated_facility_inspection",
+      "verified_claims": {
+        "toilets": "2025年第Ⅴ-222期检查资料搜索索引列出八达岭长城景区林场车场公厕。"
+      },
+      "limits": "原始表格尚未全文核验；无经纬度，检查结果不等于当前开放状态。"
+    }
+  ]
+}

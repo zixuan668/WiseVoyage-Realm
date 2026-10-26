@@ -1,0 +1,147 @@
+[
+  {
+    "name": "长廊",
+    "file": "long-corridor.jpg",
+    "source": "https://www.summerpalace.net.cn/gallery_detail/369.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2a97956509.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark."
+  },
+  {
+    "name": "昆明湖",
+    "file": "kunming-lake.jpg",
+    "source": "https://www.summerpalace.net.cn/laka_spot/detail/355.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2a028d9662.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark."
+  },
+  {
+    "name": "十七孔桥",
+    "file": "seventeen-arch-bridge.jpg",
+    "source": "https://www.summerpalace.net.cn/laka_spot/detail/362.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2a285a4be7.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark."
+  },
+  {
+    "name": "南湖岛",
+    "file": "south-lake-island.jpg",
+    "source": "https://www.summerpalace.net.cn/laka_spot/detail/360.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2a1f31940f.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 南湖岛. Preserve its exact appearance; for snowy photographs preserve snow and the original winter atmosphere."
+  },
+  {
+    "name": "铜牛",
+    "file": "bronze-ox.jpg",
+    "source": "https://www.summerpalace.net.cn/laka_spot/detail/361.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2a24891614.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 铜牛. Preserve its exact appearance; for snowy photographs preserve snow and the original winter atmosphere."
+  },
+  {
+    "name": "石舫",
+    "file": "marble-boat.jpg",
+    "source": "https://www.summerpalace.net.cn/laka_spot/detail/413.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2bb156b8e5.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 石舫. Preserve its exact appearance; for snowy photographs preserve snow and the original winter atmosphere."
+  },
+  {
+    "name": "仁寿殿",
+    "file": "renshou-hall.jpg",
+    "source": "https://www.summerpalace.net.cn/court_life/detail/346.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b299d58a43c.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce a high-resolution photograph with a long edge of approximately 1800 pixels, matching the EXACT source aspect ratio and composition. For a square source, output a square image; never turn it into a landscape crop. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 仁寿殿. This source is SQUARE: keep the entire visible building, its roof apex and pedestal/steps inside the same square frame. Preserve existing plaques and characters without inventing new text.",
+    "correction_prompt": "Image 1 is the edit target: the enhanced Renshou Hall photograph. Image 2 is the original scene reference. Make a single small correction to Image 1: remove the newly invented visitor wearing a white shirt and yellow cap at the FAR RIGHT beside the bronze urn, because this person is absent in Image 2. Replace only that visitor's silhouette with the stone pavement, railing and building surfaces already behind him, matching Image 2. Leave all architecture, qilin statue, roof, colors, plaques, existing details, crop and sharpness of Image 1 otherwise exactly unchanged. Do not add anyone. Square output, same composition. No text or watermark."
+  },
+  {
+    "name": "德和园",
+    "file": "dehe-garden.jpg",
+    "source": "https://www.summerpalace.net.cn/court_life/detail/344.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2994a79afe.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce a high-resolution photograph with a long edge of approximately 1800 pixels, matching the EXACT source aspect ratio and composition. For a square source, output a square image; never turn it into a landscape crop. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 德和园. This source is SQUARE: keep the entire visible building, its roof apex and pedestal/steps inside the same square frame. Preserve existing plaques and characters without inventing new text."
+  },
+  {
+    "name": "玉澜堂",
+    "file": "yulan-hall.jpg",
+    "source": "https://www.summerpalace.net.cn/court_life/detail/347.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b29a124201c.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce a high-resolution photograph with a long edge of approximately 1800 pixels, matching the EXACT source aspect ratio and composition. For a square source, output a square image; never turn it into a landscape crop. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 玉澜堂. This source is SQUARE: keep the entire visible building, its roof apex and pedestal/steps inside the same square frame. Preserve existing plaques and characters without inventing new text."
+  },
+  {
+    "name": "乐寿堂",
+    "file": "leshou-hall.jpg",
+    "source": "https://www.summerpalace.net.cn/court_life/detail/350.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b29ba209a1b.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 乐寿堂. Keep all existing plaques, roof tiers and source lighting exactly as shown. Match the input aspect ratio (square if the input is square)."
+  },
+  {
+    "name": "排云殿",
+    "file": "paiyun-hall.jpg",
+    "source": "https://www.summerpalace.net.cn/longevity/detailqianshan/381.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2ada2133d2.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 排云殿. Keep all existing plaques, roof tiers and source lighting exactly as shown. Match the input aspect ratio (square if the input is square)."
+  },
+  {
+    "name": "佛香阁",
+    "file": "buddhist-incense-tower.jpg",
+    "source": "https://www.summerpalace.net.cn/longevity/detailqianshan/382.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2ae16e5183.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 佛香阁. Keep all existing plaques, roof tiers and source lighting exactly as shown. Match the input aspect ratio (square if the input is square)."
+  },
+  {
+    "name": "谐趣园",
+    "file": "harmonious-interests-garden.jpg",
+    "source": "https://www.summerpalace.net.cn/longevity/detailhouhu/372.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2aabd25637.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 谐趣园. Preserve the original scene and composition exactly. For Jade Belt Bridge retain the complete arch, its water reflection and existing willow branches. For Suzhou Street retain the exact canal perspective and both rows of shops; do not invent readable signage."
+  },
+  {
+    "name": "苏州街",
+    "file": "suzhou-street.jpg",
+    "source": "https://www.summerpalace.net.cn/longevity/detailhouhu/373.html",
+    "original_url": "https://www.summerpalace.net.cn/Uploads/Picture/2025/08/30/s68b2ab09556fd.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 苏州街. Preserve the original scene and composition exactly. For Jade Belt Bridge retain the complete arch, its water reflection and existing willow branches. For Suzhou Street retain the exact canal perspective and both rows of shops; do not invent readable signage."
+  },
+  {
+    "name": "玉带桥",
+    "file": "jade-belt-bridge.jpg",
+    "source": "User-supplied original photograph",
+    "original_url": "/scenic/jade-belt-bridge.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Use case: precise-object-edit. Edit target: the supplied original attraction photograph. Perform faithful high-resolution photo restoration only, not scene redesign. Produce an approximately 1800x1350 landscape photograph, matching the source aspect ratio and composition. Remove JPEG artifacts and pixelation, reduce haze only if needed for edge clarity, and recover restrained natural detail. Preserve EXACT camera viewpoint, crop, architecture silhouette and number of tiers, existing signs, people, trees, season, weather, shadow direction, object positions and relative scale. Keep fine patterns and inscriptions faithful to visible evidence; do not invent legible writing or ornate details. Do not add or remove buildings, bridge arches, ornaments, people, snow, flowers or other objects. Retain natural source colors and realistic photographic texture. Avoid oversaturation, HDR, halos, plastic surfaces and crunchy sharpening. Output a sharper, clean version of THIS SAME PHOTO. No borders, new text, logos or watermark.\nSubject identification only: 玉带桥. Preserve the original scene and composition exactly. For Jade Belt Bridge retain the complete arch, its water reflection and existing willow branches. For Suzhou Street retain the exact canal perspective and both rows of shops; do not invent readable signage."
+  },
+  {
+    "name": "文昌阁",
+    "file": "wenchang-pavilion.jpg",
+    "source": "User-supplied original photograph",
+    "original_url": "/scenic/wenchang-pavilion.jpg",
+    "date": "2026-10-17",
+    "mode": "Built-in image editing",
+    "prompt": "Restore the original 488x250 Wenchang Pavilion photograph at higher resolution. Preserve pavilion, masonry platform, red bridge railings, trees, lotus pond, perspective and composition. Improve natural edge clarity and remove blur and compression artifacts without inventing architecture or text. Full initial prompt is retained below in README.md."
+  }
+]
