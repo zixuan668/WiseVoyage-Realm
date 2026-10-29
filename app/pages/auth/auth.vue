@@ -3,7 +3,7 @@
     <button class="auth-lang" :class="{ 'is-eng': tourLanguage !== 'en' }" hover-class="none" :aria-label="tourLanguage === 'en' ? '切换到中文' : 'Switch to English'" :aria-pressed="tourLanguage === 'en'" @tap="setLanguage(tourLanguage === 'en' ? 'zh' : 'en')">{{ tourLanguage === 'en' ? '中' : 'ENG' }}</button>
     <view class="auth-brand"><BrandLogo stacked animated /></view>
     <view class="welcome-card">
-      <text class="welcome-title">{{ t(showConnection?'连接服务站':'让每一程，都有故事') }}</text>
+      <text class="welcome-title">{{ t('让每一程，都有故事') }}</text>
     <view class="login-area">
       <view v-show="!showConnection" class="sign-in-form">
       <view >
@@ -22,19 +22,6 @@
       </view>
       <text v-if="registering && codeNotice" class="notice">{{ t(codeNotice) }}</text>
       <text v-if="error" class="error">{{ t(error) }}</text>
-      </view>
-      <view class="service-tools">
-        <button class="service-toggle" :disabled="logining||sendingCode||connecting" :aria-expanded="showConnection" @tap="toggleConnection">{{ t(showConnection?'返回':'连接服务站') }}</button>
-        <text v-if="serviceNotice" class="notice" role="status">{{ t(serviceNotice) }}</text>
-        <view v-if="showConnection" class="service-panel">
-          <text>{{ t('服务地址') }}</text>
-          <input class="service-input" v-model="serviceAddress" :disabled="connecting" :placeholder="t('输入服务地址')" :aria-label="t('服务地址')" />
-          <view class="service-actions">
-            <button :disabled="connecting" @tap="scanService">{{ t('扫码连接') }}</button>
-            <button :disabled="connecting||!serviceAddress.trim()" @tap="connectService()">{{ t(connecting?'正在连接…':'连接') }}</button>
-          </view>
-          <text v-if="serviceError" class="error" role="alert">{{ t(serviceError) }}</text>
-        </view>
       </view>
     </view>
     </view>
@@ -104,10 +91,11 @@ export default {
     },
     restoreSession() {
       this.logining=true;this.error=''
-      uni.request({url:BASE_URL+'/user/me',header:{Authorization:'Bearer '+uni.getStorageSync('token')},timeout:15000,
+      uni.request({url:BASE_URL+'/user/me?client_type=app',header:{Authorization:'Bearer '+uni.getStorageSync('token')},timeout:15000,
         success:r=>{
           this.logining=false
           if(r.statusCode===401){uni.removeStorageSync('token');this.error='登录已过期，请重新输入账号密码';return}
+          if(r.statusCode===403){uni.removeStorageSync('token');uni.removeStorageSync('user_id');uni.removeStorageSync('username');this.error='管理端账号不能登录 App，请使用游客账号';return}
           const d=r.data||{}
           if(r.statusCode!==200||!d.success||!d.data){this.error=d.detail||d.message||'登录状态验证失败';return}
           this.finishLogin(d.data)
@@ -162,7 +150,7 @@ export default {
       this.logining=true;this.error=''
       uni.request({url:BASE_URL+'/user/login',method:'POST',
         header:{'Content-Type':'application/x-www-form-urlencoded'},
-        data:'username='+encodeURIComponent(username)+'&password='+encodeURIComponent(this.password),timeout:15000,
+        data:'username='+encodeURIComponent(username)+'&password='+encodeURIComponent(this.password)+'&client_type=app',timeout:15000,
         success:r=>{
           const d=r.data||{}
           if(r.statusCode!==200||!d.access_token){this.logining=false;this.error=r.statusCode===401?'账号或密码错误':typeof d.detail==='string'?d.detail:'登录失败，请稍后重试';return}

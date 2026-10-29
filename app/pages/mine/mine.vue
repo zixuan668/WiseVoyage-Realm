@@ -194,10 +194,10 @@ export default {
     this.showAbout=false;this.translateAiChatHistory(this.tourLanguage,true)
     var token = uni.getStorageSync('token')
     if (!token) { uni.reLaunch({ url: '/pages/auth/auth' }); return }
-    uni.request({url:BASE_URL+'/user/me',header:{Authorization:'Bearer '+token},
+    uni.request({url:BASE_URL+'/user/me?client_type=app',header:{Authorization:'Bearer '+token},
       success:r=>{
         const d=r.data||{}
-        if(r.statusCode===401){uni.removeStorageSync('token');uni.reLaunch({url:'/pages/auth/auth'});return}
+        if(r.statusCode===401||r.statusCode===403){uni.removeStorageSync('token');uni.removeStorageSync('user_id');uni.removeStorageSync('username');uni.reLaunch({url:'/pages/auth/auth'});return}
         if(r.statusCode!==200||!d.success||!d.data){uni.showToast({title:this.t('个人资料加载失败'),icon:'none'});return}
         this.username=d.data.username||''
         this.userId=d.data.user_no||d.data.user_id||''

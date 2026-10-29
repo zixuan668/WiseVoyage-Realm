@@ -297,16 +297,19 @@ async def get_dashboard_info():
                 select(func.count(TourSessionStatus.status_id)).where(TourSessionStatus.live_status == 1)
             ) or 0
 
-            # 今日服务人次 & 满意度
-            today = datetime.now().date()
-            today_start = datetime(today.year, today.month, today.day)
+            # 今日服务人次 & 满意度（服务日默认 06:00 换日，凌晨仍统计前一晚）
+            from .modules.analytics_time import service_day_window, service_week_window
+            service_day_start, service_day_end = service_day_window()
             today_statuses = db.exec(
-                select(TourSessionStatus).where(TourSessionStatus.start_time >= today_start)
+                select(TourSessionStatus).where(
+                    TourSessionStatus.start_time >= service_day_start,
+                    TourSessionStatus.start_time < service_day_end,
+                )
             ).all()
             today_sessions = len(today_statuses)
 
-            # 本周会话数 & 趋势
-            week_start = today_start - timedelta(days=today.weekday())
+            # 本周会话数 & 趋势（同样按服务日口径）
+            week_start, _ = service_week_window()
             for i in range(7):
                 day_start = week_start + timedelta(days=i)
                 day_end = day_start + timedelta(days=1)
@@ -321,7 +324,11 @@ async def get_dashboard_info():
             # 今日问答数
             today_questions = db.scalar(
                 select(func.count(VisitorInteraction.message_id))
-                .where(VisitorInteraction.send_time >= today_start, VisitorInteraction.role == "user")
+                .where(
+                    VisitorInteraction.send_time >= service_day_start,
+                    VisitorInteraction.send_time < service_day_end,
+                    VisitorInteraction.role == "user",
+                )
             ) or 0
 
             # 总游客交互数

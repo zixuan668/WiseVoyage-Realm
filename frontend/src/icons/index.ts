@@ -11,7 +11,7 @@ function createIcon(icon: string, name: string) {
     setup(props, { attrs }) {
       return () => h('svg', {
         xmlns: 'http://www.w3.org/2000/svg', width: props.size, height: props.size,
-        viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': 1.5,
+        viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': 'var(--ui-icon-stroke, 1.5)',
         'stroke-linecap': 'round', 'stroke-linejoin': 'round', focusable: 'false',
         'aria-hidden': props.title || attrs['aria-label'] ? undefined : 'true',
         role: props.title || attrs['aria-label'] ? 'img' : undefined,
@@ -36,6 +36,7 @@ export const CircleCheck = createIcon('circle-check', 'CircleCheck')
 export const Clock = createIcon('clock', 'Clock')
 export const Cloudy = createIcon('cloud', 'Cloudy')
 export const Collection = createIcon('bookmark', 'Collection')
+export const Gauge = createIcon('gauge', 'Gauge')
 export const DataAnalysis = createIcon('chart-no-axes-combined', 'DataAnalysis')
 export const Delete = createIcon('trash-2', 'Delete')
 export const Document = createIcon('file-text', 'Document')

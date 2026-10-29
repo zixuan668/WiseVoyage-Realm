@@ -15,7 +15,7 @@ describe('administrator sidebar destinations', () => {
     expect(activeAdminDestination('/knowledge/list')?.group).toBe('/scenic-spot')
     expect(activeAdminDestination('/scenic-spotlight')).toBeUndefined()
   })
-  it('retains the existing three two-child groups', () => {
+  it('retains the three two-child groups', () => {
     expect(adminGroups).toHaveLength(3)
     for (const group of adminGroups) expect(adminDestinations.filter(item => item.group === group.key)).toHaveLength(2)
   })

@@ -61,6 +61,16 @@ test('scanned pickup reads route and guides without consuming the code or defaul
  assert.equal(h.storage.get('xingyun-tour-77'),'scoped-77');assert.equal(h.storage.has('station-pending-claim'),false);assert.equal(h.nav.at(-1),'/pages/tour/tour?sessionId=77')
 })
 
+test('a single available guide starts directly so the start button never looks dead',async()=>{
+ const h=page('pages/claim/claim.vue');h.s.code='ABCD2345EFGH';h.s.scanned=true
+ const run=h.s.prepare();h.calls.find(c=>c.url.endsWith('/claim/preview-app')).success({statusCode:200,data:{snapshot:{route:{stops:[{spot_id:3,spot_name:'仁寿殿'}],total_minutes:66}}}})
+ h.calls.find(c=>c.url.includes('/guides?')).success({statusCode:200,data:{success:true,data:{guide_list:[{guide_id:5,name:'次庄雅'}]}}});await run
+ assert.equal(h.s.pickedGuideId,0)
+ const start=h.s.beginTour(),call=h.calls.at(-1);assert.ok(call.url.endsWith('/claim/receive-app'));assert.equal(call.data.guide_id,5)
+ call.success({statusCode:200,data:{session_id:88}});await start
+ assert.equal(h.nav.at(-1),'/pages/tour/tour?sessionId=88')
+})
+
 test('pickup waits for sign-in while retaining the scanned route',async()=>{
  const h=page('pages/claim/claim.vue');h.storage.delete('token');h.s.code='ABCD2345EFGH';await h.s.prepare();assert.equal(h.calls.length,0);assert.equal(h.storage.get('station-pending-claim').token,'ABCD2345EFGH');assert.equal(h.nav.at(-1),'/pages/auth/auth')
 })

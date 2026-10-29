@@ -33,7 +33,7 @@
       </view>
       <text v-if="guideDisplayName" class="stage-guide-name">{{ guideDisplayName }}</text>
       <!-- #ifdef APP-PLUS -->
-      <tour-xingyun v-if="guideProvider==='xingyun'" :payload="xingyunPayload" :language="tourLanguage" @state="onXingyunState" />
+      <tour-xingyun v-if="guideProvider==='xingyun'" :payload="xingyunPayload" @state="onXingyunState" />
       <!-- #endif -->
       <!-- 知识卡片弹出 -->
       <view class="know-card" v-if="knowCard.visible" @tap="dismissKnowCard">
@@ -83,8 +83,8 @@
       <view v-for="(m,i) in msgs" :key="i" :id="'msg-'+i" class="msg-row" :class="m.role==='guide'?'msg-l':'msg-r'">
         <view class="msg-bubble" :class="m.role">
           <text class="msg-text">{{ m.message }}</text>
-          <view v-if="m.role==='guide'" class="msg-voice-btn" :class="{muted:voiceMuted||speechPaused}" :aria-label="t(voiceMuted||speechPaused ? '继续播放' : '暂停语音播报')" @tap.stop="toggleVoiceMute(m)">
-            <text v-if="voiceMuted||speechPaused" class="playback-glyph iconfont icon-play" aria-hidden="true"></text>
+          <view v-if="m.role==='guide'" class="msg-voice-btn" :class="{muted:!isMessagePlaying(i)}" :aria-label="t(isMessagePlaying(i) ? '暂停语音播报' : '继续播放')" @tap.stop="toggleVoiceMute(m,i)">
+            <text v-if="!isMessagePlaying(i)" class="playback-glyph iconfont icon-play" aria-hidden="true"></text>
             <text v-else class="playback-glyph iconfont icon-pause" aria-hidden="true"></text>
           </view>
           <text class="msg-time">{{ fmtTime(m.send_time) }}</text>
@@ -170,7 +170,7 @@ export default {
       sid: 0, msgs: [], spotCards: [], spotIdx: 0, progressActive: -1, progressScrollLeft: 0, fadeLeft: false, fadeRight: false, progressTrackW: 0, progressContentW: 0, progressNodeW: 100,
       guideName: '', guideNameEn: '', guideSourceVideo:'', guideProvider:'', statusH: 20,
       speaking: false, loading: false, text: '', recording: false, voicePressing: false, transcribing: false, voiceMode: false,
-      voiceMuted: false, speechPaused: false,
+      voiceMuted: false, speechPaused: false, activeSpeechIndex: -1, speechStarting: false,
       avatarMode:'audio',avatarMessage:'语音导览',videoUrl:'',avatarCapability:null,guideId:0,
       lastMsgId: 'bottom', _voiceManager: null,
       quick: ['这里有什么历史故事？','最佳拍照点在哪里？','附近有哪些服务设施？','请介绍景点特色','下一站推荐去哪里？'],
@@ -328,7 +328,7 @@ export default {
         if(version!==self._xingyunVersion)return
         if(!res.data.configured)throw new Error('所选星云数字人未启用或未绑定')
         self._xingyunGateway=BASE_URL+'/xingyun/session/'+self.guideId+'?tour_id='+self.sid+'&language='+(self.tourLanguage||'zh')
-        self.xingyunPayload={id:Date.now(),command:'connect',text:'',audioOutput:uni.getSystemInfoSync().platform==='ios'?'media-stream':'default',gateway:self._xingyunGateway,sdkUrl:res.data.sdkUrl,accessToken:uni.getStorageSync('xingyun-tour-'+self.sid),token:uni.getStorageSync('token')}
+        self.xingyunPayload={id:Date.now(),command:'connect',text:'',gateway:self._xingyunGateway,sdkUrl:res.data.sdkUrl,accessToken:uni.getStorageSync('xingyun-tour-'+self.sid),token:uni.getStorageSync('token')}
       }).catch(function(error){if(version!==self._xingyunVersion)return;self.xingyunActive=false;self.xingyunFailed=true;self.avatarMessage=error.message||'星云连接失败，请重试'})
       // #endif
     },
@@ -339,13 +339,15 @@ export default {
         this.xingyunConnected=true;this.xingyunFailed=false;this.avatarMessage='';this.xingyunActive=true
         var pending=this._xingyunPending;if(pending&&this._xingyunGateway){this._xingyunPending='';this.xingyunPayload=Object.assign({},this.xingyunPayload,{id:Date.now(),gateway:this._xingyunGateway,command:'speak',text:pending})}
       }
-      else if(event.state==='playing'){if(this.speechPaused||this.voiceMuted)return;if(!this._xingyunStartedAt)this._xingyunStartedAt=Date.now();this.speaking=true;this.speechPaused=false;this.avatarMessage='星云数字人正在讲解';this.revealAnswer()}
-      else if(event.state==='ended'){this.speaking=false;this._xingyunStartedAt=0;this.avatarMessage=''}
-      else if(event.state==='error'){this.speaking=false;this.xingyunConnected=false;this.xingyunActive=false;this.xingyunFailed=true;this.avatarMessage=event.message||'星云连接失败，请重试'}
+      else if(event.state==='playing'){if(this.speechPaused||this.voiceMuted)return;this.speechStarting=false;if(!this._xingyunStartedAt)this._xingyunStartedAt=Date.now();this.speaking=true;this.speechPaused=false;this.avatarMessage='星云数字人正在讲解';this.revealAnswer()}
+      else if(event.state==='ended'){this.speechStarting=false;this.speaking=false;this._xingyunStartedAt=0;this.avatarMessage=''}
+      else if(event.state==='error'){this.speechStarting=false;this.speaking=false;this.xingyunConnected=false;this.xingyunActive=false;this.xingyunFailed=true;this.avatarMessage=event.message||'星云连接失败，请重试'}
       else if(event.message)this.avatarMessage=event.message
     },
-    toggleVoiceMute:function(m){
+    isMessagePlaying:function(index){return this.activeSpeechIndex===index&&!this.voiceMuted&&!this.speechPaused&&(this.speaking||this.speechStarting)},
+    toggleVoiceMute:function(m,index){
       var text=(m&&m.message)||this._lastSpoken||''
+      if(index!==this.activeSpeechIndex){this.stopPlayback();this.speakAnswer(text,index);return}
       if(this.voiceMuted||this.speechPaused){this.resumeSpeech(text);return}
       if(this.speaking){this.pauseSpeech(text);return}
       if(text)this.speakAnswer(text)
@@ -381,7 +383,7 @@ export default {
       this.loading=false;this.lastMsgId='bottom'
       this.refresh()
     },
-    speakAnswer:function(text){if(!text)return;this._lastSpoken=text;this.speakXingyun(text)},
+    speakAnswer:function(text,index){if(!text)return;this.activeSpeechIndex=typeof index==='number'?index:this.msgs.length;this.voiceMuted=false;this.speechPaused=false;this.speechStarting=true;this._lastSpoken=text;this.speakXingyun(text)},
     speakXingyun:function(text,resume){if(this.voiceMuted)return;if(!text)return;if(!resume){this._lastSpoken=text;this._xingyunFullText=text;this._xingyunOffset=0}this._xingyunStartedAt=0;if(!this._xingyunGateway||!this.xingyunActive){this._xingyunPending=text;if(this._xingyunGateway)this.connectXingyun();return}this.xingyunPayload=Object.assign({},this.xingyunPayload,{id:Date.now(),gateway:this._xingyunGateway,command:'speak',text:text})},
     closeXingyun:function(){
       this._xingyunVersion=(this._xingyunVersion||0)+1;this._xingyunGateway='';this._xingyunPending=''
@@ -393,7 +395,7 @@ export default {
       this.xingyunPayload={command:'close',id:id}
       return this._xingyunClosePromise
     },
-    stopPlayback:function(){if(this.xingyunActive)this.xingyunPayload=Object.assign({},this.xingyunPayload,{command:'stop',text:'',id:Date.now()});this._xingyunPending='';if(this._audio){this._audio.destroy();this._audio=null}if(this._avatarTimer){clearTimeout(this._avatarTimer);this._avatarTimer=null}this._playbackVersion=(this._playbackVersion||0)+1;this.speaking=false;this.speechPaused=false;this.videoUrl='';this._xingyunStartedAt=0;this._xingyunOffset=0;this._xingyunFullText=''},
+    stopPlayback:function(){if(this.xingyunActive)this.xingyunPayload=Object.assign({},this.xingyunPayload,{command:'stop',text:'',id:Date.now()});this._xingyunPending='';if(this._audio){this._audio.destroy();this._audio=null}if(this._avatarTimer){clearTimeout(this._avatarTimer);this._avatarTimer=null}this._playbackVersion=(this._playbackVersion||0)+1;this.activeSpeechIndex=-1;this.speechStarting=false;this.voiceMuted=false;this.speaking=false;this.speechPaused=false;this.videoUrl='';this._xingyunStartedAt=0;this._xingyunOffset=0;this._xingyunFullText=''},
     updateAvatarMessage:function(){if(this.avatarMode==='audio'){this.avatarMessage='语音导览';return}var capability=this.avatarCapability&&this.avatarCapability[this.avatarMode];this.avatarMessage=capability?capability.message:'正在查询数字人服务状态'},
     videoError:function(){this.speaking=false;this.videoUrl='';this.avatarMessage='视频播放失败，请检查视频地址与网络';this.revealAnswer()},
     playAudio:function(value){
@@ -501,6 +503,7 @@ export default {
             // #ifdef APP-PLUS
             if(self.guideProvider==='xingyun')self.speakAnswer(d.data&&d.data.message,d.data&&d.data.ttsAudioUrl)
             // #endif
+            self.activeSpeechIndex=self.msgs.length;self.voiceMuted=false;self.speechPaused=false
             var job=d.data&&d.data.avatarJob
             if(job&&job.job_id){self.pollAvatar(job,playbackVersion)}
             else{if(job)self.avatarMessage=job.message;if(d.data&&d.data.ttsAudioUrl)self.playAudio(d.data.ttsAudioUrl)}
@@ -776,7 +779,8 @@ export default {
 .kc-img{width:100%;height:120rpx;border-radius:8rpx;margin-top:4rpx}
 
 /* 数字导游区域 — 大半屏 */
-.page .guide-stage{position:relative;z-index:2;height:auto;aspect-ratio:16/9;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin:0 8rpx;border-radius:24rpx;overflow:hidden;background:linear-gradient(180deg,var(--ng-surface) 0%,var(--ng-surface) 50%,var(--ng-surface) 100%);box-shadow:0 18rpx 44rpx -20rpx rgba(30,41,59,.24),0 4rpx 16rpx rgba(30,41,59,.06)}
+.page .guide-stage{position:relative;z-index:2;width:min(calc(100% - 16rpx),calc(34vh * 16 / 9));max-width:100%;aspect-ratio:16/9;height:auto;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin:0 auto;border-radius:24rpx;overflow:hidden;background:linear-gradient(180deg,var(--ng-surface) 0%,var(--ng-surface) 50%,var(--ng-surface) 100%);box-shadow:0 18rpx 44rpx -20rpx rgba(30,41,59,.24),0 4rpx 16rpx rgba(30,41,59,.06)}
+@supports not (aspect-ratio:16/9){.page .guide-stage{width:calc(100% - 16rpx);height:34vh}}
 .spot-nav-bar{position:absolute;top:16rpx;left:0;right:0;z-index:3;display:flex;align-items:center;justify-content:center;gap:12rpx;padding:0 20rpx}
 .spot-arrow{width:52rpx;height:52rpx;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);backdrop-filter: none;font-size:36rpx;color:var(--ng-text);flex-shrink:0}
 .spot-label-text{padding:8rpx 16rpx;border-radius:10rpx;background:rgba(0,0,0,.45);backdrop-filter: none;color:var(--ng-text);font-size:22rpx;font-weight:700;white-space:nowrap}

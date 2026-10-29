@@ -43,22 +43,6 @@ const fetchRoutes = async () => {
 
 // ======================== 主题映射 ========================
 
-const themeMap: Record<string, string> = {
-  history: '历史',
-  nature: '自然',
-  comprehensive: '综合',
-  photography: '摄影',
-  family: '亲子',
-}
-
-const themeTagType: Record<string, string> = {
-  history: '',
-  nature: 'success',
-  comprehensive: '',
-  photography: 'warning',
-  family: 'danger',
-}
-
 // ======================== 对话框控制 ========================
 
 const dialogVisible = ref(false)
@@ -267,9 +251,6 @@ onMounted(async () => {
               <!-- 路线名称 -->
               <div class="card-header">
                 <span class="route-name">{{ $t(item.name) }}</span>
-                <el-tag :type="themeTagType[item.theme] as any" size="small">
-                  {{ $t(themeMap[item.theme] || item.theme) }}
-                </el-tag>
               </div>
 
               <!-- 信息条 -->

@@ -1,5 +1,6 @@
 /* Admin-only type scale. Includes Element Plus overlays teleported to body. */
 html:has(.layout-container) {
+  --ui-icon-stroke: 2;
   &, body, #app { min-width: 0; }
   --el-font-size-extra-large: 22px;
   --el-font-size-large: 20px;
@@ -51,7 +52,12 @@ html:has(.layout-container) {
   .el-dialog__body { min-height: 0; overflow: auto; }
   .el-dialog__title { overflow-wrap: anywhere; }
   .dialog-footer { flex-wrap: wrap; gap: 10px; }
-  .el-message-box { max-width: calc(100vw - 24px); }
+  // Keep alerts, confirmations and prompts compact, including body-teleported ones.
+  .el-message-box {
+    width: 420px;
+    max-width: min(420px, calc(100vw - 32px));
+  }
+  .el-message-box__message { overflow-wrap: anywhere; }
   .content-stage .page-title { font-size: 26px; }
 
   :is(.dashboard-page, .dashboard-container) {

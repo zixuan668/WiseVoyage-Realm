@@ -48,7 +48,7 @@ export function popularSpotsOption(ranking: ComprehensiveData['spot_ranking'], w
   const labelWidth = Math.min(180, Math.max(90, Math.round(width * .3)))
   return {
     tooltip: { trigger: 'axis', confine: true, axisPointer: { type: 'shadow' }, textStyle: { fontSize: 18 } },
-    grid: { left: labelWidth + 12, right: 46, top: 18, bottom: 42 },
+    grid: { left: labelWidth + 12, right: 46, top: 18, bottom: 68 },
     xAxis: { type: 'value', minInterval: 1, name: t('会话数'), nameLocation: 'middle', nameGap: 30,
       axisLabel, nameTextStyle: { fontSize: 18, color: text },
       splitLine: { lineStyle: { color: '#e9edf5', type: 'dashed' } } },
