@@ -16,7 +16,7 @@
     </view>
     <view v-else-if="snapshot" class="claim-empty"><text>{{ t('暂无可用数字人，请稍后重试') }}</text><button :disabled="busy" @tap="prepare">{{ t('重试') }}</button></view>
     <text v-if="error" class="claim-error" role="alert">{{ t(error) }}</text>
-    <button class="claim-primary" :disabled="busy || !code.trim() || (snapshot&&!pickedGuideId)" @tap="snapshot?beginTour():prepare()">{{ t(busy ? '正在处理…' : snapshot?'开始导览':'领取路线') }}</button>
+    <button class="claim-primary" :disabled="busy || (!snapshot&&!code.trim())" @tap="snapshot?beginTour():prepare()">{{ t(busy ? '正在处理…' : snapshot?'开始导览':'领取路线') }}</button>
     <button class="scan" :disabled="busy" @tap="scan">{{ t(snapshot?'重新扫码':'扫描路线二维码') }}</button>
     <button class="cancel" :disabled="busy" @tap="leave">{{ t(snapshot?'暂不开始':'稍后领取') }}</button>
   </view></view>
@@ -106,7 +106,15 @@ export default {
     },
     async beginTour() {
       if(this.busy||this._disposed)return
-      if(!this.snapshot||!this.guides.some(g=>g.guide_id===this.pickedGuideId)){this.error='请先选择数字人';return}
+      if(!this.snapshot)return
+      let picked=this.guides.find(g=>g.guide_id===this.pickedGuideId)
+      // 只有一位可选人物时，点“开始导览”即视为选择这位，避免按钮看起来没有反应。
+      if(!picked&&this.guides.length===1){picked=this.guides[0];this.pickedGuideId=picked.guide_id}
+      if(!picked){
+        this.error=this.guides.length?'请先选择数字人':'暂无可用数字人，请稍后重试'
+        uni.showToast({title:this.error,icon:'none'})
+        return
+      }
       this.busy=true;this.error=''
       const ownerToken=uni.getStorageSync('token')
       try {
@@ -132,7 +140,7 @@ export default {
 </script>
 <style scoped>
 .claim-route{display:flex;flex-direction:column;gap:10rpx;padding:24rpx;margin:24rpx 0;border-radius:18rpx;background:var(--ng-raised,#f0edf8);font-size:28rpx;line-height:1.7;overflow-wrap:anywhere}.claim-duration{color:var(--ng-secondary,#4b5563);font-size:26rpx}
-.claim-guides{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16rpx;margin:24rpx 0}.claim-card .claim-guide{width:100%;margin:0;padding:0;min-width:0;min-height:44px;overflow:hidden;box-sizing:border-box;border:2rpx solid var(--ng-border,#e2e8f0);border-radius:22rpx;background:transparent;text-align:left;line-height:1.5;transition:border-color 150ms ease-out,box-shadow 150ms ease-out}.claim-guide::after{border:0}.claim-guide.selected{border-color:var(--ng-accent-text,#5141ad);box-shadow:0 0 0 2rpx var(--ng-accent-text,#5141ad)}.claim-guide-image,.claim-guide-placeholder{width:100%;height:240rpx;display:flex;align-items:center;justify-content:center}.claim-guide-placeholder{font-size:70rpx;color:var(--ng-secondary)}.claim-guide-name{display:flex;align-items:center;justify-content:space-between;gap:12rpx;padding:16rpx;color:#000;background:transparent;font-size:28rpx;font-weight:600;white-space:normal;overflow-wrap:anywhere}.claim-guide-name .iconfont{flex-shrink:0;font-size:24rpx;color:var(--ng-accent-text,#5141ad)}.claim-empty{font-size:28rpx;text-align:center;padding:20rpx;line-height:1.6}.claim-primary[disabled]{background:var(--ng-raised,#f0edf8);color:var(--ng-secondary,#4b5563)}@media(prefers-reduced-motion:reduce){.claim-guide{transition:none!important}}
+.claim-guides{display:flex;flex-wrap:wrap;justify-content:center;align-items:stretch;gap:16rpx;margin:24rpx 0}.claim-card .claim-guide{width:calc(50% - 8rpx);margin:0;padding:0;min-width:0;min-height:44px;overflow:hidden;box-sizing:border-box;border:2rpx solid var(--ng-border,#e2e8f0);border-radius:22rpx;background:transparent;text-align:left;line-height:1.5;transition:border-color 150ms ease-out,box-shadow 150ms ease-out}.claim-guide::after{border:0}.claim-guide.selected{border-color:var(--ng-accent-text,#5141ad);box-shadow:0 0 0 2rpx var(--ng-accent-text,#5141ad)}.claim-guide-image,.claim-guide-placeholder{width:100%;height:240rpx;display:flex;align-items:center;justify-content:center}.claim-guide-placeholder{font-size:70rpx;color:var(--ng-secondary)}.claim-guide-name{display:flex;align-items:center;justify-content:space-between;gap:12rpx;padding:16rpx;color:#000;background:transparent;font-size:28rpx;font-weight:600;white-space:normal;overflow-wrap:anywhere}.claim-guide-name .iconfont{flex-shrink:0;font-size:24rpx;color:var(--ng-accent-text,#5141ad)}.claim-empty{font-size:28rpx;text-align:center;padding:20rpx;line-height:1.6}@media(prefers-reduced-motion:reduce){.claim-guide{transition:none!important}}
 .claim-page{padding-top:calc(24px + env(safe-area-inset-top))!important;padding-bottom:calc(24px + env(safe-area-inset-bottom))!important}
-.claim-page{min-height:100vh;box-sizing:border-box;padding:32rpx 24rpx;background:#f8fafc;color:#1f2937}.claim-card{padding:36rpx 28rpx;background:#fff;border-radius:28rpx}.claim-title{display:block;font-size:38rpx;font-weight:700;text-align:center;margin-bottom:24rpx}.claim-note{display:block;font-size:26rpx;line-height:1.7;color:#64748b;overflow-wrap:anywhere;margin:20rpx 0}.claim-input{height:96rpx;padding:0 20rpx;border:1rpx solid #e2e8f0;border-radius:16rpx;font-size:30rpx;box-sizing:border-box}.server-input{font-size:24rpx}.claim-card button{margin-top:24rpx;min-height:88rpx;font-size:30rpx;border-radius:16rpx}.claim-primary{background:#4f46e5;color:#fff}.scan{background:#eef2ff;color:#4338ca}.cancel{background:#f8fafc;color:#64748b}.claim-error{display:block;margin-top:24rpx;color:#b42342;font-size:26rpx;line-height:1.5}
+.claim-page{min-height:100vh;box-sizing:border-box;padding:32rpx 24rpx;background:#f8fafc;color:#1f2937}.claim-card{padding:36rpx 28rpx;background:#fff;border-radius:28rpx}.claim-title{display:block;font-size:38rpx;font-weight:700;text-align:center;margin-bottom:24rpx}.claim-note{display:block;font-size:26rpx;line-height:1.7;color:#64748b;overflow-wrap:anywhere;margin:20rpx 0}.claim-input{height:96rpx;padding:0 20rpx;border:1rpx solid #e2e8f0;border-radius:16rpx;font-size:30rpx;box-sizing:border-box}.server-input{font-size:24rpx}.claim-card button{margin-top:24rpx;min-height:88rpx;font-size:30rpx;border-radius:16rpx}.claim-primary{background:var(--ng-raised,#f0edf8);color:var(--ng-secondary,#4b5563)}.scan{background:#eef2ff;color:#4338ca}.cancel{background:#f8fafc;color:#64748b}.claim-error{display:block;margin-top:24rpx;color:#b42342;font-size:26rpx;line-height:1.5}
 </style>

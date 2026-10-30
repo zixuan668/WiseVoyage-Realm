@@ -18,7 +18,13 @@ echarts.registerTheme('soft-ui', {
   textStyle: { color: foreground, fontFamily, fontSize: 18 },
   title: { textStyle: { color: '#1f2937', fontFamily, fontSize: 18 }, subtextStyle: { color: foreground, fontFamily, fontSize: 18 } },
   legend: { textStyle: { color: foreground, fontFamily, fontSize: 18 }, inactiveColor: 'rgba(99,102,241,0.12)' },
-  tooltip: { backgroundColor: '#ffffff', borderColor: 'transparent', textStyle: { color: '#1f2937', fontFamily, fontSize: 18 }, extraCssText: 'border-radius:16px;box-shadow:0 10px 40px -10px rgba(30,41,59,.15)' },
+  tooltip: {
+    // Escape card overflow clipping while keeping edge tooltips inside the chart.
+    renderMode: 'html', appendTo: 'body', confine: true,
+    backgroundColor: '#ffffff', borderColor: 'transparent',
+    textStyle: { color: '#1f2937', fontFamily, fontSize: 18 },
+    extraCssText: 'border-radius:16px;box-shadow:0 10px 40px -10px rgba(30,41,59,.15)',
+  },
   categoryAxis: axis,
   valueAxis: axis,
   timeAxis: axis,

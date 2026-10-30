@@ -4,7 +4,7 @@ function harness(){
  const calls=[],uploads=[],feedback=[],navigations=[],storage=new Map([['user_id',17],['token','mock-17']]),handlers={}
  const uni={getStorageSync:k=>storage.get(k),setStorageSync:(k,v)=>storage.set(k,v),removeStorageSync:k=>storage.delete(k),request:o=>{calls.push(o);return{abort(){}}},uploadFile:o=>{uploads.push(o);return{abort(){}}},showToast:o=>feedback.push(o),reLaunch:o=>navigations.push(o),getRecorderManager:()=>({onStart:fn=>handlers.start=fn,onStop:fn=>handlers.stop=fn,onError:fn=>handlers.error=fn,stop(){},start(){}})}
  const translateTour=(s,language,params={})=>String(s??'').replace(/\{(\w+)\}/g,(m,k)=>params[k]??m)
- const c={uni,console,Promise,Date,Set,Number,Math,JSON,Array,Object,String,setTimeout,clearTimeout,BASE_URL:'http://local/api/v1',NocturneSelect:{},translateTour,LANGUAGE_STORAGE_KEY:'zhiyou.app-language',assetUrl:x=>x,uiToast:o=>feedback.push(o)}
+ const c={uni,console,Promise,Date,Set,Number,Math,JSON,Array,Object,String,setTimeout,clearTimeout,BASE_URL:'http://local/api/v1',NocturneSelect:{},TourXingyun:{},translateTour,LANGUAGE_STORAGE_KEY:'zhiyou.app-language',assetUrl:x=>x,uiToast:o=>feedback.push(o)}
  vm.createContext(c);vm.runInContext(fs.readFileSync(path.join(root,'common/chat-language.js'),'utf8').replace(/export /g,''),c);vm.runInContext(fs.readFileSync(path.join(root,'common/planning-language.js'),'utf8').replace(/^import .*$/gm,'').replace(/export /g,''),c)
  const source=fs.readFileSync(path.join(root,'pages/ai-chat/ai-chat.vue'),'utf8').match(/<script>([\s\S]*?)<\/script>/)[1]
  vm.runInContext(source.replace(/^import .*$/gm,'').replace('export default','globalThis.component='),c)
@@ -130,13 +130,32 @@ function audioHarness(){
  s.playTTS=h.o.methods.playTTS.bind(s)
  return {...h,audios}
 }
-test('AI replies use audio only and do not open hidden digital human sessions',async()=>{
+test('browser replies retain the Edge audio playback path',async()=>{
  const h=audioHarness();h.s.playTTS('English answer',0)
  assert.equal(h.calls.length,1);assert.match(h.calls[0].url,/\/tts\/edge\?/)
  h.reply(h.calls.shift(),'/files/speech.mp3');await tick()
  assert.equal(h.audios.length,1);assert.equal(h.audios[0].plays,1)
  const source=fs.readFileSync(path.join(root,'pages/ai-chat/ai-chat.vue'),'utf8')
- assert.doesNotMatch(source,/<chat-voice|<ChatVoice|\/xingyun\/chat-voice/)
+ assert.ok(source.includes('playEdgeTTS'))
+})
+test('native AI replies use the default digital human voice and finish with play',async()=>{
+ const h=audioHarness(),s=h.s;s.nativeChatVoice=true
+ s.playTTS('欢迎参观',2)
+ assert.equal(h.calls[0].url,'http://local/api/v1/xingyun/chat-voice')
+ h.calls.shift().success({statusCode:200,data:{guide_id:2,sdk_url:'https://example.invalid/sdk.js'}});await tick()
+ assert.equal(s.chatVoicePayload.command,'speak');assert.match(s.chatVoicePayload.gateway,/chat_speech=true/)
+ assert.equal(s.chatVoicePayload.text,'欢迎参观');assert.equal(h.audios.length,0)
+ s.onChatVoiceState({state:'playing',gateway:s.chatVoicePayload.gateway});assert.equal(s.isReplyPlaying(2),true)
+ s.onChatVoiceState({state:'ended',gateway:s.chatVoicePayload.gateway});assert.equal(s.isReplyPlaying(2),false)
+ assert.equal(s.chatVoicePayload.command,'close')
+})
+test('completed AI reply shows play instead of pause',async()=>{
+ const h=audioHarness(),s=h.s
+ assert.equal(s.isReplyPlaying(0),false)
+ s.playTTS('回答',0);h.reply(h.calls.shift(),'/files/speech.mp3');await tick()
+ h.audios[0].played();assert.equal(s.isReplyPlaying(0),true)
+ h.audios[0].ended();assert.equal(s.isReplyPlaying(0),false)
+ assert.equal(s.isReplyPlaying(1),false)
 })
 test('audio resume preserves the actual position and ignores a late playing event after pause',async()=>{
  const h=audioHarness(),s=h.s;s.playTTS('欢迎参观',0);h.reply(h.calls.shift(),'/files/speech.mp3');await tick()
@@ -163,4 +182,8 @@ test('the welcome block keeps its layout when the keyboard opens',()=>{
  }
  assert.doesNotMatch(pageStyle,/\.chat-keyboard \.welcome-title\s*\{[^}]*font-size/,'keyboard state must not resize the welcome title')
  assert.doesNotMatch(pageStyle,/\.chat-keyboard \.welcome-topics\s*\{[^}]*margin-top/,'keyboard state must not move the welcome topics')
+})
+
+test('selecting a question spot updates context without sending even after a pending shortcut',()=>{
+ const {s}=harness();s.qaSpots=spots;s._pendingGuideKind='intro';s.text='my draft';s.showQASpots=true;s.$refs={};let sends=0;s.sendGuideKind=()=>{sends++};s.selectQuestionSpot({detail:{value:1}});assert.equal(s.qaSpotId,8);assert.equal(sends,0);assert.equal(s.text,'my draft');assert.equal(s._pendingGuideKind,'');assert.equal(s.showQASpots,false)
 })

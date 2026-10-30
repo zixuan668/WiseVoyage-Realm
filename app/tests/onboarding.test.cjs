@@ -180,7 +180,7 @@ test('onboarding explicitly opens sign-in without automatically restoring a save
   assert.equal(h.requests.length, 0)
   assert.equal(h.navigation.length, 0)
   h.options.onLoad.call(h.state, {})
-  assert.equal(h.requests[0].url, '/api/v1/user/me')
+  assert.equal(h.requests[0].url, '/api/v1/user/me?client_type=app')
 })
 
 test('unloading during the animation cancels pending reveal and navigation', () => {

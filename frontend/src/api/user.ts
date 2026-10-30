@@ -32,6 +32,7 @@ const loginRequest = (loginForm: loginFormType) => {
   const formData = new FormData()
   formData.append('username', loginForm.username)
   formData.append('password', loginForm.password)
+  formData.append('client_type', 'admin')
 
   return request_handler<TokenItem>({
     method: 'POST',
@@ -47,7 +48,7 @@ const loginRequest = (loginForm: loginFormType) => {
 const getUserInfoRequest = async () => {
   return request_handler<ResultPackage<UserInfo>>({
     method: 'GET',
-    url: '/user/me',
+    url: '/user/me?client_type=admin',
     headers: {
       Authorization: header_authorization.value
     }

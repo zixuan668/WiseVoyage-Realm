@@ -118,11 +118,39 @@ test('a rating opened from history returns to that history instead of replacing 
  const {s,navigation}=component('pages/tour-summary/tour-summary.vue');s.goBack();assert.equal(navigation.length,1);assert.equal(navigation[0].back,true)
 })
 
+test('pausing an old reply does not mute the next reply',()=>{
+ const {s}=component('pages/tour/tour.vue')
+ s.xingyunActive=true;s._xingyunGateway='gateway'
+ s.msgs=[{role:'guide',message:'上一条'},{role:'guide',message:'下一条'}]
+ s.speakAnswer('上一条',0);s.speaking=true;s.toggleVoiceMute(s.msgs[0],0)
+ assert.equal(s.speechPaused,true)
+ s.stopPlayback();s.speakAnswer('下一条',1)
+ assert.equal(s.voiceMuted,false);assert.equal(s.speechPaused,false)
+ assert.equal(s.xingyunPayload.command,'speak');assert.equal(s.xingyunPayload.text,'下一条')
+ assert.equal(s.isMessagePlaying(0),false);assert.equal(s.isMessagePlaying(1),true)
+})
+test('selecting another reply does not resume the previous reply text or audio',()=>{
+ const {s}=component('pages/tour/tour.vue')
+ s.xingyunActive=true;s._xingyunGateway='gateway'
+ const a={message:'旧回答'},b={message:'新回答'}
+ s.speakAnswer(a.message,0);s.speaking=true;s.toggleVoiceMute(a,0)
+ s.toggleVoiceMute(b,1)
+ assert.equal(s.xingyunPayload.text,b.message);assert.equal(s.activeSpeechIndex,1)
+ s.speaking=true;s.toggleVoiceMute(b,1)
+ assert.equal(s.speechPaused,true);assert.equal(s.isMessagePlaying(0),false)
+})
 test('tour resume at the estimated end never restarts the entire answer',()=>{
  const {s}=component('pages/tour/tour.vue'),spoken=[]
  s._xingyunFullText='欢迎参观';s._xingyunOffset=4;s.xingyunActive=true;s.speechPaused=true;s.voiceMuted=true;s.speakAnswer=t=>spoken.push(t);s.speakXingyun=t=>spoken.push(t)
  s.resumeSpeech('欢迎参观');assert.equal(spoken.length,0);assert.equal(s.speaking,false)
  s._xingyunOffset=2;s.resumeSpeech('欢迎参观');assert.deepEqual(spoken,['参观'])
+})
+test('completed digital guide speech returns its button to play',()=>{
+ const {s}=component('pages/tour/tour.vue');s._xingyunGateway='gateway';s.xingyunActive=true
+ s.speakAnswer('回答',0);s.onXingyunState({state:'playing',gateway:'gateway'})
+ assert.equal(s.isMessagePlaying(0),true)
+ s.onXingyunState({state:'ended',gateway:'gateway'})
+ assert.equal(s.isMessagePlaying(0),false)
 })
 test('tour pause survives late playing callbacks',()=>{
  const {s}=component('pages/tour/tour.vue');s._xingyunGateway='gateway';s.speechPaused=true;s.voiceMuted=true

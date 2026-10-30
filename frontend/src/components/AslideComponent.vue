@@ -42,6 +42,9 @@ function scheduleMarker() {
 
 async function revealActiveGroup() {
   await nextTick()
+  for (const group of adminGroups) {
+    if (group.key !== active.value?.group) menu.value?.close(group.key)
+  }
   if (!isCollapse.value && active.value?.group) menu.value?.open(active.value.group)
   scheduleMarker()
 }
@@ -67,18 +70,20 @@ onBeforeUnmount(() => { disposed = true; observer?.disconnect(); cancelAnimation
     <div ref="viewport" class="menu-viewport" @transitionend="scheduleMarker">
       <div class="menu-active-indicator" :class="{ ready: markerReady }" :style="marker" aria-hidden="true"></div>
       <el-menu ref="menu" router :default-active="selectedPath" :default-openeds="initialGroups"
-        :collapse="isCollapse" :collapse-transition="false" unique-opened class="enterprise-menu"
+        :collapse="isCollapse" :collapse-transition="false" class="enterprise-menu"
         @open="scheduleMarker" @close="scheduleMarker">
-        <el-menu-item v-for="item in adminDestinations.filter(item => !item.group)" :key="item.path" :index="item.path" :data-admin-path="item.path" :aria-current="selectedPath === item.path ? 'page' : undefined">
+        <el-menu-item v-for="item in adminDestinations.filter(item => !item.group && item.path !== '/stations')" :key="item.path" :index="item.path" :data-admin-path="item.path" :aria-current="selectedPath === item.path ? 'page' : undefined">
           <el-icon><component :is="item.icon" /></el-icon><span>{{ $t(item.label) }}</span>
         </el-menu-item>
         <template v-for="group in adminGroups" :key="group.key">
-          <div v-if="group.caption" v-show="!isCollapse" class="menu-caption" role="presentation">{{ $t(group.caption) }}</div>
           <el-sub-menu :index="group.key" :data-admin-group="group.key">
             <template #title><el-icon><component :is="group.icon" /></el-icon><span>{{ $t(group.label) }}</span></template>
-            <el-menu-item v-for="item in adminDestinations.filter(item => item.group === group.key)" :key="item.path" :index="item.path" :data-admin-path="item.path" :aria-current="selectedPath === item.path ? 'page' : undefined"><span>{{ $t(item.label) }}</span></el-menu-item>
+            <el-menu-item v-for="item in adminDestinations.filter(item => item.group === group.key)" :key="item.path" :index="item.path" :data-admin-path="item.path" :aria-current="selectedPath === item.path ? 'page' : undefined"><el-icon><component :is="item.icon" /></el-icon><span>{{ $t(item.label) }}</span></el-menu-item>
           </el-sub-menu>
         </template>
+        <el-menu-item v-for="item in adminDestinations.filter(item => item.path === '/stations')" :key="item.path" :index="item.path" :data-admin-path="item.path" :aria-current="selectedPath === item.path ? 'page' : undefined">
+          <el-icon><component :is="item.icon" /></el-icon><span>{{ $t(item.label) }}</span>
+        </el-menu-item>
       </el-menu>
     </div>
   </div>
@@ -90,13 +95,13 @@ onBeforeUnmount(() => { disposed = true; observer?.disconnect(); cancelAnimation
 .menu-viewport { position:relative;isolation:isolate; }
 .menu-active-indicator { position:absolute;top:0;left:0;z-index:0;pointer-events:none;border-radius:12px;background:var(--glass-raised,#eef2ff); }
 .menu-active-indicator.ready { transition:transform 200ms cubic-bezier(.2,0,0,1),width 200ms ease-out,height 200ms ease-out,opacity 150ms ease-out; }
-.menu-caption { padding:20px 12px 8px;color:var(--text-secondary);font-size:18px;font-weight:700;letter-spacing:.04em; }
 .enterprise-menu { position:relative;z-index:1;--el-menu-bg-color:transparent;--el-menu-text-color:var(--text-secondary);--el-menu-hover-bg-color:transparent;--el-menu-active-color:var(--champagne-text);border-right:0;background:transparent; }
 .admin-navigation .enterprise-menu :deep(.el-menu-item),.admin-navigation .enterprise-menu :deep(.el-sub-menu__title) { min-height:52px;margin:3px 0;border-radius:12px;font-size:18px;font-weight:600;transition:color 150ms ease-out,background-color 150ms ease-out; }
 .admin-navigation .enterprise-menu :deep(.el-menu-item.is-active) { color:var(--champagne-text);background:transparent!important;box-shadow:none!important; }
 .admin-navigation .enterprise-menu :deep(.el-menu--inline) { background:transparent!important; }
 .admin-navigation .enterprise-menu :deep(.el-menu-item:hover),.admin-navigation .enterprise-menu :deep(.el-sub-menu__title:hover) { background:rgba(99,102,241,.045); }
-.enterprise-menu :deep(.el-icon) { color:inherit;font-size:18px; }
+.enterprise-menu :deep(.el-icon) { color:inherit;font-size:20px;width:20px;height:20px;flex-shrink:0; }
+.enterprise-menu :deep(.el-sub-menu__icon-arrow) { font-size:18px;width:18px;height:18px; }
 .enterprise-menu.el-menu--collapse { width:48px; }
 .enterprise-menu :deep(.el-sub-menu__title:focus-visible),.enterprise-menu :deep(.el-menu-item:focus-visible) { outline:2px solid var(--champagne-text);outline-offset:-3px; }
 .collapsed .brand-block { justify-content:center;padding-left:0;padding-right:0; }

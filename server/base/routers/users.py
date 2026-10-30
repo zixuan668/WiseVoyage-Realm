@@ -10,6 +10,7 @@
 """
 
 from datetime import datetime, timedelta, timezone
+import os
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Request
@@ -219,7 +220,7 @@ def register_email(data: EmailRegistration):
 
 
 @router.post("/login", summary="登录接口")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), client_type: str = Form('app')):
     if not WEB_CONFIGS.TOKEN_JWT_SECURITY_KEY:
         logger.error("TOKEN_JWT_SECURITY_KEY 未配置")
         raise HTTPException(status_code=503, detail="Authentication service is not configured")
@@ -232,6 +233,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
         if not user_info:
             raise HTTPException(status_code=401, detail="Incorrect username or password", headers={"WWW-Authenticate": "Bearer"})
+        validate_login_client(user_info, client_type)
     except HTTPException:
         raise
     except Exception as e:
@@ -259,12 +261,24 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     return res_json
 
 
+def validate_login_client(user_info, client_type: str):
+    is_admin = user_info.username == os.getenv('ADMIN_USERNAME', 'admin')
+    if client_type not in ('app', 'admin'):
+        raise HTTPException(400, '无效的登录端类型')
+    if client_type == 'app' and is_admin:
+        raise HTTPException(403, '管理端账号不能登录 App，请使用游客账号')
+    if client_type == 'admin' and not is_admin:
+        raise HTTPException(403, '该账号不能登录管理端')
+
+
 @router.get("/me", summary="获取用户信息")
-async def get_streaming_room_api(user_id: int = Depends(get_current_user_info)):
+async def get_streaming_room_api(user_id: int = Depends(get_current_user_info), client_type: str | None = None):
     """获取用户信息"""
     user_info = get_db_user_info(id=user_id, all_info=True)
     if not user_info or user_info.delete:
         raise HTTPException(401, "登录账号不存在或已停用")
+    if client_type is not None:
+        validate_login_client(user_info, client_type)
     from ..models.user_model import UserBaseInfo
     user_info = UserBaseInfo(**user_info.model_dump())
     return make_return_data(True, ResultCode.SUCCESS, "成功", user_info)

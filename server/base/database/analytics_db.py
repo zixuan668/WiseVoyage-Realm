@@ -183,19 +183,32 @@ async def get_sentiment_summary(user_id: int) -> dict:
 
 
 async def get_service_stats(user_id: int) -> dict:
-    """获取服务统计数据（今日/本周）"""
-    from datetime import timedelta
+    """获取服务统计数据（当前服务日/服务周）。
 
-    today = datetime.now().date()
-    week_start = today - timedelta(days=today.weekday())
+    服务日默认按本地时间 06:00 换日：凌晨仍在上演的晚间导览算作“今日”，
+    避免 0 点后看板被清零。可用 ANALYTICS_DAY_START_HOUR 调整。
+    """
+    from ..modules.analytics_time import service_day_window, service_week_window
+
+    day_start, day_end = service_day_window()
+    week_start, _ = service_week_window()
 
     with Session(DB_ENGINE) as session:
-        # 今日会话数
+        base_session_filter = (
+            TourSessionInfo.user_id == user_id,
+            TourSessionInfo.delete == False,
+        )
+        session_join = select(func.count(TourSessionInfo.session_id)).join(
+            TourSessionStatus, TourSessionInfo.status_id == TourSessionStatus.status_id
+        )
+
+        # 今日会话数（按会话开始时间落在当前服务日内）
         today_sessions = session.scalar(
-            select(func.count(TourSessionInfo.session_id)).where(
+            session_join.where(
                 and_(
-                    TourSessionInfo.user_id == user_id,
-                    TourSessionInfo.delete == False,
+                    *base_session_filter,
+                    TourSessionStatus.start_time >= day_start,
+                    TourSessionStatus.start_time < day_end,
                 )
             )
         ) or 0
@@ -205,17 +218,19 @@ async def get_service_stats(user_id: int) -> dict:
             select(func.count(VisitorInteraction.message_id)).where(
                 and_(
                     VisitorInteraction.role == "user",
-                    func.date(VisitorInteraction.send_time) == today,
+                    VisitorInteraction.send_time >= day_start,
+                    VisitorInteraction.send_time < day_end,
                 )
             )
         ) or 0
 
-        # 本周会话数
+        # 本周会话数（按会话开始时间落在当前服务周内）
         week_sessions = session.scalar(
-            select(func.count(TourSessionInfo.session_id)).where(
+            session_join.where(
                 and_(
-                    TourSessionInfo.user_id == user_id,
-                    TourSessionInfo.delete == False,
+                    *base_session_filter,
+                    TourSessionStatus.start_time >= week_start,
+                    TourSessionStatus.start_time < day_end,
                 )
             )
         ) or 0
@@ -242,26 +257,28 @@ async def get_hot_spot_ranking(limit: int = 10) -> list:
             select(ScenicSpotInfo).where(ScenicSpotInfo.delete == False)
         ).all()
 
-        ranking = []
-        for spot in (spots or []):
-            # 统计包含此景点的会话数（通过路线-景点关联）
-            session_count = session.scalar(
-                select(func.count(TSI.session_id)).where(
-                    and_(
-                        TSI.delete == False,
-                        TSI.route_id.in_(
-                            select(TourRouteSpot.route_id).where(TourRouteSpot.spot_id == spot.spot_id)
-                        ),
-                    )
-                )
-            ) or 0
-            ranking.append({
-                "spot_id": spot.spot_id,
-                "spot_name": spot.spot_name,
-                "category": spot.category,
-                "session_count": session_count,
-            })
-
+        import json
+        from collections import Counter, defaultdict
+        route_spots = defaultdict(set)
+        for link in session.exec(select(TourRouteSpot)).all():
+            route_spots[link.route_id].add(link.spot_id)
+        counts = Counter()
+        tours = session.exec(select(TSI).where(TSI.delete == False)).all()
+        for tour in tours:
+            try:
+                preferences = json.loads(tour.visitor_preferences or '{}')
+            except (ValueError, TypeError):
+                preferences = {}
+            if isinstance(preferences, dict) and 'spot_ids' in preferences:
+                ids = preferences['spot_ids']
+                ids = {sid for sid in ids if type(sid) is int} if isinstance(ids, list) else set()
+            else:
+                ids = route_spots.get(tour.route_id, set())
+            counts.update(ids)
+        ranking = [{
+            'spot_id': spot.spot_id, 'spot_name': spot.spot_name,
+            'category': spot.category, 'session_count': counts[spot.spot_id],
+        } for spot in spots]
         # 按会话数降序排列
         ranking.sort(key=lambda x: x["session_count"], reverse=True)
         return ranking[:limit]

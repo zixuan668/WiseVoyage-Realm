@@ -7,6 +7,7 @@
     "packageIntegrity": "sha512-yLAiQB3MWUJEstsEDAwenSA3m7vr1tdLvgnC16Q/XMxRRma0DWwMs8M2bWlvgShrIs1m2mWMJ+0AiahqQO4GrA=="
   },
   "icons": {
+    "gauge": [["path", {"d": "m12 14 4-4"}], ["path", {"d": "M3.34 19a10 10 0 1 1 17.32 0"}], ["path", {"d": "M12 4v2M4.93 6.93l1.42 1.42M2 14h2M20 14h2M17.66 8.34l1.41-1.41"}], ["circle", {"cx": "12", "cy": "14", "r": "1"}]],
     "arrow-down": [
       [
         "path",

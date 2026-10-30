@@ -42,7 +42,18 @@ function initChart() {
       textStyle: { fontSize: 18, fontWeight: 600 },
     } : undefined,
     tooltip: {
-      position: 'top',
+      appendToBody: true,
+      confine: false,
+      enterable: false,
+      position: (point, _params, _element, rect, size) => {
+        const [tooltipWidth, tooltipHeight] = size.contentSize
+        const centerX = rect ? rect.x + rect.width / 2 : point[0]
+        const top = rect ? rect.y : point[1]
+        return [
+          Math.max(0, Math.min(centerX - tooltipWidth / 2, size.viewSize[0] - tooltipWidth)),
+          top - tooltipHeight - 12,
+        ]
+      },
       formatter: (params: any) => {
         return `${params.value[1]} ${params.value[0]}<br/>${t('活跃度: {p0}次', {p0: params.value[2]})}`
       },

@@ -70,8 +70,8 @@
           <text v-else-if="m.content" class="msg-text">{{ m.content }}</text>
           <button v-if="m.recognitionEvidence" class="photo-evidence-toggle" @tap="toggleEvidence(m)">{{ $t(m.showEvidence?'收起识别依据':'查看识别依据（原文）') }}</button>
           <text v-if="m.showEvidence&&m.recognitionEvidence" class="photo-evidence">{{ m.recognitionEvidence }}</text>
-          <view v-if="m.role==='ai' && m.content && !m.cursor" class="msg-speaker" :class="{on:speaking && speakingIndex===i}" :aria-label="$t(speakingIndex===i && !ttsPaused ? '暂停语音播报' : '继续播放')" @tap="replayTTS(m.content,i)">
-            <text v-if="speakingIndex===i && ttsPaused" class="playback-glyph iconfont icon-play" aria-hidden="true"></text>
+          <view v-if="m.role==='ai' && m.content && !m.cursor" class="msg-speaker" :class="{on:isReplyPlaying(i)}" :aria-label="$t(isReplyPlaying(i) ? '暂停语音播报' : '继续播放')" @tap="replayTTS(m.content,i)">
+            <text v-if="!isReplyPlaying(i)" class="playback-glyph iconfont icon-play" aria-hidden="true"></text>
             <text v-else class="playback-glyph iconfont icon-pause" aria-hidden="true"></text>
           </view>
         </view>
@@ -185,6 +185,9 @@
         </view>
       </view>
     </view>
+    <!-- #ifdef APP-PLUS -->
+    <view v-if="nativeChatVoice" class="chat-voice-runtime" aria-hidden="true"><tour-xingyun :payload="chatVoicePayload" @state="onChatVoiceState" /></view>
+    <!-- #endif -->
   </view>
 </template>
 
@@ -192,6 +195,7 @@
 import { localizeChatMessages, warmChatTranslations, getChatTranslationCache } from '../../common/chat-language.js'
 import { BASE_URL, assetUrl, isBeijingCity } from '../../common/config.js'
 import NocturneSelect from '../../components/NocturneSelect.vue'
+import TourXingyun from '../../components/tour-xingyun.vue'
 import { planningMessage, recommendationText, questionLanguage, findQuestionSpot, photoIdentificationText } from '../../common/planning-language.js'
 import { translateTour, LANGUAGE_STORAGE_KEY } from '../../common/tour-language.js'
 
@@ -225,12 +229,13 @@ function request(options) {
 }
 
 export default {
-  components:{NocturneSelect},
+  components:{NocturneSelect,TourXingyun},
   data: function () {
     return {
       chatMode:'guide',qaSpots:[],qaGuides:[],qaSpotId:null,spotAnchor:null,qaSession:null,qaCatalogLoading:false,catalogError:'',showQASpots:false,requestEpoch:0,historyOwner:null,applyingRoute:false,
       keyboardVisible:false,keyboardHeight:0,recognizing:false,pendingPhoto:'',recognitionError:'',showPhotoChoices:false,photoClosing:false,scrollAnim:false,
       undoVisible:false,undoKind:'',showHistory:false, historyTranslating:false, historyTranslationFailed:false, text: '', msgs: [], historyMsgs: [], loading: false, chatScrollTop:0, followBottom:true, chatViewH:0, tabLeaving:false, lastSpotIds: [], recommendSpots: [], recommendLoading: false,recommendedPlan:null,
+      nativeChatVoice:false,chatVoicePayload:{},
       voiceError:'',transcribing:false,voiceMode: false, recording: false, voicePressing: false, speaking: false, speakingIndex:-1,ttsLoading:false,ttsPaused:false,
       recordingText: '正在聆听...', _voiceManager: null, _voiceTimer: null, _ws: null, statusH:20, inputHeight:0, textareaFocus:false,
     }
@@ -245,6 +250,9 @@ export default {
     loading:function(){this.scrollChat();this.warmHistory()},
   },
   onLoad:function(){
+    // #ifdef APP-PLUS
+    this.nativeChatVoice=true
+    // #endif
     this._keyboardListener=event=>this.updateKeyboardHeight(event.height)
     if(uni.onKeyboardHeightChange)uni.onKeyboardHeightChange(this._keyboardListener)
   },
@@ -446,13 +454,9 @@ export default {
     selectQuestionSpot:function(event){
       this.qaSpotId=this.qaSpots[Number(event.detail.value)]?.spot_id||null
       this.saveHistory()
-      const kind=this._pendingGuideKind
-      if(kind){
-        this._pendingGuideKind=''
-        this.sendGuideKind(kind)
-        if(this.$refs.spotPicker)this.$refs.spotPicker.requestClose()
-        else this.showQASpots=false
-      }
+      this._pendingGuideKind=''
+      if(this.$refs.spotPicker)this.$refs.spotPicker.requestClose()
+      else this.showQASpots=false
     },
     pickSpot:function(){
       this.loadWelcomeCatalog()
@@ -759,10 +763,12 @@ export default {
     blockTouch:function(){},
     toggleVoiceMode: function () { if(this.recording||this.transcribing)return;this.voiceMode = !this.voiceMode;this.textareaFocus=false;if(this.voiceMode)uni.hideKeyboard() },
     stopTTS:function(){
+      if(this.nativeChatVoice){this.chatVoicePayload={command:'close',id:Date.now()};this._chatVoiceStarted=0;this._chatVoiceText='';this._chatVoiceOffset=0}
       this._ttsRequestId=(this._ttsRequestId||0)+1
       if(this._ttsAudio){this._ttsAudio.destroy();this._ttsAudio=null}
       this.speaking=false;this.ttsLoading=false;this.ttsPaused=false;this.speakingIndex=-1
     },
+    isReplyPlaying:function(index){return this.speakingIndex===index&&!this.ttsPaused&&(this.speaking||this.ttsLoading)},
     replayTTS: function (text,index) {
       if(this.speakingIndex===index){
         if(this.ttsLoading){this.stopTTS();return}
@@ -774,11 +780,13 @@ export default {
     },
     // Keep the same audio object so resume preserves the actual playback position.
     pauseTTS: function () {
+      if(this.nativeChatVoice){if(this._chatVoiceStarted)this._chatVoiceOffset=Math.min((this._chatVoiceText||'').length,(this._chatVoiceOffset||0)+(Date.now()-this._chatVoiceStarted)/1000*4);this._chatVoiceStarted=0;this.chatVoicePayload=Object.assign({},this.chatVoicePayload,{command:'stop',text:'',id:Date.now()})}
       this.ttsPaused=true;this.speaking=false
       try{this._ttsAudio&&this._ttsAudio.pause()}catch(e){}
     },
     resumeTTS: function () {
       this.ttsPaused=false
+      if(this.nativeChatVoice){const text=(this._chatVoiceText||'').slice(Math.floor(this._chatVoiceOffset||0));if(text){this.ttsLoading=true;this.chatVoicePayload=Object.assign({},this.chatVoicePayload,{command:'speak',text,id:Date.now()})}else this.stopTTS();return}
       if(this._ttsAudio){try{this._ttsAudio.play();return}catch(e){this.stopTTS()}}
       // An in-flight request starts when ready; completed playback is never restarted here.
     },
@@ -788,7 +796,26 @@ export default {
       if (!text) return
       this.stopTTS()
       var clean=this.cleanTTS(text)
+      if(this.nativeChatVoice){this.playDigitalVoice(clean,index);return}
       this.playEdgeTTS(clean,index)
+    },
+    playDigitalVoice:async function(text,index){
+      this.speakingIndex=index;this.ttsLoading=true
+      const version=this._ttsRequestId,owner=uni.getStorageSync('token')
+      try{
+        const res=await request({url:'/xingyun/chat-voice'})
+        if(version!==this._ttsRequestId||owner!==uni.getStorageSync('token'))return
+        const config=res.data
+        if(!config?.guide_id||!config.sdk_url)throw new Error('数字人语音服务未配置')
+        this._chatVoiceText=text;this._chatVoiceOffset=0
+        this.chatVoicePayload={command:this.ttsPaused?'connect':'speak',text:this.ttsPaused?'':text,id:Date.now(),gateway:BASE_URL+'/xingyun/session/'+config.guide_id+'?chat_speech=true&language='+questionLanguage(text,this.tourLanguage),sdkUrl:config.sdk_url,token:owner}
+      }catch(error){if(version!==this._ttsRequestId)return;this.stopTTS();uiToast({title:error.message||'数字人语音连接失败',icon:'none'})}
+    },
+    onChatVoiceState:function(event){
+      if(event.gateway&&event.gateway!==this.chatVoicePayload.gateway)return
+      if(event.state==='playing'){if(this.ttsPaused)return;this._chatVoiceStarted=Date.now();this.ttsLoading=false;this.speaking=true}
+      else if(event.state==='ended'){if(this.ttsPaused)return;this.stopTTS()}
+      else if(event.state==='error'){this.stopTTS();uiToast({title:event.message||'数字人语音连接失败',icon:'none'})}
     },
     playEdgeTTS: function (clean,index) {
       if (!clean) return
@@ -936,7 +963,7 @@ export default {
 .qh-chip { padding:12rpx 20rpx; border-radius:22rpx; background:rgba(99,102,241,0.12); border:1rpx solid rgba(99,102,241,0.25); font-size:22rpx; color:var(--ng-secondary); }
 .qh-chip:active { background:rgba(99,102,241,0.18); }
 
-.chat-area { position:relative; z-index:1; flex:1; height:0; min-height:0; box-sizing:border-box; padding:16rpx 24rpx; }
+.chat-area { position:relative; z-index:1; flex:1; height:100%; min-height:0; box-sizing:border-box; padding:16rpx 24rpx; }
 .chat-empty { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; min-height:0; padding-top:34rpx; }
 .ce-icon { font-size:72rpx; margin-bottom:18rpx; display:inline-block; animation:bounceBall 2.4s ease-in-out infinite; }
 @keyframes bounceBall { 0%,100%{transform:translateY(0)} 4%{transform:translateY(-36rpx)} 8%{transform:translateY(0)} 12%{transform:translateY(-24rpx)} 16%{transform:translateY(0)} 20%{transform:translateY(-14rpx)} 24%{transform:translateY(0)} 28%{transform:translateY(-6rpx)} 32%{transform:translateY(0)} }
@@ -1036,9 +1063,10 @@ export default {
 .nav .qh-spot{display:flex;align-items:center;gap:12rpx;width:auto;flex:0 1 auto;max-width:450rpx;min-width:0;margin:0;padding:12rpx 18rpx 12rpx 10rpx;min-height:72rpx;line-height:1.4;border:1rpx solid rgba(255,255,255,.76);border-radius:40rpx;background:rgba(255,255,255,.64);box-shadow:0 6rpx 24rpx rgba(115,91,185,.07);text-align:left;box-sizing:border-box}
 .qh-spot::after{border:0}.context-pin{display:flex;align-items:center;justify-content:center;width:46rpx;height:46rpx;flex-shrink:0;border-radius:50%;background:var(--ng-glass-blue-bg);box-shadow:0 1rpx 2rpx rgba(70,105,170,.06),0 4rpx 8rpx -4rpx rgba(70,105,170,.12),inset 0 1rpx 0 rgba(255,255,255,.9)}.context-pin .iconfont{font-size:31rpx;color:var(--ng-soft-blue-text)}
 .context-name{flex:1;min-width:0;font-size:25rpx;font-weight:500;color:#261956;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nav-clear{flex-shrink:0;margin:0;padding:8rpx;font-size:23rpx;background:transparent}
-.conversation-stage{position:relative;flex:1;min-height:0;overflow:hidden;padding-bottom:128rpx}.conversation-stage .chat-area{height:100%;padding:0 28rpx 24rpx}
+.conversation-stage{position:relative;flex:1;min-height:0;overflow:hidden;padding-bottom:128rpx}.conversation-stage .chat-area{position:absolute;inset:0;width:100%;height:100%;padding:0 28rpx 24rpx}
 .welcome-active :deep(.uni-scroll-view-content){display:flex;flex-direction:column;min-height:100%}
-.guide-welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24rpx 12rpx 210rpx;box-sizing:border-box}
+.guide-welcome{flex:0 0 auto;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:160rpx 12rpx 120rpx;box-sizing:border-box}
+.guide-welcome>view,.guide-welcome>text{flex-shrink:0}
 .welcome-art{position:relative;width:240rpx;height:172rpx;flex-shrink:0;margin:0 0 34rpx;pointer-events:none}
 .welcome-art-shadow{position:absolute;left:16rpx;right:8rpx;bottom:4rpx;height:28rpx;border-radius:50%;background:radial-gradient(ellipse,rgba(171,147,232,.12),rgba(194,176,245,0) 72%)}
 .welcome-balloon{position:absolute;left:42rpx;top:24rpx;width:146rpx;height:96rpx;border-radius:36rpx;background:linear-gradient(135deg,#e1d8ff,#ac91ed);box-shadow:inset 4rpx 6rpx 16rpx rgba(255,255,255,.38),0 10rpx 28rpx rgba(162,130,225,.12);animation:welcomeFloat 4s ease-in-out infinite}
@@ -1049,7 +1077,7 @@ export default {
 .welcome-description{display:block;max-width:100%;margin-top:14rpx;text-align:center;font-size:25rpx;line-height:1.7;color:#9a98ae}
 .welcome-topics{display:flex;flex-wrap:wrap;align-items:stretch;gap:18rpx;width:100%;margin-top:48rpx}
 .welcome-topic{position:relative;max-width:100%;min-width:0;min-height:88rpx;margin:0;padding:16rpx 22rpx;border:1rpx solid rgba(255,255,255,.95);border-radius:32rpx;background:rgba(255,255,255,.85);box-shadow:0 6rpx 20rpx rgba(116,85,196,.06),inset 0 2rpx 6rpx rgba(255,255,255,.85);display:flex;align-items:center;gap:14rpx;text-align:left;line-height:1.45;box-sizing:border-box}
-.welcome-photo-row{width:100%;display:flex;justify-content:center}.welcome-topic-photo{justify-content:center;text-align:center}
+.welcome-photo-row{width:100%;min-height:88rpx;flex-shrink:0;display:flex;justify-content:center}.welcome-topic-photo{justify-content:center;text-align:center}
 .welcome-topic::after{border:0}.welcome-topic[disabled]{opacity:.55}.topic-icon-wrap{width:48rpx;height:48rpx;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--ng-glass-blue-bg);box-shadow:0 1rpx 2rpx rgba(70,105,170,.06),0 4rpx 8rpx -4rpx rgba(70,105,170,.12),inset 0 1rpx 0 rgba(255,255,255,.9)}.topic-icon{font-size:31rpx;color:var(--ng-soft-blue-text)}.topic-title{min-width:0;font-size:26rpx;font-weight:500;color:#291b58;white-space:normal}
 .welcome-loading,.welcome-unavailable{width:100%;margin-bottom:20rpx;padding:14rpx 20rpx;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:16rpx;border-radius:20rpx;background:rgba(255,255,255,.6);color:#8b829d;font-size:23rpx;line-height:1.5;white-space:normal;text-align:center}
 .welcome-unavailable button{flex-shrink:0;margin:0;padding:6rpx 18rpx;font-size:23rpx;line-height:1.7;border-radius:14rpx;color:#7961bc;background:#fff}
@@ -1068,4 +1096,9 @@ export default {
 @keyframes welcomeTwinkle{0%,100%{opacity:.5;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
 @media (prefers-reduced-motion:reduce){.welcome-balloon,.welcome-sparkle,.history-panel,.photo-popover{animation:none!important}}
 @media (max-width:360px){.chat-ref-page .nav{gap:10rpx;padding-left:18rpx;padding-right:18rpx}.nav .qh-spot{max-width:370rpx;padding-right:14rpx;gap:8rpx}.context-name{font-size:24rpx}.welcome-title{font-size:40rpx}.guide-welcome{padding-left:4rpx;padding-right:4rpx;padding-bottom:80rpx}.welcome-topic{padding:14rpx 16rpx;gap:10rpx}.topic-title{font-size:25rpx}.chat-ref-page .input-bar{gap:8rpx;padding-left:14rpx;padding-right:14rpx}.photo-add,.voice-btn{width:76rpx;height:76rpx}.input-bar .msg-input,.input-bar .voice-hold-btn,.send-btn{height:76rpx;line-height:76rpx}.send-btn{padding:0 20rpx}}
+</style>
+
+
+<style scoped>
+.chat-ref-page>.chat-voice-runtime{position:fixed!important;left:-1000px;top:0;width:240px;height:400px;pointer-events:none;opacity:0;overflow:hidden}
 </style>

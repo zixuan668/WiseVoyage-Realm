@@ -45,7 +45,7 @@ const statCards = computed(() => {
   return [
     { title: t("总交互数"), value: emotion?.total || 0, icon: ChatDotRound, sub: t("全局交互次数") },
     { title: t("好评率"), value: (emotion?.positive_rate || 0) + '%', icon: CircleCheck, sub: (emotion?.positive || 0) + t(" 条正面") },
-    { title: t("今日提问"), value: stats?.today_questions || 0, icon: QuestionFilled, sub: t("今日游客提问") },
+    { title: t("今日提问"), value: stats?.today_questions || 0, icon: QuestionFilled, sub: t("服务日 06:00 起") },
     { title: t("负面率"), value: (emotion?.negative_rate || 0) + '%', icon: WarningFilled, sub: t("负面情绪占比") },
     { title: t("本周服务"), value: stats?.week_sessions || 0, icon: UserFilled, sub: t("本周会话数") },
     { title: t("知识覆盖"), value: knowledgeGaps.value ? Math.max(0, 100 - knowledgeGaps.value.uncertain_answers_count * 2) + '%' : 'N/A', icon: Reading, sub: t("知识响应率") },
