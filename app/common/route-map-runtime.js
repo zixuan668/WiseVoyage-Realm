@@ -1,6 +1,6 @@
 // DOM-only map renderer shared by H5 and App renderjs. No native map view is
 // inserted into scroll-view: the map, SVG paths and labels scroll together.
-export const SCENIC_TILES = 'https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}'
+import { WALK_TILES, WALK_ATTRIBUTION } from '../../shared/pedestrian-map.js'
 
 export function routeLineStyle(original, active) {
   return { color: original ? '#8b96ac' : active ? '#513dbe' : '#a69acb', weight: active ? 6 : 4,
@@ -71,8 +71,9 @@ export function createRouteMap(element, report = () => {}, win = window, doc = d
       const L = await loadRouteLibrary(win, doc, next.assetBase)
       if (disposed || own !== version || !element.isConnected) return
       if (!map) {
-        map = L.map(element, { zoomControl: false, attributionControl: false, scrollWheelZoom: false, zoomAnimation: false, dragging: true, touchZoom: true, bounceAtZoomLimits: false })
-        tiles = L.tileLayer(SCENIC_TILES, { maxZoom: 18 }).addTo(map)
+        map = L.map(element, { zoomControl: false, attributionControl: true, scrollWheelZoom: false, zoomAnimation: false, dragging: true, touchZoom: true, bounceAtZoomLimits: false })
+        map.attributionControl.setPrefix(false)
+        tiles = L.tileLayer(WALK_TILES, { maxZoom: 19, attribution: WALK_ATTRIBUTION }).addTo(map)
         tiles.on('tileload', () => { tileLoaded++; if (!disposed && tileLoaded === 1) report({ state: 'ready' }) })
         tiles.on('tileerror', () => { if (!disposed && ++tileErrors >= 3 && !tileLoaded) report({ state: 'tiles-error' }) })
         group = L.layerGroup().addTo(map)

@@ -3,6 +3,12 @@ import { roadPoints, roadPaths, routeLegs } from '../routeGeometry'
 import type { RouteOverviewData, WalkingLeg } from '@/api/tourExperience'
 const leg=(geometry?:number[][]):WalkingLeg=>({from_id:1,to_id:2,from_name:'A',to_name:'B',meters:200,minutes:3,basis:'osm_pedestrian_network',geometry})
 describe('actual pedestrian geometry',()=>{
+ it('keeps OSM road vertices in WGS84 without a GCJ02 offset or mutation',()=>{
+  const geometry = [[39.9966755,116.2755965],[39.99650335,116.27383459]]
+  const points = roadPoints(leg(geometry))
+  expect(points).toEqual(geometry)
+  expect(points[0]).not.toBe(geometry[0])
+ })
  it('does not draw a connector from stop coordinates when road geometry is missing',()=>{
   const route={stops:[{latitude:39.99,longitude:116.26},{latitude:40,longitude:116.27}],legs:[leg()]} as RouteOverviewData
   expect(roadPaths(route)).toEqual([])

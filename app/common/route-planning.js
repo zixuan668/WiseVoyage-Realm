@@ -1,5 +1,5 @@
 import { BASE_URL } from './config.js'
-import { wgs84ToGcj02 } from '../../shared/coordinates.js'
+import { walkingMapPoint } from '../../shared/pedestrian-map.js'
 
 export function selectedOrder(order, selected) {
   const available = new Set(Object.keys(selected).filter(id => selected[id]).map(Number))
@@ -39,7 +39,7 @@ export function roadMap(overview) {
   const markers = stops.flatMap((stop, index) => {
     const lat = stop.access_latitude ?? stop.latitude, lng = stop.access_longitude ?? stop.longitude
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return []
-    const point = wgs84ToGcj02(lat, lng)
+    const point = walkingMapPoint(lat, lng)
     return [{ id: index + 1, latitude: point[0], longitude: point[1], width: 26, height: 26,
       iconPath: '/static/pin-blue.png', label: { content: String(index + 1), color: '#4338ca', fontSize: 12 } }]
   })
@@ -49,12 +49,12 @@ export function roadMap(overview) {
     if (leg.available === false || !Array.isArray(leg.geometry) || leg.geometry.length < 2 ||
       !leg.geometry.every(p => Array.isArray(p) && p.length === 2 && p.every(Number.isFinite) && Math.abs(p[0]) <= 90 && Math.abs(p[1]) <= 180)) return []
     legIndexes.push(index)
-    return [{ points: leg.geometry.map(p => { const point = wgs84ToGcj02(p[0], p[1]); return { latitude: point[0], longitude: point[1] } }), color: '#6554b9', width: 5 }]
+    return [{ points: leg.geometry.map(p => { const point = walkingMapPoint(p[0], p[1]); return { latitude: point[0], longitude: point[1] } }), color: '#6554b9', width: 5 }]
   })
   for (const [key, id] of [['entry_anchor', 1001], ['exit_anchor', 1002]]) {
     const gate = overview?.[key]
     if (Number.isFinite(gate?.latitude) && Number.isFinite(gate?.longitude)) {
-      const point = wgs84ToGcj02(gate.latitude, gate.longitude)
+      const point = walkingMapPoint(gate.latitude, gate.longitude)
       markers.push({ id, latitude: point[0], longitude: point[1], iconPath: '/static/pin-red.png', width: 26, height: 26,
         callout: { content: gate.label, display: 'BYCLICK' } })
     }

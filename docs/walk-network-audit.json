@@ -1,0 +1,17 @@
+{
+  "network_version": "ca83d147eb156082-4f53cda18c",
+  "nodes": 1188,
+  "edges": 1270,
+  "anchors": 19,
+  "checked_pairs": 171,
+  "disconnected_pairs": [],
+  "invalid_geometry_edges": [],
+  "restricted_edges_excluded_at_runtime": 0,
+  "access_points_requiring_field_review": [
+    {
+      "name": "乐寿堂",
+      "offset_meters": 33.7
+    }
+  ],
+  "limitation": "Connectivity and geometry only; projected entrances and live closures require field verification."
+}

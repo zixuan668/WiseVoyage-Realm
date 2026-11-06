@@ -3,9 +3,9 @@ import { ArrowUpRight, ArrowDown, Bottom, iconMarkup } from '@/icons'
 import { computed, ref, watch, nextTick, onBeforeUnmount } from 'vue'
 import { t, locale } from '@/i18n'
 import { getRouteOverview, type RouteOverviewData } from '@/api/tourExperience'
-import { loadScenicMap, SCENIC_TILES } from '@/utils/leaflet'
+import { loadScenicMap } from '@/utils/leaflet'
 import { roadPoints, routeLegs } from '@/utils/routeGeometry'
-import { wgs84ToGcj02 } from '../../../shared/coordinates.js'
+import { walkingMapPoint, WALK_TILES, WALK_ATTRIBUTION } from '../../../shared/pedestrian-map.js'
 const props = withDefaults(defineProps<{
   spotIds?: number[]; overview?: RouteOverviewData | null; compare?: RouteOverviewData | null
   pace?: string; showMap?: boolean; compact?: boolean; currentId?: number; mapOnly?: boolean; showStatistics?: boolean
@@ -38,8 +38,8 @@ async function draw(){
   try{
     const L=await loadScenicMap()
     if(disposed||own!==drawVersion||!mapEl.value||!displayed.value)return
-    if(!map){map=L.map(mapEl.value,{zoomControl:true,attributionControl:false,scrollWheelZoom:false})
-      L.tileLayer(SCENIC_TILES,{maxZoom:18}).addTo(map);group=L.layerGroup().addTo(map)
+    if(!map){map=L.map(mapEl.value,{zoomControl:true,attributionControl:true,scrollWheelZoom:false})
+      L.tileLayer(WALK_TILES,{maxZoom:19,attribution:WALK_ATTRIBUTION}).addTo(map);map.attributionControl.setPrefix(false);group=L.layerGroup().addTo(map)
       if(typeof ResizeObserver!=='undefined'){resize=new ResizeObserver(()=>map?.invalidateSize({pan:false}));resize.observe(mapEl.value)}}
     group.clearLayers()
     const route=displayed.value, bounds:number[][]=[]
@@ -52,17 +52,17 @@ async function draw(){
     route.stops.forEach(stop=>{
       const lat=stop.access_latitude??stop.latitude,lng=stop.access_longitude??stop.longitude
       if(lat==null||lng==null)return
-      const point=wgs84ToGcj02(lat,lng);bounds.push(point)
+      const point=walkingMapPoint(lat,lng);bounds.push(point)
       const active=stop.spot_id===props.currentId
       const icon=L.divIcon({className:'route-order-marker',html:`<span style="display:grid;place-items:center;width:30px;height:30px;border-radius:50%;border:3px solid white;box-shadow:0 2px 9px #50428155;background:${active?'#23816b':'#6652bd'};color:white;font:600 18px var(--app-font-family)">${stop.order}</span>`,iconSize:[36,36],iconAnchor:[18,18]})
       const label=document.createElement('span');label.textContent=t(stop.spot_name)+' · '+t('步行接入点')
       L.marker(point,{icon,title:t(stop.spot_name)}).bindPopup(label).addTo(group)
     })
-    if(route.entry_anchor){const entry=route.entry_anchor,point=wgs84ToGcj02(entry.latitude,entry.longitude);bounds.push(point)
+    if(route.entry_anchor){const entry=route.entry_anchor,point=walkingMapPoint(entry.latitude,entry.longitude);bounds.push(point)
       const icon=L.divIcon({className:'route-entry-marker',html:'<span style="display:grid;place-items:center;width:32px;height:32px;border:3px solid white;border-radius:10px;background:#315c65;color:white;font:700 18px var(--app-font-family)">'+iconMarkup('map-pin')+'</span>',iconSize:[38,38],iconAnchor:[19,19]})
       const label=document.createElement('span');label.textContent=locale.value==='en'&&entry.label_en?entry.label_en:t(entry.label)
       L.marker(point,{icon,title:label.textContent}).bindPopup(label).addTo(group)}
-    if(route.exit_anchor){const gate=route.exit_anchor,point=wgs84ToGcj02(gate.latitude,gate.longitude);bounds.push(point)
+    if(route.exit_anchor){const gate=route.exit_anchor,point=walkingMapPoint(gate.latitude,gate.longitude);bounds.push(point)
       const icon=L.divIcon({className:'route-exit-marker',html:'<span style="display:grid;place-items:center;width:32px;height:32px;border:3px solid white;border-radius:10px;background:#23816b;color:white;font:700 18px var(--app-font-family)">'+iconMarkup('arrow-up-right')+'</span>',iconSize:[38,38],iconAnchor:[19,19]})
       const label=document.createElement('span');label.textContent=t(gate.label)
       L.marker(point,{icon,title:t(gate.label)}).bindPopup(label).addTo(group)}

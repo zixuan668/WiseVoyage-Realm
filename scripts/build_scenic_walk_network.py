@@ -10,7 +10,10 @@ import math
 from pathlib import Path
 import xml.etree.ElementTree as ET
 
+import sys
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+from server.base.modules.walk_access import pedestrian_access_allowed
 SOURCE = 'https://api.openstreetmap.org/api/0.6/map?bbox=116.245,39.979,116.281,40.004'
 
 
@@ -50,15 +53,12 @@ def build(path, snapshot_date):
     segments = []
     for wid, seq, tags in ways:
         if tags.get('highway') not in allowed: continue
-        if tags.get('foot') in {'no', 'private', 'use_sidepath'}: continue
-        if tags.get('access') in {'no', 'private', 'customers', 'permit'} and tags.get('foot') not in {'yes', 'designated', 'permissive'}: continue
-        if tags.get('construction') or tags.get('proposed'): continue
+        if not pedestrian_access_allowed(tags): continue
         for a, b in zip(seq, seq[1:]):
             if a not in nodes or b not in nodes or a == b: continue
             midpoint = [(nodes[a][i]+nodes[b][i])/2 for i in (0, 1)]
             if not inside(midpoint, polygon): continue
-            if any(node_tags.get(n, {}).get('barrier') in {'wall', 'fence', 'hedge'} for n in (a, b)): continue
-            if any(node_tags.get(n, {}).get('foot') == 'no' for n in (a, b)): continue
+            if any(not pedestrian_access_allowed(node_tags.get(n, {}), node=True) for n in (a, b)): continue
             segments.append(dict(a=a, b=b, way_id=wid, name=tags.get('name', ''),
                 highway=tags['highway'], steps=tags['highway']=='steps',
                 bridge=tags.get('bridge', 'no') != 'no', surface=tags.get('surface', ''),

@@ -191,6 +191,8 @@ async def test_qa_accuracy(user_id: int = Depends(get_current_user_info)):
     from datetime import datetime, timezone
     from pathlib import Path
 
+    import asyncio
+    from ..modules.answer_evidence import verify_answer
     from ..modules.evaluation_metrics import evaluate_keyword_coverage
 
     try:
@@ -226,6 +228,7 @@ async def test_qa_accuracy(user_id: int = Depends(get_current_user_info)):
                 "",
             )
 
+        retriever = rag_worker.TOUR_RAG_RETRIEVER
         model_name = os.getenv("LLM_MODEL_NAME", "Qwen/Qwen2.5-7B-Instruct")
         results = []
         correct_count = 0
@@ -244,10 +247,11 @@ async def test_qa_accuracy(user_id: int = Depends(get_current_user_info)):
 
             # RAG 检索
             try:
-                rag_prompt, references = rag_worker.build_tour_rag_prompt(
-                    rag_worker.TOUR_RAG_RETRIEVER,
+                rag_prompt, references, evidence = rag_worker.build_tour_rag_prompt(
+                    retriever,
                     spot_name,
                     question,
+                    include_evidence=True,
                 )
             except Exception as e:
                 logger.warning(f"Q{idx+1} RAG检索失败: {e}")
@@ -274,7 +278,7 @@ async def test_qa_accuracy(user_id: int = Depends(get_current_user_info)):
 
             # LLM 生成答案
             try:
-                response = LLM_MODEL_HANDLER.chat.completions.create(
+                response = await asyncio.to_thread(LLM_MODEL_HANDLER.chat.completions.create,
                     model=model_name,
                     messages=[
                         {
@@ -308,7 +312,20 @@ async def test_qa_accuracy(user_id: int = Depends(get_current_user_info)):
                 llm_error = ""
 
             evaluation = evaluate_keyword_coverage(expected_keywords, actual_answer)
-            is_correct = evaluation["is_correct"] and not llm_error
+            # Only review source excerpts actually supplied to the answering model.
+            async def review_model(messages, timeout=12):
+                reply = await asyncio.to_thread(LLM_MODEL_HANDLER.chat.completions.create,
+                    model=model_name, messages=messages, temperature=0, max_tokens=1800, timeout=timeout,
+                    reasoning_effort="none", extra_body={"thinking": {"type": "disabled"}})
+                return reply.choices[0].message.content or ''
+            review = {'status': 'unavailable', 'checks': []}
+            if actual_answer and evidence and not llm_error:
+                review = await verify_answer(actual_answer, '\n'.join(e['excerpt'] for e in evidence),
+                                             evidence, review_model, question=question)
+            is_correct = evaluation["is_correct"] and not llm_error and review['status'] == 'model_checked'
+            if not llm_error and review['status'] != 'model_checked':
+                llm_error = '证据或问题相关性检查未通过' if review['status'] == 'rejected' else '证据不足或复核服务不可用'
+
 
             if is_correct:
                 correct_count += 1
@@ -327,6 +344,8 @@ async def test_qa_accuracy(user_id: int = Depends(get_current_user_info)):
                     "required_count": evaluation["required_count"],
                     "keyword_coverage": evaluation["coverage"],
                     "reference_count": len(references or []),
+                    "evidence_status": review["status"],
+                    "evidence_checks": review["checks"],
                     "duration_ms": round((time.perf_counter() - item_started_at) * 1000),
                     "is_correct": is_correct,
                     "error": llm_error,
@@ -347,9 +366,9 @@ async def test_qa_accuracy(user_id: int = Depends(get_current_user_info)):
                 "correct": correct_count,
                 "accuracy": accuracy,
                 "passed": accuracy >= 90.0,
-                "metric_name": "关键词覆盖通过率",
+                "metric_name": "关键词与证据联合通过率",
                 "pass_threshold": 90.0,
-                "evaluation_method": "RAG检索 + LLM生成；每题命中30%关键词且最多要求3个关键词",
+                "evaluation_method": "关键词覆盖达标 + 回答切题 + 逐段证据复核；逐字检查引用来源。模型复核不等同人工事实核验",
                 "model_name": model_name,
                 "rag_enabled": True,
                 "duration_ms": round((time.perf_counter() - started_at) * 1000),

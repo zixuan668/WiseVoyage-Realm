@@ -1,10 +1,5 @@
-# 景点图片版权说明
+# 颐和园景点图片说明
 
-除项目自有图片外，以下两张景点配图来自 Wikimedia Commons，按原许可证署名使用：
+当前 `static/tour_files/spot_images/enhanced/` 仅保留 16 个颐和园景点配图，与交付景点目录对应。已移除指向不存在的外景区图片的旧说明。
 
-| 景点 | 文件 | 作者 | 许可证 | 来源 |
-| --- | --- | --- | --- | --- |
-| 故宫博物院 | `static/tour_files/spot_images/enhanced/forbidden-city.jpg` | Gisling | CC BY 3.0 | https://commons.wikimedia.org/wiki/File:Hall_of_Supreme_Harmony.JPG |
-| 长城（八达岭） | `static/tour_files/spot_images/enhanced/great-wall-badaling.jpg` | CEphoto, Uwe Aranas | CC BY-SA 3.0 | https://commons.wikimedia.org/wiki/File:Badaling_China_Great-Wall-of-China-01.jpg |
-
-图片已按站点统一的 1254×1254 方形裁切并压缩；原图与许可证以来源页为准。
+图片文件存在不代表原始出处和授权已经核实。当前不能统一声明这些图片为项目自有或均采用某项开放许可证；公开使用前需逐张补齐来源与授权依据。颐和园官网参考图片的来源链接保存在 `data/tour_visual_catalog.json`，应按对应记录使用。

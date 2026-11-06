@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onBeforeUnmount } from 'vue'
-import { loadScenicMap, SCENIC_TILES } from '@/utils/leaflet'
-import { wgs84ToGcj02 } from '../../../shared/coordinates.js'
+import { loadScenicMap } from '@/utils/leaflet'
+import { walkingMapPoint, WALK_TILES, WALK_ATTRIBUTION } from '../../../shared/pedestrian-map.js'
 import type { StationDirections } from '@/api/serviceStation'
 import { t, locale } from '@/i18n'
 const props = defineProps<{ directions: StationDirections }>()
@@ -19,14 +19,15 @@ async function draw() {
     const L = await loadScenicMap()
     if (disposed || own !== version || !host.value) return
     if (!map) {
-      map = L.map(host.value, { attributionControl: false, scrollWheelZoom: false })
-      L.tileLayer(SCENIC_TILES, { maxZoom: 18 }).addTo(map)
+      map = L.map(host.value, { attributionControl: true, scrollWheelZoom: false })
+      L.tileLayer(WALK_TILES, { maxZoom: 19, attribution: WALK_ATTRIBUTION }).addTo(map)
+      map.attributionControl.setPrefix(false)
       group = L.layerGroup().addTo(map)
       observer = new ResizeObserver(() => map?.invalidateSize())
       observer.observe(host.value)
     }
     group.clearLayers()
-    const points = props.directions.geometry.map((p) => wgs84ToGcj02(p[0], p[1]))
+    const points = props.directions.geometry.map((p) => walkingMapPoint(p[0], p[1]))
     if (points.length > 1) {
       L.polyline(points, { color: '#fff', weight: 10, opacity: 0.9 }).addTo(group)
       L.polyline(points, { color: '#4f46e5', weight: 6 }).addTo(group)
@@ -56,7 +57,7 @@ async function draw() {
         iconSize: [34, 34],
         iconAnchor: [17, 17]
       })
-      L.marker(wgs84ToGcj02(anchor.latitude, anchor.longitude), { icon })
+      L.marker(walkingMapPoint(anchor.latitude, anchor.longitude), { icon })
         .bindTooltip(text, { permanent: true, direction: 'top' })
         .addTo(group)
     }

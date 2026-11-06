@@ -1,0 +1,161 @@
+{
+  "success": true,
+  "code": 0,
+  "message": "评测完成",
+  "data": {
+    "total": 3,
+    "correct": 2,
+    "accuracy": 66.7,
+    "passed": false,
+    "metric_name": "关键词与证据联合通过率",
+    "pass_threshold": 90.0,
+    "evaluation_method": "关键词覆盖达标 + 回答切题 + 逐段证据复核；逐字检查引用来源。模型复核不等同人工事实核验",
+    "model_name": "deepseek-flash",
+    "rag_enabled": true,
+    "duration_ms": 10068,
+    "executed_at": "2026-11-06T04:31:10.150803+00:00",
+    "details": [
+      {
+        "question": "颐和园位于北京市哪个区？",
+        "spot_name": "颐和园",
+        "source_doc": "summer_palace_overview.md",
+        "category": "景区概况",
+        "expected_answer": "颐和园位于北京市海淀区。",
+        "expected_keywords": "北京,海淀区",
+        "actual_answer": "颐和园位于北京市海淀区。依据资料，颐和园原名清漪园，是清代皇家园林，游览时可按东部宫廷区、生活区和以万寿山、昆明湖为主体的湖山游赏区域来识别空间。",
+        "matched_keywords": [
+          "北京",
+          "海淀区"
+        ],
+        "matched_count": 2,
+        "required_count": 1,
+        "keyword_coverage": 100.0,
+        "reference_count": 1,
+        "evidence_status": "model_checked",
+        "evidence_checks": [
+          {
+            "segment": 1,
+            "supported": true,
+            "quotes": [
+              {
+                "evidence_id": "local",
+                "quote": "颐和园位于北京市海淀区"
+              }
+            ]
+          },
+          {
+            "segment": 2,
+            "supported": true,
+            "quotes": [
+              {
+                "evidence_id": "local",
+                "quote": "颐和园位于北京市海淀区，原名清漪园，是清代皇家园林"
+              },
+              {
+                "evidence_id": "local",
+                "quote": "游览时先区分东部宫廷区、生活区和以万寿山、昆明湖为主体的湖山游赏区域"
+              }
+            ]
+          }
+        ],
+        "duration_ms": 3877,
+        "is_correct": true,
+        "error": ""
+      },
+      {
+        "question": "颐和园亲子轻松线依次经过哪些主要景点？",
+        "spot_name": "亲子轻松线",
+        "source_doc": "summer_palace_overview.md",
+        "category": "亲子游览",
+        "expected_answer": "亲子轻松线依次经过苏州街、长廊和昆明湖。",
+        "expected_keywords": "苏州街,长廊,昆明湖",
+        "actual_answer": "根据资料，亲子轻松线这一旧示例名称可包含苏州街、长廊、昆明湖的观察组合，但资料未给出严格的“依次”顺序，只说明线路观察顺序属于编辑建议，不是官方路线。资料还提示苏州街存在临水和高差条件，长距离步行可能不适合疲劳儿童，可按体力减少站点并优先选择湖岸和平缓区域。",
+        "matched_keywords": [
+          "苏州街",
+          "长廊",
+          "昆明湖"
+        ],
+        "matched_count": 3,
+        "required_count": 1,
+        "keyword_coverage": 100.0,
+        "reference_count": 1,
+        "evidence_status": "rejected",
+        "evidence_checks": [],
+        "duration_ms": 2819,
+        "is_correct": false,
+        "error": "证据或问题相关性检查未通过"
+      },
+      {
+        "question": "颐和园长廊有哪些实用功能和游览特色？",
+        "spot_name": "长廊",
+        "source_doc": "summer_palace_culture.md",
+        "category": "建筑特色",
+        "expected_answer": "长廊能够遮阳避雨，也是形成移步换景体验的重要载体。",
+        "expected_keywords": "遮阳,避雨,移步换景",
+        "actual_answer": "颐和园长廊的实用功能是遮阳避雨、串联沿线景物并组织游览路线，游览特色在于彩画丰富、廊柱与湖山形成移步换景的空间体验。它沿昆明湖北岸、万寿山南麓展开，全长728米、共273间，从邀月门延伸到石丈亭，适合分段慢看。梁枋彩画包含山水、花鸟和人物故事，沿线四座亭为留佳、寄澜、秋水、清遥。",
+        "matched_keywords": [
+          "遮阳",
+          "避雨",
+          "移步换景"
+        ],
+        "matched_count": 3,
+        "required_count": 1,
+        "keyword_coverage": 100.0,
+        "reference_count": 3,
+        "evidence_status": "model_checked",
+        "evidence_checks": [
+          {
+            "segment": 1,
+            "supported": true,
+            "quotes": [
+              {
+                "evidence_id": "local",
+                "quote": "长廊沿昆明湖北岸、万寿山南麓展开，既能遮阳避雨，也把沿线景物联系起来。"
+              },
+              {
+                "evidence_id": "local",
+                "quote": "走动时，廊柱、湖面和远处建筑的相互位置不断变化，形成移步换景的体验。"
+              },
+              {
+                "evidence_id": "63796e5d2c7bef0c",
+                "quote": "长廊兼具遮阳避雨和组织游线的作用。梁枋绘画包含山水、花鸟与人物故事等题材"
+              }
+            ]
+          },
+          {
+            "segment": 2,
+            "supported": true,
+            "quotes": [
+              {
+                "evidence_id": "977958da481c9892",
+                "quote": "长廊全长728米，共273间。它从东侧邀月门延伸到西侧石丈亭，游览时可以按体力分段看。"
+              },
+              {
+                "evidence_id": "local",
+                "quote": "长廊沿昆明湖北岸、万寿山南麓展开"
+              }
+            ]
+          },
+          {
+            "segment": 3,
+            "supported": true,
+            "quotes": [
+              {
+                "evidence_id": "977958da481c9892",
+                "quote": "彩画包含山水、花鸟和人物故事"
+              },
+              {
+                "evidence_id": "977958da481c9892",
+                "quote": "沿廊的四座亭是留佳、寄澜、秋水、清遥"
+              }
+            ]
+          }
+        ],
+        "duration_ms": 3372,
+        "is_correct": true,
+        "error": ""
+      }
+    ]
+  },
+  "timestamp": "2026-11-06 12:31:10"
+}

@@ -62,3 +62,5 @@ project.private.config.json
 !/static/tour_files/spot_images/enhanced/*.jpg
 /static/user/
 /static/user_avatars/
+
+/frontend/vite.config.*.timestamp-*.mjs

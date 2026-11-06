@@ -20,3 +20,8 @@
 坐标测试覆盖 16 个点的正逆变换、瓦片投影和公开 POI；组件测试覆盖全景范围、选择状态锚点、18 级定位与窄屏适配。浏览器在 18 级实际读取标记中心及瓦片的屏幕几何，16 个标记相对校准坐标的渲染偏差均小于 1px（Leaflet 整像素取整）。这证明展示对齐，不代表实地 GPS 测绘精度；底图符号、地形表达和公众 POI 本身仍有数据精度限制。
 
 参考：[高德坐标转换说明](https://lbs.amap.com/api/javascript-api/guide/transform/convertfrom)、[Leaflet 1.9.4 地图参考](https://leafletjs.com/reference-1.9.4.html)、[颐和园官方导览图](https://www.summerpalace.net.cn/guide_map.html)。各景点来源见数据文件。
+
+
+## 2026-11-06 路线地图同源修正
+
+步行路线预览、服务站步行指引及 App 路线图统一使用 OSM 底图与 WGS84 坐标，通过 shared/pedestrian-map.js 共享配置。原高德底图与 OSM 路网的道路几何存在差异，坐标转换不能消除跨来源道路位置差异。景点浏览图仍保留原高德底图和 GCJ02 转换。此次未改变路网节点、边、距离或通行状态，不代表实地测绘或实时开放验证。OSM 底图需联网，保留地图署名，不批量预取瓦片。

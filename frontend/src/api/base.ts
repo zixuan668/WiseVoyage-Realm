@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 const request_handler = axios.create({
-  // baseURL: import.meta.env.BASE_SERVER_URL
+  timeout: 30000,
+  timeoutErrorMessage: '请求超时，请检查网络或服务状态后重试',
 })
 
 interface ResultPackage<T> {

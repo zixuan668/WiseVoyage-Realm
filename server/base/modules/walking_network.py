@@ -8,6 +8,7 @@ import hashlib
 import heapq
 import json
 import math
+from .walk_access import pedestrian_access_allowed
 from pathlib import Path
 
 DATA = Path(__file__).resolve().parents[3]/'data'
@@ -67,6 +68,7 @@ def _path(start, end, avoid_steps, blocked):
         if node == end: break
         for next_node, edge_index in ADJ[node]:
             edge = NETWORK['edges'][edge_index]
+            if not pedestrian_access_allowed(edge): continue
             if edge['way_id'] in blocked or avoid_steps and edge['steps']: continue
             candidate = distance+edge['meters']
             if candidate < distances.get(next_node, float('inf')):

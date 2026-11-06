@@ -12,7 +12,25 @@ LEGACY_TABLES = {'chat_message_info', 'on_air_room_status_item', 'sales_doc_and_
                  'stream_room_info', 'streamer_info', 'product_info'}
 
 
+def check_content_scope(root=ROOT):
+    """Reject unrelated destination records in the delivered Summer Palace content."""
+    allowed = set(json.loads((root / 'data/summer_palace_locations.json').read_text(encoding='utf-8'))['spots'])
+    audit = json.loads((root / 'data/scenic_content_audit.json').read_text(encoding='utf-8'))
+    assert all(s['name'] in allowed for s in audit['spots']), 'Unrelated scenic audit records remain'
+    sources = json.loads((root / 'data/official_travel_sources.json').read_text(encoding='utf-8'))
+    assert all(s.get('spots') and set(s['spots']).issubset(allowed) for s in sources['sources']), 'Unrelated travel sources remain'
+    facilities = json.loads((root / 'data/official_toilet_evidence.json').read_text(encoding='utf-8'))
+    assert all(s['destination'] == '颐和园' for s in facilities['facilities']), 'Unrelated facility records remain'
+    with zipfile.ZipFile(root / 'resources/summer-palace-content.zip') as bundle:
+        manifests = [n for n in bundle.namelist() if n.endswith('/resources.json')]
+        assert len(manifests) == 1
+        manifest = json.loads(bundle.read(manifests[0]))
+        assert {s['spot_name'] for s in manifest['tables']['scenic_spot_info']} == allowed, 'Content pack scenic scope differs'
+    return {'scenic_spots': len(allowed), 'audit_records': len(audit['spots']), 'sources': len(sources['sources']), 'facility_leads': len(facilities['facilities'])}
+
+
 def check_files():
+    check_content_scope()
     for name in ['frontend/src/router/index.ts', 'app/pages.json', 'server/base/base_server.py',
                  'shared/coordinates.js', 'data/summer_palace_walk_network.json', 'LICENSE']:
         assert (ROOT / name).is_file(), f'Missing required delivery file: {name}'

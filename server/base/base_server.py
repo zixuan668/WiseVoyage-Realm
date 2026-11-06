@@ -136,6 +136,8 @@ app.add_middleware(
 )
 
 # 数字人服务站、管理员端和 App 共用的景区接口
+from .routers import health
+app.include_router(health.router)
 app.include_router(users.router)
 # 景区导览新增路由
 app.include_router(scenic_spots.router)

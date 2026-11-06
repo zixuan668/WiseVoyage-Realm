@@ -36,11 +36,11 @@ def validate_review(review,segments,records):
     return True
 
 
-async def verify_answer(answer,grounded_answer,evidence,model):
+async def verify_answer(answer,grounded_answer,evidence,model, *, question=""):
     segments=answer_segments(answer)
     records={'local':grounded_answer,**{e['id']:e['excerpt'] for e in evidence}}
     if not segments or not grounded_answer: return {'status':'unavailable','checks':[]}
-    cache_key=hashlib.sha256(json.dumps([answer,records],sort_keys=True,ensure_ascii=False).encode()).hexdigest()
+    cache_key=hashlib.sha256(json.dumps([answer,records,question],sort_keys=True,ensure_ascii=False).encode()).hexdigest()
     if cache_key in _CACHE:
         _CACHE.move_to_end(cache_key)
         return _CACHE[cache_key]
@@ -51,14 +51,15 @@ async def verify_answer(answer,grounded_answer,evidence,model):
         '中文资料可以支持英文翻译。每段给出supported布尔值，并复制实际原文句子作为quotes，禁止捏造或改写引用。'
         '缺证、矛盾或不确定一律supported=false。只输出JSON：'
         '{"checks":[{"segment":1,"supported":true,"quotes":[{"evidence_id":"local或资料ID","quote":"原文逐字摘录，至少6个字符"}]}]}。'
-        '必须覆盖每个输入段落，不能遗漏。'},
+        '必须覆盖每个输入段落，不能遗漏。若输入含question，还须返回answers_question布尔值：'
+        '判断回答是否直接回应问题意图；关键词相同但答非所问、回避核心问题均为false。'},
         {'role':'user','content':json.dumps({'segments':[{ 'segment':i,'text':s} for i,s in enumerate(segments,1)],
-                                          'evidence':records},ensure_ascii=False)}]
+                                          'evidence':records, 'question':question},ensure_ascii=False)}]
     try:
         text=await asyncio.wait_for(model(prompt,timeout=12),timeout=13)
         text=re.sub(r'^```(?:json)?\s*|\s*```$','',text.strip())
         review=json.loads(text)
-        passed=validate_review(review,segments,records)
+        passed=validate_review(review,segments,records) and (not question or review.get("answers_question") is True)
         result={'status':'model_checked' if passed else 'rejected','checks':review.get('checks',[]) if passed else []}
     except Exception:
         return {'status':'unavailable','checks':[]}

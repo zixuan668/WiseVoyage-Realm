@@ -30,7 +30,10 @@ foreach ($requiredName in @("POSTGRES_PASSWORD", "LLM_API_KEY", "TOKEN_JWT_SECUR
 
 $env:HTTP_PROXY = ""
 $env:HTTPS_PROXY = ""
-$env:FILES_URL_BASE = "http://localhost:$Port/api/v1"
+if (-not $env:FILES_URL_BASE) {
+    $publicOrigin = if ($env:PUBLIC_SERVER_ORIGIN) { $env:PUBLIC_SERVER_ORIGIN.TrimEnd('/') } else { "http://localhost:$Port" }
+    $env:FILES_URL_BASE = "$publicOrigin/api/v1"
+}
 if (-not $env:POSTGRES_SERVER) { $env:POSTGRES_SERVER = "127.0.0.1" }
 if (-not $env:POSTGRES_PORT) { $env:POSTGRES_PORT = "25432" }
 if (-not $env:POSTGRES_DB) { $env:POSTGRES_DB = "streamer_sales_db" }
@@ -40,4 +43,8 @@ Write-Host "  Scenic AI Guide - Backend" -ForegroundColor Cyan
 Write-Host "  http://127.0.0.1:$Port" -ForegroundColor Green
 Write-Host "======================================" -ForegroundColor Cyan
 
-uvicorn server.base.base_server:app --host 0.0.0.0 --port $Port
+Push-Location -LiteralPath $PSScriptRoot
+try {
+    python -m uvicorn server.base.base_server:app --host 0.0.0.0 --port $Port
+    if ($LASTEXITCODE -ne 0) { throw "Backend startup failed (exit $LASTEXITCODE). Check database and configuration." }
+} finally { Pop-Location }

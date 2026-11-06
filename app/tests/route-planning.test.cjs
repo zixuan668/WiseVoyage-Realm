@@ -5,7 +5,7 @@ function environment(){
   const uni={getStorageSync:key=>storage[key],setStorageSync:(key,value)=>storage[key]=value,removeStorageSync:key=>delete storage[key],showToast(){},navigateTo(){},reLaunch(){},getSystemInfoSync:()=>({}),request(options){const call={...options,aborted:false};calls.push(call);return{abort(){call.aborted=true}}}}
   const context={uni,console,Promise,Date,Set,Number,Math,JSON,setTimeout,clearTimeout,setInterval:()=>1,clearInterval(){},BASE_URL:'http://local/api/v1'}
   vm.createContext(context)
-  const coords=fs.readFileSync(path.join(root,'../shared/coordinates.js'),'utf8').replace(/export /g,'')
+  const coords=fs.readFileSync(path.join(root,'../shared/pedestrian-map.js'),'utf8').replace(/export /g,'')
   vm.runInContext(coords,context)
   const source=fs.readFileSync(path.join(root,'common/route-planning.js'),'utf8').replace(/^import .*$/gm,'').replace(/export /g,'')
   vm.runInContext(source+'\nglobalThis.helpers={selectedOrder,moveStop,previewOptions,roadMap,routeRequest,isRouteChange,repairDefaults}',context)
@@ -134,3 +134,14 @@ test('tour creation shows service errors separately from connection failures',as
     assert.equal(s.starting,false)
   }
 })
+
+ test('OSM route vertices and access markers use the same unshifted WGS84 frame',()=>{
+ const {helpers:h}=environment()
+ const a={latitude:39.9966755,longitude:116.2755965}
+ const b={latitude:39.99650335,longitude:116.27383459}
+ const m=h.roadMap({stops:[{spot_id:3,order:1,latitude:b.latitude,longitude:b.longitude}],entry_anchor:{...a,label:'东宫门'},legs:[{geometry:[[a.latitude,a.longitude],[b.latitude,b.longitude]]}]})
+ assert.deepEqual(plain(m.polyline[0].points),[a,b])
+ assert.equal(m.markers[0].latitude,b.latitude)
+ assert.equal(m.markers[0].longitude,b.longitude)
+ assert.equal(m.markers.find(x=>x.id===1001).longitude,a.longitude)
+ })

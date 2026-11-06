@@ -383,7 +383,7 @@ const handleAccuracyTest = async () => {
             <el-table-column prop="actual_answer" :label='$t("RAG 回答")' min-width="140" show-overflow-tooltip>
               <template #default="scope">
                 <span :style="{ color: scope.row.error ? 'var(--danger)' : 'var(--text)' }">
-                  {{ $t(scope.row.error || scope.row.actual_answer) }}
+                  {{ $t(scope.row.actual_answer || scope.row.error) }}
                 </span>
               </template>
             </el-table-column>
@@ -391,6 +391,11 @@ const handleAccuracyTest = async () => {
               <template #default="scope">
                 {{ $t(scope.row.matched_count) }}/{{ $t(scope.row.required_count) }}
                 <div style="font-size: 18px; color: var(--text-muted)">{{ $t(scope.row.keyword_coverage) }}%</div>
+              </template>
+            </el-table-column>
+            <el-table-column :label='$t("证据复核")' min-width="155">
+              <template #default="scope">
+                {{ $t(scope.row.evidence_status === 'model_checked' ? '引用与相关性通过' : (scope.row.error || '未完成复核')) }}
               </template>
             </el-table-column>
             <el-table-column prop="is_correct" :label='$t("结果")' width="80" align="center">

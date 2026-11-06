@@ -56,6 +56,7 @@ interface AccuracyTestDetail {
   matched_count: number
   required_count: number
   keyword_coverage: number
+  evidence_status?: string
   reference_count: number
   duration_ms: number
   error?: string
@@ -69,6 +70,7 @@ const uploadDoc = (formData: FormData) => {
   return request_handler<ResultPackage<{ doc_id: number }>>({
     method: 'POST',
     url: '/knowledge-base/upload',
+    timeout: 120000,
     data: formData,
     headers: {
       Authorization: header_authorization.value,
@@ -105,6 +107,7 @@ const rebuildIndex = () => {
   return request_handler<ResultPackage<string>>({
     method: 'POST',
     url: '/knowledge-base/reindex',
+    timeout: 300000,
     headers: {
       Authorization: header_authorization.value,
     },
@@ -116,6 +119,7 @@ const testAccuracy = () => {
   return request_handler<ResultPackage<AccuracyTestResult>>({
     method: 'GET',
     url: '/knowledge-base/test-qa',
+    timeout: 1500000,
     headers: {
       Authorization: header_authorization.value,
     },

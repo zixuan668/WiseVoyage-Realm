@@ -138,23 +138,26 @@ class LightweightTourRetriever:
         return self
 
     def query(self, question: str, context_max_length: int = TOUR_CONTEXT_MAX_LENGTH,
-              spot_name: str = "", topics=None):
+              spot_name: str = "", topics=None, include_evidence=False):
         selected=self.search_evidence(question,spot_name,topics)
 
+        used_evidence = []
         chunks: list[str] = []
         references: list[str] = []
         context = ""
         for item in selected:
             source,text=item['document'],item['excerpt']
-            remaining = context_max_length - len(context)
+            remaining = context_max_length - len(context) - len(f"【来源：{item['document']}】\n") - 1
             if remaining <= 0:
                 break
             excerpt = text[:remaining]
+            used_evidence.append(dict(item, excerpt=excerpt))
             chunks.append(excerpt)
             context += f"【来源：{source}】\n{excerpt}\n"
             if source not in references:
                 references.append(source)
-        return "\n".join(chunks), context[:context_max_length], references
+        result = ("\n".join(chunks), context[:context_max_length], references)
+        return (*result, used_evidence) if include_evidence else result
 
 
 async def _load_lightweight_tour_retriever(user_id: int, file_paths=None) -> LightweightTourRetriever:
@@ -197,7 +200,7 @@ async def _load_lightweight_tour_retriever(user_id: int, file_paths=None) -> Lig
 
 
 
-def build_tour_rag_prompt(rag_retriever: Any, spot_name: str, prompt: str, topics=None) -> tuple:
+def build_tour_rag_prompt(rag_retriever: Any, spot_name: str, prompt: str, topics=None, *, include_evidence=False) -> tuple:
     """构建景区导览 RAG prompt
 
     Args:
@@ -212,7 +215,7 @@ def build_tour_rag_prompt(rag_retriever: Any, spot_name: str, prompt: str, topic
 
     if isinstance(real_retriever, tuple):
         logger.info(f" @@@ Tour RAG not ready: {real_retriever}")
-        return prompt, []
+        return (prompt, [], []) if include_evidence else (prompt, [])
 
     # 保留完整问题，同时补充口语问题对应的检索主题。
     from ..tour_intent import retrieval_topics
@@ -230,12 +233,15 @@ def build_tour_rag_prompt(rag_retriever: Any, spot_name: str, prompt: str, topic
     query_text = f"景点：{spot_name}。游客问题：{prompt}" + (' ' + ' '.join(query_expansions) if query_expansions else '')
     kwargs=dict(context_max_length=TOUR_CONTEXT_MAX_LENGTH-len(TOUR_GENERATE_TEMPLATE))
     if isinstance(real_retriever,LightweightTourRetriever): kwargs.update(spot_name=spot_name,topics=topics)
-    chunk, db_context, references = real_retriever.query(query_text, **kwargs)
+    if include_evidence and isinstance(real_retriever, LightweightTourRetriever): kwargs['include_evidence'] = True
+    query_result = real_retriever.query(query_text, **kwargs)
+    chunk, db_context, references = query_result[:3]
+    evidence = query_result[3] if len(query_result) > 3 else []
     logger.info(f"Tour db_context length: {len(db_context) if db_context else 0}")
 
     # A shared index must not override the active dossier with another park.
     if not isinstance(real_retriever,LightweightTourRetriever) and spot_name and db_context and spot_name not in db_context:
-        return prompt, []
+        return (prompt, [], []) if include_evidence else (prompt, [])
     if db_context is not None and len(db_context) > 1:
         prompt_rag = TOUR_GENERATE_TEMPLATE.format(db_context, prompt)
     else:
@@ -246,7 +252,7 @@ def build_tour_rag_prompt(rag_retriever: Any, spot_name: str, prompt: str, topic
     logger.info(f"Tour RAG references = {references}")
     logger.info("=" * 20)
 
-    return prompt_rag, references
+    return (prompt_rag, references, evidence) if include_evidence else (prompt_rag, references)
 
 
 async def load_tour_rag_model(user_id):
