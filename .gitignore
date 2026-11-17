@@ -64,3 +64,4 @@ project.private.config.json
 /static/user_avatars/
 
 /frontend/vite.config.*.timestamp-*.mjs
+/logs/

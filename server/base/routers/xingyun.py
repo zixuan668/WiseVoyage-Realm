@@ -245,7 +245,7 @@ async def session_proxy(guide_id: int, request: Request, tour_id: int = 0, chat_
                 chat_user = get_current_user_info(token)
                 state = db.get(XingyunBootstrapState, 'default-guide-v1')
                 if tour_id or not state or state.guide_id != guide_id:
-                    raise HTTPException(403, 'AI小导游仅可使用默认数字人的声音')
+                    raise HTTPException(403, 'AI导游仅可使用默认数字人的声音')
                 owner_id = chat_user
             else:
                 tour = authorize_tour(db, tour_id, guide_id, x_tour_access, authorization)

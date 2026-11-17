@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import ScanOnPhone from "@/components/ScanOnPhone.vue"
 import { computed, ref } from 'vue'
 import QRCode from 'qrcode'
 import {
@@ -19,7 +18,7 @@ import { locale } from '@/i18n'
 import { summerPalaceVisitorInfo as info, summerPalaceSeasonAt } from '@/data/parkVisitorInfo'
 import type { StationInfo } from '@/api/serviceStation'
 
-const props = defineProps<{ now: number; summerPalace?: boolean; announcements: StationInfo['announcements'] }>()
+const props = defineProps<{ now: number; announcements: StationInfo['announcements'] }>()
 const S = (zh: string, en: string) => (locale.value === 'en' ? en : zh)
 defineEmits<{ facilities: [] }>()
 const active = ref('hours')
@@ -207,15 +206,7 @@ async function openOfficial() {
             <p>{{ locale === 'en' ? notice.text_en || notice.text : notice.text }}</p>
           </article></template
         >
-        <article v-if="summerPalace">
-          <Bell aria-hidden="true" />
-          <div><time datetime="2026-10-28">2026-10-28</time>
-            <h2>{{ S('冬季游船停航安排','Winter suspension of boat services') }}</h2>
-            <p>{{ S('园方公告明确，2026 年 11 月 2 日起，六座电瓶船和摆渡船进入冬季停航期。','The park announced that six-seat electric boats and ferries would suspend service for winter from 2 November 2026.') }}</p>
-            <ScanOnPhone url="https://www.summerpalace.net.cn/noticelist/detail/2000666.html" :label="S('扫码看公告原文', 'Scan for notice')" />
-            <ScanOnPhone url="https://www.summerpalace.net.cn/noticelist.html" :label="S('扫码看园方公告', 'Scan for park notices')" />
-          </div></article>
-        <div v-else-if="!announcements.length" class="visitor-info-empty">
+        <div v-else class="visitor-info-empty">
           <Bell aria-hidden="true" />
           <h2>{{ S('本站暂无已发布公告', 'No notices published at this station') }}</h2>
           <p>
@@ -259,6 +250,7 @@ async function openOfficial() {
         <img v-if="qr" :src="qr" :alt="S('扫码查看颐和园官网游园信息', 'Scan to view official Summer Palace visitor information')" />
         <p v-else role="status">{{ qrBusy ? S('正在生成二维码…', 'Preparing QR code…') : S('二维码生成失败，请重新打开。', 'Unable to generate the code. Please reopen it.') }}</p>
         <p>{{ S('手机扫码，查看开放安排与游园信息。', 'Scan for opening hours and visitor information.') }}</p>
+        <a :href="info.source" target="_blank" rel="noopener noreferrer">{{ S('颐和园官网', 'Summer Palace official website') }} ↗</a>
       </section>
       <template #footer>
         <button class="visitor-official-close" @click="showOfficial = false">{{ S('关闭', 'Close') }}</button>

@@ -5,7 +5,7 @@ import { t, locale } from '@/i18n'
 import { getRouteOverview, type RouteOverviewData } from '@/api/tourExperience'
 import { loadScenicMap } from '@/utils/leaflet'
 import { roadPoints, routeLegs } from '@/utils/routeGeometry'
-import { walkingMapPoint, WALK_TILES } from '../../../shared/pedestrian-map.js'
+import { walkingMapPoint, WALK_TILES, WALK_ATTRIBUTION } from '../../../shared/pedestrian-map.js'
 const props = withDefaults(defineProps<{
   spotIds?: number[]; overview?: RouteOverviewData | null; compare?: RouteOverviewData | null
   pace?: string; showMap?: boolean; compact?: boolean; currentId?: number; mapOnly?: boolean; showStatistics?: boolean
@@ -39,7 +39,7 @@ async function draw(){
     const L=await loadScenicMap()
     if(disposed||own!==drawVersion||!mapEl.value||!displayed.value)return
     if(!map){map=L.map(mapEl.value,{zoomControl:true,attributionControl:true,scrollWheelZoom:false})
-      L.tileLayer(WALK_TILES,{maxZoom:19,attribution:'© OpenStreetMap contributors'}).addTo(map);map.attributionControl.setPrefix(false);group=L.layerGroup().addTo(map)
+      L.tileLayer(WALK_TILES,{maxZoom:19,attribution:WALK_ATTRIBUTION}).addTo(map);map.attributionControl.setPrefix(false);group=L.layerGroup().addTo(map)
       if(typeof ResizeObserver!=='undefined'){resize=new ResizeObserver(()=>map?.invalidateSize({pan:false}));resize.observe(mapEl.value)}}
     group.clearLayers()
     const route=displayed.value, bounds:number[][]=[]

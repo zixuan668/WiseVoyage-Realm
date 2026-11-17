@@ -12,7 +12,7 @@ usbDevelopment = import.meta.env.MODE === 'development' &&
 // Android USB debugging uses adb reverse; iPhone must reach the PC over the LAN.
 let appUsbDevelopment = false
 // #ifdef APP-PLUS
-appUsbDevelopment = import.meta.env.MODE === 'development' && uni.getSystemInfoSync().platform === 'android'
+appUsbDevelopment = uni.getSystemInfoSync().platform === 'android'
 // #endif
 // A stable HTTPS endpoint can be supplied when building; local testing keeps its existing default.
 const releaseOrigin = normalizeServiceOrigin(import.meta.env.VITE_APP_SERVER_ORIGIN || '')
@@ -20,6 +20,13 @@ export let SERVER_ORIGIN = normalizeServiceOrigin(uni.getStorageSync('station-se
   ? 'http://127.0.0.1:18000'
   : LAN_SERVER_ORIGIN)
 export let BASE_URL = SERVER_ORIGIN + '/api/v1'
+
+// 景点详情页（Web 内嵌页）地址：开发时后端 18000、前端 Vite 5173。
+export function scenicWebOrigin() {
+  const explicit = String(import.meta.env.VITE_APP_SCENIC_ORIGIN || '').trim().replace(/\/$/, '')
+  if (explicit) return explicit
+  return SERVER_ORIGIN.replace(/:18000$/, ':5173')
+}
 
 export function isLocalStationOrigin(value) {
   const match = /^http:\/\/(\d{1,3}(?:\.\d{1,3}){3}):18000$/.exec(value)
@@ -53,10 +60,23 @@ export function setServiceOrigin(value) {
   uni.setStorageSync('station-server-origin', origin)
 }
 
+// Backend file links are stored as absolute URLs with the host they were uploaded
+// from. After the service moves (or when a phone reaches the PC over USB) that host
+// is stale, so local/LAN file links are re-pointed at the server this session uses.
+const LOCAL_FILE_HOST = /^(?:localhost|127\.\d+\.\d+\.\d+|0\.0\.0\.0|\[::1\]|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(?:1[6-9]|2\d|3[01])\.\d+\.\d+)$/
+
+// Regex parsing instead of new URL(): the App runtime does not always expose URL,
+// and a missing constructor would silently keep the stale host.
+const FILE_LINK = /^https?:\/\/(?:[^/@]+@)?([^/:?#]+)(?::\d+)?(\/(?:api\/v1\/)?files\/.*)$/i
+
 export function assetUrl(value) {
   if (!value) return ''
   if (/^https?:\/\//i.test(value)) {
-    return value.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, SERVER_ORIGIN)
+    const local = value.replace(/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i, SERVER_ORIGIN)
+    if (local !== value) return local
+    const match = FILE_LINK.exec(value)
+    if (match && LOCAL_FILE_HOST.test(match[1].toLowerCase())) return SERVER_ORIGIN + match[2]
+    return value
   }
   if (value.indexOf('/static/') === 0) return value
   if (value.indexOf('/api/v1/') === 0) return SERVER_ORIGIN + value

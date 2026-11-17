@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { locale } from "@/i18n"
-import ScanOnPhone from "@/components/ScanOnPhone.vue"
 import { ref, watch, computed } from 'vue'
 import type { VisualContext } from '@/api/tourExperience'
 import { isKnowledgeSourceUrl } from '@/utils/tourPresentation'
+import { backendAssetUrl } from '@/utils/backendAssetUrl'
 const props = defineProps<{ context?: VisualContext | null; expanded?: boolean }>()
 const failed = ref<string[]>([])
 watch(
@@ -26,7 +25,11 @@ function allowedImage(value: string) {
     return false
   }
 }
-const pictures = computed(() => props.context?.images?.filter((p) => allowedImage(p.url)) || [])
+const pictures = computed(() =>
+  (props.context?.images || [])
+    .map((picture) => ({ ...picture, url: backendAssetUrl(picture.url) }))
+    .filter((picture) => allowedImage(picture.url))
+)
 </script>
 <template>
   <details
@@ -54,7 +57,13 @@ const pictures = computed(() => props.context?.images?.filter((p) => allowedImag
         <div v-else class="image-unavailable">{{ $t('图片暂时无法加载') }}</div>
         <figcaption>
           <span>{{ $t(picture.label) }}</span
-          ><ScanOnPhone v-if="isKnowledgeSourceUrl(picture.source)" :url="picture.source" :label="locale === 'en' ? 'Scan for image source' : '扫码看图片来源'" />
+          ><a
+            v-if="isKnowledgeSourceUrl(picture.source)"
+            :href="picture.source"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{{ $t('图片来源') }}</a
+          >
         </figcaption>
       </figure>
     </div>

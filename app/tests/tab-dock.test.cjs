@@ -1,7 +1,7 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),vm=require('node:vm')
 const root=path.resolve(__dirname,'..')
 function dock(props={}){
-  const c={console,Date,Promise,setTimeout,clearTimeout,Math,Number,String,Object,Array}
+  const c={WanderIcon:{},console,Date,Promise,setTimeout,clearTimeout,Math,Number,String,Object,Array}
   vm.createContext(c)
   const source=fs.readFileSync(path.join(root,'components/TabDock.vue'),'utf8').match(/<script>([\s\S]*?)<\/script>/)[1]
   vm.runInContext(source.replace(/^import .*$/gm,'').replace('export default','globalThis.options='),c)

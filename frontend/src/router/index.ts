@@ -10,6 +10,17 @@ const router = createRouter({
       component: () => import('@/views/station/StationServiceView.vue'),
       meta: {title:'景区数字人服务站',requiresAuth:false},
     },
+    // 模块② 景点详情一条龙：独立手机预览入口（先做 06 介绍展开 / 07 图库展开）
+    {
+      path: '/app',
+      redirect: '/app/scenic'
+    },
+    {
+      path: '/app/scenic/:spotId?',
+      name: 'AppScenicDetail',
+      component: () => import('@/views/scenic-app/ScenicDetailView.vue'),
+      meta: { title: '景点详情' }
+    },
     {
       path: '/login',
       name: 'Login',

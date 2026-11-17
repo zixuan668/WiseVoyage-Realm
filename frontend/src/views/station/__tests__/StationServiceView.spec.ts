@@ -25,7 +25,6 @@ vi.mock('@/api/serviceStation', async (importOriginal) => {
     endStationVisit: vi.fn(),
     extendStationVisit: vi.fn(),
     planAtStation: vi.fn(),
-    interpretStationRoute: vi.fn(),
     consultStation: vi.fn(),
     speakAtStation: vi.fn(),
     shareStationPlan: vi.fn(),
@@ -309,54 +308,6 @@ describe('Fixed service station', () => {
     await button('生成路线').trigger('click')
     await flushPromises()
     expect(api.planAtStation).toHaveBeenCalledWith(visit, expect.objectContaining({end_area:'return'}), expect.any(AbortSignal))
-  })
-  it('keeps group wishes separate and waits for consent before applying an alternative', async () => {
-    render()
-    await flushPromises()
-    await button('规划路线').trigger('click')
-    await wrapper.findAll('.station-endpoint-options button')[1].trigger('click')
-    await button('我们一起选').trigger('click')
-    expect(button('生成路线').attributes('disabled')).toBeDefined()
-    for (const member of wrapper.findAll('.station-member')) {
-      await member.get('select').setValue(1)
-    }
-    const changes = { spot_ids: [1], end_area: 'east' as const, avoid_steps: false, budget: 120 }
-    vi.mocked(api.planAtStation).mockRejectedValueOnce({ response: { status: 422, data: { detail: {
-      message: '北宫门无法连通', network_version: 'v1', alternatives: [{ changes, stop_ids: [1], minutes: 60, meters: 504 }]
-    } } } })
-    await button('生成路线').trigger('click')
-    await flushPromises()
-    expect(api.planAtStation).toHaveBeenCalledTimes(1)
-    const submitted = vi.mocked(api.planAtStation).mock.calls[0][1]
-    expect(submitted.spot_ids).toEqual([1])
-    expect(submitted.party).toEqual([{ first: 1, backup: null }, { first: 1, backup: null }])
-    expect(wrapper.get('.station-adjustments').text()).toContain('终点改为东宫门')
-    expect(wrapper.get('.station-endpoint-options [aria-pressed="true"]').text()).toContain('北宫门')
-    await button('采用此方案').trigger('click')
-    await flushPromises()
-    expect(api.planAtStation).toHaveBeenLastCalledWith(visit, expect.objectContaining({
-      ...changes, expected_network_version: 'v1', party: submitted.party
-    }), expect.any(AbortSignal))
-  })
-  it('interprets extra requests on submit and preserves the form if the model is unavailable', async () => {
-    render()
-    await flushPromises()
-    await button('规划路线').trigger('click')
-    await wrapper.findAll('.station-endpoint-options button')[2].trigger('click')
-    const note = '想看长廊的彩画'
-    await wrapper.get('.station-extra-request textarea').setValue(note)
-    vi.mocked(api.interpretStationRoute).mockRejectedValueOnce({ response: { status: 503, data: { detail: '请重试' } } })
-    await button('生成路线').trigger('click')
-    await flushPromises()
-    expect(wrapper.get('.station-plan-error').text()).toContain('请重试')
-    expect(api.planAtStation).not.toHaveBeenCalled()
-    const profile = { note, less_walking: false, matches: { 1: '长廊' }, unresolved: [] }
-    vi.mocked(api.interpretStationRoute).mockResolvedValueOnce({ spot_ids:[1], avoid_steps:false, personalization:profile })
-    await button('生成路线').trigger('click')
-    await flushPromises()
-    expect(api.planAtStation).toHaveBeenCalledWith(visit, expect.objectContaining({
-      end_area:'south', budget:120, spot_ids:[1], personalization:profile
-    }), expect.any(AbortSignal))
   })
   it('asks only for two hours, then lets the visitor choose an exit without inventing their words', async () => {
     vi.mocked(api.consultStation).mockResolvedValue({answer:'按120分钟安排。您想从哪个出口离园，还是返回本站？',actions:['plan'],source:'local',preferences:api.defaultStationPreferences(),needs_end_area:true,end_area_confirmed:false})

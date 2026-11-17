@@ -7,6 +7,10 @@ export default {
     console.log('App Launch')
     clearPendingClaim()
   },
+  onHide: function() {
+    // 记录是从主界面切到后台的，回来时重新展示欢迎页。
+    this._hiddenFromMain = true
+  },
   onShow: function() {
     let incomingClaim = false
     // #ifdef APP-PLUS
@@ -21,6 +25,13 @@ export default {
     var currentPage = ''
     if (pages && pages.length) {
       currentPage = (pages[pages.length - 1] || {}).route || ''
+    }
+    // 冷启动先停在欢迎页，由欢迎页自己决定下一步，避免被登录/引导重定向打断。
+    if (currentPage === 'pages/welcome/welcome') return
+    if (this._hiddenFromMain) {
+      this._hiddenFromMain = false
+      // 从后台回到主界面时也先看「Hi 颐和园」，再决定进哪个主页面。
+      if (currentPage === 'pages/tabs/tabs') { uni.reLaunch({ url: '/pages/welcome/welcome' }); return }
     }
     if (!uni.getStorageSync(ONBOARDING_STORAGE_KEY)) {
       if (currentPage && currentPage !== ONBOARDING_ROUTE) uni.reLaunch({ url: '/' + ONBOARDING_ROUTE })
@@ -100,4 +111,38 @@ page{--app-page-gradient:linear-gradient(135deg,#eee8ff 0%,#fbfbff 52%,#eef8fc 1
 page .page .aurora-background{background:var(--app-page-gradient)!important;background-size:100vw 100vh!important;background-position:0 0!important;background-repeat:no-repeat!important}
 .page.aurora-page > .app-status-bar-shield{position:fixed!important;top:0;left:0;right:0;height:var(--status-bar-height);z-index:10000!important;background:var(--app-page-gradient);background-size:100vw 100vh;background-position:0 0;background-repeat:no-repeat;pointer-events:none}
 /* #endif */
+/* 全局统一返回箭头 */
+.app-back-icon{width:40rpx;height:40rpx;background-color:#282332;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 6l-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 12H5M11 6l-6 6 6 6'/%3E%3C/svg%3E") center / contain no-repeat}
+/* ==========================================================================
+   全系统统一返回键：白底 + 浅紫描边 + 深色细箭头（设计基准：导览页左上返回键）
+   统一结构：
+     <view class="app-back-btn" ...><view class="app-back-icon"></view></view>
+   新增页面一律复用这两个类，不要再单独画箭头/单独改圆角底色。
+   ========================================================================== */
+.app-back-btn, .nav-back, .planning-back, .detail-back, .guide-back, .wander-back {
+  box-sizing: border-box !important;
+  width: 44px !important; height: 44px !important;
+  min-width: 44px !important; min-height: 44px !important;
+  padding: 0 !important;
+  border: 1rpx solid rgba(139,120,230,.45) !important;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  box-shadow: 0 6rpx 18rpx rgba(90,70,180,.12) !important;
+  color: #282332 !important;
+  display: flex !important; align-items: center !important; justify-content: center !important;
+  line-height: 1 !important;
+}
+.app-back-btn:active, .nav-back:active, .planning-back:active, .detail-back:active,
+.guide-back:active, .wander-back:active { transform: scale(.94); transition: transform 120ms cubic-bezier(.2,.8,.2,1); }
+.app-back-btn .app-back-icon, .nav-back .app-back-icon, .planning-back .app-back-icon,
+.detail-back .app-back-icon, .guide-back .app-back-icon, .wander-back .app-back-icon,
+.app-back-btn .back-icon, .nav-back .back-icon, .planning-back .back-icon, .detail-back .back-icon {
+  width: 40rpx !important; height: 40rpx !important; background-color: #282332 !important;
+}
+/* 旧页面若仍用 iconfont 画箭头，也统一成同一深色 */
+.nav-back.iconfont { font-size: 22px !important; color: #282332 !important; }
+/* 统一返回键是 button 时，去掉 uni-app 默认的边框伪元素 */
+button.app-back-btn::after, button.nav-back::after, button.planning-back::after,
+button.detail-back::after, button.guide-back::after, button.wander-back::after { border: 0 !important; }
+
 </style>

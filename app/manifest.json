@@ -49,6 +49,27 @@
                     "zhiyouguide"
                 ]
             }
+        },
+        "statusbar": {
+            "immersed": true,
+            "background": "#ffffff",
+            "style": "dark"
+        },
+        "nativePlugins": {
+            "WZZC-CustomPreview": {
+                "__plugin_info__": {
+                    "name": "完全界面自定义相机预览，拍照，录像，各种原生操作按钮，集成设置分辨率，视频质量 - [试用版，仅用于自定义调试基座]",
+                    "description": "完全界面自定义相机预览，拍照，录像，各种原生操作按钮，集成设置分辨率，视频质量，新增图片旋转，镜像处理,:【如特殊机型有问题，可私信拿离线包】",
+                    "platforms": "Android",
+                    "url": "https://ext.dcloud.net.cn/plugin?id=14752",
+                    "android_package_name": "",
+                    "ios_bundle_id": "",
+                    "isCloud": true,
+                    "bought": 0,
+                    "pid": "14752",
+                    "parameters": {}
+                }
+            }
         }
     },
     "h5": {

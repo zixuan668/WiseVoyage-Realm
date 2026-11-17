@@ -73,9 +73,13 @@ export default defineConfig(({ mode }) => {
   const backendUrl = env.VITE_BASE_SERVER_URL || 'http://127.0.0.1:18000'
 
   return {
+  // node_modules is shared with another checkout; keep optimized modules local.
+  cacheDir: fileURLToPath(new URL('./.vite-cache', import.meta.url)),
   server: {
     host: '0.0.0.0',  // 监听所有网络接口
     port: 5173,
+    // 文件编辑工具会在源码目录生成临时目录，watch 到锁定文件会让 dev server 直接退出
+    watch: { ignored: ['**/.*.tmpdir/**', '**/*.tmp'] },
     // 隧道访问时禁用HMR WebSocket（localtunnel不支持WebSocket）
     hmr: {
       // 当通过隧道访问时，HMR WebSocket连接会失败导致页面卡住
@@ -94,15 +98,15 @@ export default defineConfig(({ mode }) => {
       '/scenic-spots': { target: backendUrl, bypass: spaNavigationBypass },
       '/knowledge-base': { target: backendUrl, bypass: spaNavigationBypass },
       '/tour-routes': { target: backendUrl, bypass: spaNavigationBypass },
-      '/tour-session': { target: backendUrl, bypass: spaNavigationBypass },
-      '/tour-experience': { target: backendUrl, bypass: spaNavigationBypass },
+      '/tour-session': { target: env.VITE_SCENIC_PREVIEW_URL || backendUrl, bypass: spaNavigationBypass },
+      '/tour-experience': { target: env.VITE_SCENIC_PREVIEW_URL || backendUrl, bypass: spaNavigationBypass },
       '/service-stations': { target: backendUrl, bypass: spaNavigationBypass },
       '/analytics': { target: backendUrl, bypass: spaNavigationBypass },
       '/system': { target: backendUrl, bypass: spaNavigationBypass },
       '/files': { target: backendUrl, bypass: spaNavigationBypass },
       '/api': { target: backendUrl, bypass: spaNavigationBypass },
-      '/xingyun': { target: backendUrl, bypass: spaNavigationBypass },
-      '/avatar': { target: backendUrl, bypass: spaNavigationBypass }
+      '/xingyun': { target: env.VITE_SCENIC_PREVIEW_URL || backendUrl, bypass: spaNavigationBypass },
+      '/avatar': { target: env.VITE_SCENIC_PREVIEW_URL || backendUrl, bypass: spaNavigationBypass }
     }
   },
   plugins: [vue(), serverInfoPlugin()],

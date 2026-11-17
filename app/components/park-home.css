@@ -1,0 +1,457 @@
+@font-face {
+  font-family: 'Source Han Park';
+  src: url('/static/park-home/source-han-regular.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+}
+.park-home {
+  --app-font-family: 'Source Han Park', 'Noto Sans CJK SC', sans-serif;
+  --park-bg: #fff;
+  --park-soft: #eee8fa;
+  --park-ink: #302548;
+  --park-muted-ink: #756a8b;
+  --park-purple: #6547ad;
+  --park-bar: 64px;
+  --park-map-footer: 63px;
+  --park-status-h: max(24px, var(--status-bar-height, 0px), env(safe-area-inset-top));
+  --park-top: max(16px, var(--park-status-h));
+  /* 地图铺到状态栏后面，用顶部白色渐变把图标区柔化；内容的位置保持不变 */
+  --park-map-top: 0px;
+  --park-gutter: 14px;
+  --park-map-radius: clamp(44px, 14.5vw, 76px);
+  --park-map-gap: clamp(14px, 2.3vh, 24px);
+  --park-preview-height: calc(clamp(210px, 41vh, 470px) + var(--park-status-h));
+  --park-full-height: calc(100% - var(--park-map-top) - var(--park-bar) - var(--park-map-footer) - env(safe-area-inset-bottom));
+  --park-travel: calc(var(--park-full-height) - var(--park-preview-height));
+  --park-rest-offset: 0px;
+  --park-panel-offset: clamp(0px, calc(var(--park-rest-offset) + var(--park-pull, 0px)), var(--park-travel));
+  --park-settle: 280ms cubic-bezier(.2,.75,.25,1);
+  --park-column: min(100%, 570px);
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overflow: clip;
+  color: var(--park-ink);
+  background: var(--park-bg);
+  font: 400 14px/1.45 'Source Han Park', 'Noto Sans CJK SC', sans-serif;
+}
+.park-home button {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  line-height: inherit;
+}
+.park-home button::after { border: 0; }
+.park-home button:focus-visible { outline: 2px solid #7558bf; outline-offset: -2px; }
+.park-content-layer {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  transform: translate3d(0, var(--park-panel-offset), 0);
+  transition: transform var(--park-settle);
+}
+.park-page {
+  position: absolute;
+  inset: calc(var(--park-map-top) + var(--park-preview-height) + var(--park-map-gap)) 0 calc(var(--park-bar) + env(safe-area-inset-bottom));
+  overflow: hidden;
+  background: var(--park-bg);
+  pointer-events: auto;
+}
+.park-map-frame {
+  --park-map-cut: clamp(0px, calc(100% - var(--park-preview-height) - var(--park-pull, 0px)), calc(100% - var(--park-preview-height)));
+  --park-credits-offset: calc(var(--park-map-cut) * .56 + 8px);
+  --park-credits-inset: max(10px, calc(var(--park-map-radius) * .5));
+  position: absolute;
+  z-index: 0;
+  inset: var(--park-map-top) 0 auto;
+  height: var(--park-full-height);
+  overflow: hidden;
+  clip-path: inset(0 0 var(--park-map-cut) 0 round 0 0 var(--park-map-radius) var(--park-map-radius));
+  background: #e5ede9;
+  transition: clip-path var(--park-settle);
+}
+.park-expanded { --park-rest-offset: var(--park-travel); }
+.park-expanded .park-map-frame {
+  --park-map-cut: clamp(0px, calc(-1 * var(--park-pull, 0px)), calc(100% - var(--park-preview-height)));
+  --park-map-radius: 30px;
+  --park-credits-inset: 10px;
+}
+.park-expanded .park-page { pointer-events: none; }
+.park-expanded:not(.park-dragging) .park-content-layer {
+  visibility: hidden;
+  transition: transform var(--park-settle), visibility 0s 280ms;
+}
+.park-map-frame .park-map {
+  transform: translate3d(0, calc(var(--park-map-cut) * -.44), 0);
+  transition: transform var(--park-settle);
+}
+.park-home .park-map-frame :deep(:is(.amap-logo, .amap-copyright, .leaflet-bottom)) {
+  bottom: var(--park-credits-offset) !important;
+  transition: bottom var(--park-settle), left var(--park-settle), right var(--park-settle), margin-left var(--park-settle);
+}
+.park-home .park-map-frame :deep(.amap-logo) { left: var(--park-credits-inset) !important; }
+.park-home .park-map-frame :deep(.amap-copyright) { margin-left: var(--park-credits-inset); }
+.park-home .park-map-frame :deep(.leaflet-bottom.leaflet-right) { right: var(--park-credits-inset); }
+.park-dragging :is(.park-content-layer, .park-map-frame, .park-map-frame .park-map),
+.park-dragging .park-map-frame :deep(:is(.amap-logo, .amap-copyright, .leaflet-bottom)) {
+  transition: none;
+}
+.park-map-reveal {
+  position: absolute;
+  z-index: 1;
+  inset: var(--park-map-top) 0 auto;
+  height: calc(var(--park-preview-height) + var(--park-panel-offset));
+  clip-path: inset(0 round 0 0 var(--park-map-radius) var(--park-map-radius));
+  touch-action: none;
+}
+@media (pointer: fine) {
+  .park-map-reveal { cursor: grab; }
+  .park-dragging { cursor: grabbing; user-select: none; }
+  .park-dragging .park-map-reveal { cursor: inherit; }
+}
+/* 状态栏区域：地图继续铺上去，但用白色渐变压掉地图文字，保证时间/电量可读 */
+.park-status-veil {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: calc(var(--park-status-h) + 18px);
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255,255,255,.96) 0%, rgba(255,255,255,.9) 34%, rgba(255,255,255,.62) 62%, rgba(255,255,255,0) 100%);
+  transition: opacity .24s ease;
+}
+.park-expanded .park-status-veil { opacity: 0; }
+/* 首页右上角：扫码领取路线（用 .park-home 前缀压过全局 .park-home button 的透明底） */
+.park-home .park-scan {
+  position: absolute;
+  top: calc(var(--park-status-h) + 8px);
+  right: max(12px, env(safe-area-inset-right, 0px));
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 13px 8px 11px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(139, 120, 230, 0.32);
+  box-shadow: 0 8px 20px -14px rgba(60, 40, 120, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #4a3aa8;
+  transition: transform 0.16s ease, background-color 0.16s ease;
+}
+.park-home .park-scan:active { transform: scale(0.96); background: rgba(245, 241, 255, 0.96); }
+.park-home .park-scan .park-scan-icon { font-size: 17px; color: #6a5ae0; }
+.park-home .park-scan .park-scan-label { font-size: 13px; font-weight: 600; line-height: 1; color: #4a3aa8; }
+.park-map-status {
+  position: absolute;
+  right: 13px;
+  top: calc(var(--park-top) + 10px);
+  font-size: 10px;
+  color: var(--park-muted-ink);
+}
+.park-content { position: relative; width: var(--park-column); margin: 0 auto; padding: 0 var(--park-gutter) 16px; box-sizing: border-box; }
+.park-action-panel { margin-bottom: 14px; touch-action: none; }
+.park-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  justify-items: center;
+  gap: clamp(10px, 3vw, 22px);
+  width: min(100%, 360px);
+  margin: 0 auto;
+}
+.park-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  min-height: clamp(48px, 5.5vh, 55px);
+  padding: 7px 8px;
+  border-radius: 17px;
+  background: #f3eefb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.92), 0 10px 20px -16px rgba(74, 52, 130, 0.55);
+  text-align: center;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.16s cubic-bezier(0.2, 0, 0, 1), background 0.16s ease, box-shadow 0.16s ease;
+}
+.park-actions button:active { background: #eee6f9; transform: scale(0.96); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 10px -12px rgba(74, 52, 130, 0.5); }
+.park-action-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  background-color: #7957be;
+  -webkit-mask: var(--park-icon) center / contain no-repeat;
+  mask: var(--park-icon) center / contain no-repeat;
+}
+.park-icon-pin {
+  --park-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M19 10c0 5-7 11-7 11S5 15 5 10a7 7 0 1 1 14 0Z'/%3E%3Ccircle cx='12' cy='10' r='3'/%3E%3C/svg%3E");
+}
+.park-icon-route {
+  --park-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='6' cy='18' r='2.4'/%3E%3Ccircle cx='18' cy='6' r='2.4'/%3E%3Cpath d='M8.4 18h6.1a3.5 3.5 0 0 0 0-7H9.5a3.5 3.5 0 0 1 0-7h6.1'/%3E%3C/svg%3E");
+}
+.park-icon-compass {
+  --park-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9.2'/%3E%3Cpath d='m15.6 8.4-1.7 5.2-5.2 1.7 1.7-5.2 5.2-1.7Z'/%3E%3C/svg%3E");
+}
+.park-action-name {
+  display: block;
+  font-size: clamp(13px, 3.6vw, 16px);
+  line-height: 1.35;
+  text-wrap: balance;
+}
+.park-home .park-section-heading {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 40px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  /* 标题贴近轮播卡片但不贴着：按钮自身 40px 高，文字下方已有约 10px 余量，
+     这里只留 4px，加上卡片自身的 4px 上边距，视觉间距约 18px */
+  margin: 0 0 4px;
+  /* 左缘与轮播当前卡片对齐：卡片留白 56rpx(7.4667vw)，内容区已有 --park-gutter 内缩；
+     再减去汉字左侧字面留白(~1.7px)，让文字墨迹而不是文本框与卡片左缘齐平；
+     右侧同样按卡片留白收进，让箭头贴到卡片右缘 */
+  padding: 0 calc(7.4667vw - var(--park-gutter)) 0 calc(7.4667vw - var(--park-gutter) - 1.7px);
+  font-size: 20px;
+  text-align: left;
+}
+.park-section-arrow {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  background-color: var(--park-purple);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.park-carousel {
+  --park-card-height: clamp(150px, 26vh, 285px);
+  margin: 0 calc(-1 * var(--park-gutter));
+}
+.park-carousel swiper, .park-carousel uni-swiper { height: var(--park-card-height); overflow: visible; }
+.park-route {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: calc(100% - 8px);
+  margin: 4px 0 !important;
+  overflow: hidden;
+  border-radius: 24px;
+  isolation: isolate;
+  background: #836c9b !important;
+  text-align: left;
+  transform: scale(.94);
+  transition: transform 320ms cubic-bezier(.21,.66,.25,1), filter 280ms ease;
+  filter: saturate(.9) brightness(.96);
+}
+.park-route.is-featured {
+  z-index: 1;
+  transform: scale(1);
+  filter: none;
+  box-shadow: 0 6px 17px #3d23562e;
+}
+.park-route image, .park-route uni-image, .park-route-shade { position: absolute; inset: 0; width: 100%; height: 100%; }
+.park-route-shade { background: linear-gradient(180deg, transparent 31%, #21162f1f 46%, #21162fdc 100%); }
+.park-route-copy {
+  position: absolute;
+  inset: auto clamp(14px, 4.9vw, 24px) clamp(15px, 2.45vh, 24px);
+  color: #fff;
+}
+.park-route-title, .park-route-note { display: block; }
+.park-route-title { font-size: clamp(19px, 5.25vw, 24px); }
+.park-route-note { margin-top: 3px; font-size: 13px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.park-route-empty { min-height: 114px; display: grid; place-content: center; gap: 8px; color: var(--park-muted-ink); }
+.park-route-empty button { color: var(--park-purple); }
+.park-pagination { display: flex; justify-content: center; align-items: center; gap: 5px; height: 18px; margin-top: 7px; }
+.park-pagination > view, .park-pagination > uni-view { width: 6px; height: 6px; background: #d7cbea; border-radius: 6px; transition: width 220ms ease; }
+.park-pagination .active { width: 18px; background: #886abd; }
+.park-search-results {
+  display: grid;
+  gap: 0;
+  width: min(100%, 540px);
+  box-sizing: border-box;
+  margin: 0 auto 6px;
+  padding: 4px 10px;
+  border-radius: 17px;
+  background: #fff;
+  box-shadow: 0 8px 26px #21193b22;
+}
+.park-search-results button {
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 6px; min-height: 43px; padding: 2px 7px; text-align: left; color: var(--park-purple);
+}
+.park-search-results button + button { border-top: 1px solid #f0ebf6; }
+.park-search-results button text:first-child, .park-search-results button uni-text:first-child { color: var(--park-ink); }
+.park-map-page {
+  position: absolute;
+  z-index: 3;
+  inset: 0 0 calc(var(--park-bar) + env(safe-area-inset-bottom));
+  pointer-events: none;
+  opacity: var(--park-map-opacity, 1);
+  animation: park-map-in 180ms ease-out;
+}
+@keyframes park-map-in { from { opacity: 0; } }
+.park-dragging .park-map-page { animation: none; }
+.park-map-header {
+  position: absolute;
+  z-index: 8;
+  top: calc(var(--park-top) + 7px);
+  left: calc(var(--park-gutter) + 10px);
+  right: calc(var(--park-gutter) + 10px);
+  pointer-events: none;
+}
+.park-map-header > * { pointer-events: auto; }
+.park-map-filter-row {
+  display: inline-flex; align-items: center; padding: 2px 4px; margin: 0 0 8px;
+  color: var(--park-purple); background: #fcfafff5; border: 1px solid #fff;
+  border-radius: 17px; box-shadow: 0 4px 16px #30254817;
+}
+.park-map-filter-row button {
+  display: flex; align-items: center; justify-content: center;
+  min-height: 34px; padding: 0 10px; font-size: 12px; color: var(--park-purple);
+}
+.park-map-filter-row button[aria-expanded='true'] { text-decoration: underline; text-underline-offset: 3px; }
+.park-weather, .park-sheet {
+  border: 1px solid #fff9;
+  border-radius: 20px;
+  background: #fcfafff5 !important;
+  box-shadow: 0 9px 23px #2e1e4d1c;
+}
+.park-weather {
+  --park-weather-width: min(100%, 380px);
+  position: relative; overflow: hidden; width: 112px; height: 70px;
+  box-sizing: border-box;
+  transition: width 235ms cubic-bezier(.2,.75,.25,1), height 235ms cubic-bezier(.2,.75,.25,1);
+}
+.park-weather.is-open { width: var(--park-weather-width); height: var(--park-weather-detail-height, 200px); }
+.park-weather.has-error { --park-weather-detail-height: 103px; }
+.park-home .park-weather-small {
+  position: absolute; inset: 0 auto auto 0;
+  display: grid; align-content: start; justify-items: start; width: 110px; min-height: 68px; padding: 8px 11px; text-align: left;
+  transition: opacity 120ms ease-out, visibility 0s;
+}
+.park-home .park-weather-source {
+  position: absolute; right: 4px; bottom: 2px;
+  display: grid; place-items: center; width: 34px; height: 34px;
+  border-radius: 12px; color: var(--park-muted-ink); line-height: 1;
+}
+.park-weather-source .iconfont { font-size: 14px; }
+.park-weather.is-open .park-weather-source { top: 9px; right: 50px; bottom: auto; height: 37px; }
+.park-weather.is-open .park-weather-small { opacity: 0; visibility: hidden; transition: opacity 120ms ease-out, visibility 0s 120ms; }
+.park-weather-temp { display: flex; gap: 6px; align-items: center; font-size: 26px; color: var(--park-ink); line-height: 1.35; font-variant-numeric: tabular-nums; }
+.park-weather-icon { color: #677e90; font-size: 20px; }
+.park-weather-sub { color: var(--park-muted-ink); font-size: 11px; }
+.park-sheet { box-sizing: border-box; padding: 10px 13px 13px; }
+.park-weather-large {
+  width: min(calc(100vw - var(--park-gutter) * 2 - 22px), 378px); padding: 9px 12px 13px; box-sizing: border-box;
+  opacity: 0; visibility: hidden; pointer-events: none;
+  transition: opacity 110ms ease-out, visibility 0s 110ms;
+}
+.park-weather.is-open .park-weather-large { opacity: 1; visibility: visible; pointer-events: auto; transition: opacity 160ms 40ms ease-out; }
+.park-sheet-heading { display: flex; justify-content: space-between; align-items: center; min-height: 37px; gap: 6px; }
+.park-sheet-title { display: block; font-size: 16px; }
+.park-sheet-heading button { flex: none; width: 40px; min-height: 37px; color: var(--park-purple); font-size: 21px; }
+.park-muted { display: block; color: var(--park-muted-ink); font-size: 11px; line-height: 1.55; }
+.park-weather-summary { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 0 10px; gap: 6px; }
+.park-weather-summary .park-weather-temp { font-size: 31px; }
+.park-forecast { display: flex; gap: 8px; justify-content: space-between; padding: 5px 0 9px; }
+.park-forecast > * { display: grid; justify-items: center; gap: 2px; font-size: 10px; color: var(--park-muted-ink); }
+.park-forecast-icon { color: #655696; font-size: 19px; }
+.park-empty-weather { display: flex; align-items: center; gap: 8px; color: var(--park-muted-ink); min-height: 42px; font-size: 12px; }
+.park-empty-weather button { color: var(--park-purple); min-height: 38px; padding: 0 8px; }
+.park-map-tools {
+  position: absolute; z-index: 7; right: calc(var(--park-gutter) + 10px); bottom: 117px;
+  display: grid; border-radius: 17px; overflow: hidden; background: white; box-shadow: 0 5px 16px #2e1e4d1c;
+}
+.park-map-tools button, .park-sheet-heading button, .park-assistant button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.park-map-tools button { width: 43px; height: 43px; font-size: 21px; color: var(--park-purple); }
+.park-map-heading {
+  position: absolute; z-index: 9; top: calc(var(--park-top) + 7px); right: calc(var(--park-gutter) + 10px);
+  border-radius: 15px; background: white; box-shadow: 0 5px 16px #2e1e4d1c;
+  pointer-events: auto; overflow: hidden;
+}
+.park-home .park-compass {
+  display: flex; align-items: center; justify-content: center; width: 43px; height: 43px;
+  flex-direction: column; gap: 2px; font-size: 9px;
+  color: #52436c;
+}
+.park-home .park-compass.is-following { background: #ede5fa; color: var(--park-purple); }
+.park-compass-needle { width: 14px; height: 16px; background: var(--park-purple);
+  clip-path: polygon(50% 3%,96% 94%,50% 72%,4% 94%); transform-origin: center; }
+.park-target {
+  width: 14px; height: 14px; border: 1.5px solid currentColor; border-radius: 50%;
+  display: grid; place-items: center;
+}
+.park-target::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.park-map-tools, .park-map-sheet, .park-map-footer { pointer-events: auto; }
+.park-map-tools button + button { border-top: 1px solid #efe8f6; }
+.park-map-sheet { margin-top: 8px; width: min(calc(100% - 47px), 320px); border-radius: 17px; }
+.park-layer-popup { transform-origin: top left; animation: park-layer-enter 160ms cubic-bezier(.2,.75,.25,1) both; }
+.park-layer-popup.is-closing { pointer-events: none; animation: park-layer-exit 110ms ease-out both; }
+@keyframes park-layer-enter { from { opacity: 0; transform: translateY(-5px) scale(.98); } }
+@keyframes park-layer-exit { to { opacity: 0; transform: translateY(-4px) scale(.98); } }
+.park-sheet-scroll { max-height: 28vh; }
+.park-weather.is-open + .park-map-sheet .park-sheet-scroll { max-height: min(28vh, max(70px, calc(100vh - 440px))); }
+.park-sheet-line { display: block; font-size: 12px; margin: 5px 0 7px; }
+.park-source-row, .park-road-options { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+.park-source-row button, .park-road-options button { min-height: 32px; padding: 2px 9px; font-size: 11px; color: var(--park-purple); background: #efe8fa; border-radius: 12px; }
+.park-road-options button.active { background: #6950a8; color: white; }
+.park-list-button { width: 100%; min-height: 40px; display: flex; align-items: center; justify-content: space-between; gap: 6px; text-align: left; }
+.park-list-button text:first-child, .park-list-button uni-text:first-child { font-size: 12px; }
+.park-list-button text:last-child, .park-list-button uni-text:last-child { white-space: nowrap; font-size: 10px; color: var(--park-muted-ink); }
+.park-road-row { padding-top: 8px; margin-top: 7px; border-top: 1px solid #ede5f6; font-size: 12px; }
+.park-provider { position: absolute; z-index: 6; left: 12px; bottom: 101px; padding: 3px 7px; border-radius: 8px; background: #ffffffe6; color: var(--park-muted-ink); font-size: 10px; max-width: calc(100% - 78px); }
+.park-map-footer { position: absolute; z-index: 10; right: 0; bottom: 0; left: 0; padding: 7px var(--park-gutter) 8px; background: var(--park-bg); touch-action: none; }
+.park-assistant {
+  display: flex; align-items: center; gap: 2px; width: min(100%, 540px); margin: 0 auto; min-height: 47px;
+  padding: 2px 5px 2px 10px; box-sizing: border-box; border-radius: 25px; background: #fff; color: var(--park-purple);
+}
+.park-map-footer .park-assistant { border: 1px solid #eee8f5; }
+.park-assistant button { flex: none; width: 41px; min-height: 42px; font-size: 18px; border-radius: 50%; }
+.park-assistant .park-assistant-search {
+  width: 26px;
+  font-size: 21px;
+}
+.park-assistant .park-assistant-query {
+  flex: 1;
+  min-width: 0;
+  height: 42px;
+  font: inherit;
+  font-size: 12px;
+  color: var(--park-ink);
+}
+.park-assistant .park-portrait { width: 36px; height: 36px; min-height: 36px; overflow: hidden; background: #ece4f9; }
+.park-portrait image, .park-portrait uni-image { width: 100%; height: 100%; display: block; }
+@media(max-width: 345px) {
+  .park-action-icon { width: 20px; height: 20px; }
+}
+@media(max-height: 660px) {
+  .park-home { --park-preview-height: calc(clamp(180px, 39.5vh, 260px) + var(--park-status-h)); }
+  .park-action-panel { margin-bottom: 10px; }
+  .park-home .park-section-heading { margin-bottom: 2px; }
+  .park-carousel { --park-card-height: clamp(150px, 26vh, 172px); }
+  .park-sheet-scroll { max-height: 24vh; }
+}
+@media(prefers-reduced-motion: reduce) {
+  .park-route, .park-pagination > * { transition: none; }
+  .park-content-layer, .park-expanded:not(.park-dragging) .park-content-layer, .park-map-frame,
+  .park-map-frame .park-map, .park-map-frame :deep(:is(.amap-logo, .amap-copyright, .leaflet-bottom)),
+  .park-weather, .park-weather .park-weather-small, .park-weather .park-weather-large { transition: none; }
+  .park-map-page, .park-layer-popup { animation: none; }
+}

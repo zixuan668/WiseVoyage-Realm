@@ -718,17 +718,14 @@ async def _tour_chat(chat_item: TourChatItem, background_tasks: BackgroundTasks)
     rag_references: list = []
     evidence=[]
     rag_applied = False
-    if not direct_answer and SERVER_PLUGINS_INFO.rag_enabled and rag_worker.TOUR_RAG_RETRIEVER:
+    if SERVER_PLUGINS_INFO.rag_enabled and rag_worker.TOUR_RAG_RETRIEVER and turn.intents != ['greeting'] and not turn.clarification and chat_item.persona != 'qianlong':
         try:
             topics=turn.intents if not turn.detailed else list(set(turn.intents+["history","architecture"]))
-            if isinstance(rag_worker.TOUR_RAG_RETRIEVER,rag_worker.LightweightTourRetriever):
-                evidence=rag_worker.TOUR_RAG_RETRIEVER.search_evidence(
-                    f'景点：{spot_name}。游客问题：{turn.resolved_question}',spot_name,topics)
-            rag_prompt, references = rag_worker.build_tour_rag_prompt(
-                rag_worker.TOUR_RAG_RETRIEVER,
-                spot_name,
-                turn.resolved_question,
-                topics=topics,
+            # Review exactly the fragments inserted into the prompt, with one
+            # retrieval pass instead of independently retrieving them twice.
+            rag_prompt, references, evidence = rag_worker.build_tour_rag_prompt(
+                rag_worker.TOUR_RAG_RETRIEVER, spot_name, turn.resolved_question,
+                topics=topics, include_evidence=True,
             )
             if rag_prompt != turn.resolved_question:
                 prompt[-1]["content"] = rag_prompt
@@ -776,7 +773,7 @@ async def _tour_chat(chat_item: TourChatItem, background_tasks: BackgroundTasks)
         else: numeric_guard='no_unseen_numbers'
     if answer_mode.startswith('llm_'):
         from ..modules.answer_evidence import verify_answer
-        claim_review=await verify_answer(guide_response,grounded_answer,evidence,get_llm_res)
+        claim_review=await verify_answer(guide_response,grounded_answer,evidence,get_llm_res,question=turn.resolved_question)
         if claim_review['status']!='model_checked':
             guide_response=grounded_answer
             answer_mode='local_knowledge'
@@ -785,6 +782,8 @@ async def _tour_chat(chat_item: TourChatItem, background_tasks: BackgroundTasks)
         guide_response = await translate_answer(guide_response, get_llm_res if _llm_is_configured() else None)
         if guide_response == ENGLISH_UNAVAILABLE:
             fallback_reason = "english_unavailable"
+    from ..modules.tour_dialogue import natural_guide_reply
+    guide_response = natural_guide_reply(guide_response, chat_item.language)
     text_ready_ms = round((time.perf_counter() - started_at) * 1000)
     speech_text = spoken_answer(guide_response, chat_item.language)
     logger.info(f"Guide response: {guide_response[:100]}...")

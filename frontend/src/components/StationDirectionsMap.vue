@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, onBeforeUnmount } from 'vue'
 import { loadScenicMap } from '@/utils/leaflet'
-import { walkingMapPoint, WALK_TILES } from '../../../shared/pedestrian-map.js'
+import { walkingMapPoint, WALK_TILES, WALK_ATTRIBUTION } from '../../../shared/pedestrian-map.js'
 import type { StationDirections } from '@/api/serviceStation'
 import { t, locale } from '@/i18n'
 const props = defineProps<{ directions: StationDirections }>()
@@ -20,7 +20,7 @@ async function draw() {
     if (disposed || own !== version || !host.value) return
     if (!map) {
       map = L.map(host.value, { attributionControl: true, scrollWheelZoom: false })
-      L.tileLayer(WALK_TILES, { maxZoom: 19, attribution:'© OpenStreetMap contributors' }).addTo(map)
+      L.tileLayer(WALK_TILES, { maxZoom: 19, attribution: WALK_ATTRIBUTION }).addTo(map)
       map.attributionControl.setPrefix(false)
       group = L.layerGroup().addTo(map)
       observer = new ResizeObserver(() => map?.invalidateSize())

@@ -19,7 +19,7 @@ from .init_db import DB_ENGINE
 
 
 async def get_db_scenic_spot_info(
-    user_id: int,
+    user_id: int | None,
     current_page: int = -1,
     page_size: int = 10,
     spot_name: str | None = None,
@@ -46,7 +46,9 @@ async def get_db_scenic_spot_info(
     assert current_page != 0
     assert page_size != 0
 
-    query_condition = and_(ScenicSpotInfo.user_id == user_id, ScenicSpotInfo.delete == False)
+    query_condition = ScenicSpotInfo.delete == False
+    if user_id is not None:
+        query_condition = and_(ScenicSpotInfo.user_id == user_id, query_condition)
 
     if spot_name:
         query_condition = and_(query_condition, ScenicSpotInfo.spot_name.ilike(f"%{spot_name}%"))

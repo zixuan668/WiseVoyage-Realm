@@ -72,16 +72,24 @@ watch(() => [props.guideId, props.tourId, props.stationVisit?.visit_id,configRev
 async function loadSdk() {
   const win = window as Window & { XmovAvatar?: Constructor }
   if (win.XmovAvatar) return win.XmovAvatar
-  await new Promise<void>((resolve, reject) => {
-    const script = document.createElement('script')
-    script.src = 'https://media.xingyun3d.com/xingyun3d/general/litesdk/xmovAvatar@latest.js'
-    const timer = setTimeout(() => { script.remove(); reject(new Error(t("SDK 下载超时"))) }, 30000)
-    script.onload = () => { clearTimeout(timer); resolve() }
-    script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error(t("SDK 下载失败"))) }
-    document.head.appendChild(script)
-  })
-  if (!win.XmovAvatar) throw new Error(t("SDK 未正确加载"))
-  return win.XmovAvatar
+  // 与 App 端保持一致：优先加载随包发布的 2.4.1 兼容版 SDK，再回退线上版本，
+  // 这样网页端与 App 端使用同一份数字人运行时，人脸和身体的合成效果一致。
+  const sources = ['/vendor/xingyun/xmov-avatar-2.4.1-compatible.js',
+    'https://media.xingyun3d.com/xingyun3d/general/litesdk/xmovAvatar@latest.js']
+  for (const src of sources) {
+    try {
+      await new Promise<void>((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = src
+        const timer = setTimeout(() => { script.remove(); reject(new Error(t("SDK 下载超时"))) }, 30000)
+        script.onload = () => { clearTimeout(timer); resolve() }
+        script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error(t("SDK 下载失败"))) }
+        document.head.appendChild(script)
+      })
+      if (win.XmovAvatar) return win.XmovAvatar
+    } catch { /* 尝试下一个来源 */ }
+  }
+  throw new Error(t("SDK 未正确加载"))
 }
 function release() {
   generation++
@@ -130,6 +138,8 @@ async function connect() {
     const instance = new SDK({
       containerId: '#' + containerId,
       appId: 'server-proxy', appSecret: 'server-proxy',
+      // 与 App 端 tour-xingyun 使用同一解码偏好，避免网页端人脸/身体两套渲染不一致。
+      hardwareAcceleration: 'prefer-hardware',
       gatewayServer: new URL('/xingyun/session/' + props.guideId + '?tour_id=' + (props.tourId || 0) + (props.stationVisit?'&station_visit_id='+encodeURIComponent(props.stationVisit.visit_id):''), location.origin).href,
       headers: props.stationVisit ? {'X-Station-Token':props.stationVisit.access_token} : avatarHeaders(props.tourId || 0),
       proxyWidget: {
@@ -215,9 +225,11 @@ defineExpose({ speak, stop, isReady: () => ready.value })
 <style scoped>
 .xingyun-guide:not(.half) .xingyun-frame{box-sizing:border-box;padding:44px 16px 62px}
 .xingyun-guide:not(.half) .xingyun-canvas{position:absolute!important;inset:44px 16px 62px!important;width:calc(100% - 32px)!important;height:calc(100% - 106px)!important;transform:none!important}
-/* SDK injects its own pixel size, scale and offsets. Fit the complete source frame
-   into the available stage instead of cropping it or inheriting those offsets. */
-.xingyun-guide:not(.half) .xingyun-canvas :deep(canvas){position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;min-width:0!important;min-height:0!important;margin:0!important;transform:none!important;object-fit:contain!important;object-position:50% 50%!important}
+/* SDK 会按资源像素、缩放和横向位移写入内联样式；数字人由多个层（画面/人脸）组成，
+   只缩放 canvas 会让脸和身体错位。沿用 App 端 tour-xingyun 的处理：所有带尺寸的层
+   统一铺满显示区域并等比例完整显示，人脸与身体才会合成在同一个画面里。 */
+.xingyun-guide:not(.half) .xingyun-canvas :deep(canvas),
+.xingyun-guide:not(.half) .xingyun-canvas :deep([width][height]){position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;min-width:0!important;min-height:0!important;margin:0!important;padding:0!important;border:0!important;transform:none!important;object-fit:contain!important;object-position:50% 50%!important}
 .xingyun-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;margin:0;padding:24px;text-align:center;font-size:18px;line-height:1.6;color:var(--text-secondary)}
 .xingyun-guide.station-mode:not(.half) .xingyun-frame{padding:8px 4px 6px}
 .xingyun-guide.station-mode:not(.half) .xingyun-canvas{inset:8px 4px 6px!important;width:calc(100% - 8px)!important;height:calc(100% - 14px)!important}

@@ -130,8 +130,8 @@ async def get_route_recommendation(
     request: RouteRecommendRequest,
 ):
     """根据游客偏好推荐游览路线（免登录）"""
-    # 获取所有可用景点
-    spot_list, _ = await get_db_scenic_spot_info(user_id=1)
+    # 获取所有可用景点（公开推荐，不按内容归属用户过滤）
+    spot_list, _ = await get_db_scenic_spot_info(user_id=None)
 
     if not spot_list:
         return make_return_data(False, ResultCode.FAIL, "暂无可用景点", "")

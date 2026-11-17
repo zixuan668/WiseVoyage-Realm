@@ -1,6 +1,15 @@
 {
   "pages": [
     {
+      "path": "pages/welcome/welcome",
+      "style": {
+        "navigationStyle": "custom",
+        "navigationBarTextStyle": "white",
+        "backgroundColor": "#182942",
+        "disableScroll": true
+      }
+    },
+    {
       "path": "pages/onboarding/onboarding",
       "style": {
         "navigationStyle": "custom",
@@ -22,6 +31,10 @@
     {
       "path": "pages/claim/claim",
       "style": { "navigationBarTitleText": "领取电脑路线", "navigationBarTextStyle": "black", "navigationBarBackgroundColor": "#f8fafc" }
+    },
+    {
+      "path": "pages/park-map/park-map",
+      "style": { "navigationStyle": "custom", "disableScroll": true, "backgroundColor": "#f7f4ff" }
     },
     {
       "path": "pages/auth/auth",
@@ -83,14 +96,11 @@
       }
     },
     {
-      "path": "pages/mine/history",
+      "path": "pages/mine/checkins",
       "style": {
         "navigationStyle": "custom",
-        "disableScroll": false,
-        "navigationBarBackgroundColor": "#f8fafc",
-        "navigationBarTextStyle": "black",
-        "backgroundColor": "#f8fafc",
-        "backgroundTextStyle": "dark"
+        "disableScroll": true,
+        "backgroundColor": "#f7f4ff"
       }
     },
     {
@@ -102,6 +112,25 @@
         "navigationBarTextStyle": "black",
         "backgroundColor": "#f8fafc",
         "backgroundTextStyle": "dark"
+      }
+    },
+{
+      "path": "pages/scenic/scenic",
+      "style": {
+        "navigationStyle": "custom",
+        "disableScroll": true,
+        "navigationBarTextStyle": "black",
+        "navigationBarBackgroundColor": "#ffffff",
+        "backgroundColor": "#ffffff"
+      }
+    },
+    {
+      "path": "pages/featured/featured",
+      "style": {
+        "navigationStyle": "custom",
+        "disableScroll": true,
+        "navigationBarTextStyle": "black",
+        "backgroundColor": "#f7f4ff"
       }
     }
   ],

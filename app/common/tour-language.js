@@ -92,9 +92,8 @@ const appEnglish = {
   // 「我的」页及底部导航（App 专属文案，网页端不存在对应键）
   '界面语言': 'Interface language',
   '我的': 'Mine',
-  '游览记录': 'Tour history',
   '关于我们': 'About us',
-  'AI小导游': 'AI Guide',
+  'AI导游': 'AI Guide',
   '个人资料加载失败': 'Could not load profile',
   '个人资料加载失败，请检查网络': 'Could not load profile. Please check your network.',
   '确定要退出登录吗？': 'Log out of your account?',

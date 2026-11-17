@@ -118,10 +118,7 @@ def gate_distance(a, area, avoid_steps=False):
     return round(result[2]) if result else float('inf')
 
 
-def anchor_to_anchor_distance(origin, destination, avoid_steps=False):
-    result = _path(origin['node_id'], destination['node_id'], bool(avoid_steps), rules()) if origin and destination else None
-    return round(result[2]) if result else float('inf')
-
-
 def anchor_distance(a, anchor, avoid_steps=False):
-    return anchor_to_anchor_distance(access_point(a), anchor, avoid_steps)
+    origin = access_point(a)
+    result = _path(origin['node_id'], anchor['node_id'], bool(avoid_steps), rules()) if origin and anchor else None
+    return round(result[2]) if result else float('inf')
