@@ -10,11 +10,11 @@ These are AI-enhanced display images, not documentary originals. Textures, inscr
 
 See [enhancement-records.json](enhancement-records.json) for the full prompt used for each attraction, its original image URL, source and any targeted correction prompt. No model identifier is asserted beyond the built-in tool's reported execution mode.
 
-## Original supplied photographs and first Wenchang enhancement
+## First Wenchang enhancement
 
-- `jade-belt-bridge.jpg`: original user-supplied photograph of Jade Belt Bridge.
-- `wenchang-pavilion.jpg`: original user-supplied Wenchang Pavilion photograph (488 × 250), retained unchanged.
-- `wenchang-pavilion-enhanced.png`: the first approved AI-enhanced Wenchang photograph, retained as a full-resolution reference. The card now uses its JPEG copy at `enhanced/wenchang-pavilion.jpg`. Created on 2026-10-17 with the built-in image editing tool. Fine textures are AI reconstructions, not independently verified architectural documentation. Use the original photograph for factual detail comparisons.
+The two user-supplied originals (`jade-belt-bridge.jpg`, `wenchang-pavilion.jpg`) were removed on request now that every card uses the enhanced cover under `enhanced/`; their source URLs and prompts remain in [enhancement-records.json](enhancement-records.json) for provenance.
+
+- `wenchang-pavilion-enhanced.png`: the first approved AI-enhanced Wenchang photograph, retained as a full-resolution reference. The card uses its JPEG copy at `enhanced/wenchang-pavilion.jpg`. Created on 2026-10-17 with the built-in image editing tool. Fine textures are AI reconstructions, not independently verified architectural documentation.
 
 ## Enhancement prompt
 

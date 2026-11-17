@@ -1,5 +1,5 @@
-// 导览中与数字人的问答也记入「AI 小导游」的问答历史（右上角时钟图标）。
-// 记录按账号隔离，和 AI 小导游共用 ai_chat_state:<账号> 存储。
+// 导览中与数字人的问答也记入「AI 导游」的问答历史（右上角时钟图标）。
+// 记录按账号隔离，和 AI 导游共用 ai_chat_state:<账号> 存储。
 const STATE_PREFIX = 'ai_chat_state:'
 const MAX_MESSAGES = 200
 

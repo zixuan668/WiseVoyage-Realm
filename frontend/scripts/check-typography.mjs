@@ -37,6 +37,9 @@ async function walk(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     if (['tests', '__tests__', 'node_modules', 'static', 'dist', 'unpackage'].includes(entry.name)) continue
     const file = path.join(directory, entry.name)
+    // These directories are rendered inside the mobile App's scenic web-view.
+    const relative = path.relative(project, file).split(path.sep).join('/')
+    if (['frontend/src/views/scenic-app', 'frontend/src/components/scenic-detail'].includes(relative)) continue
     if (entry.isDirectory()) await walk(file)
     else if (extensions.has(path.extname(file))) await checkFile(file)
   }

@@ -25,8 +25,8 @@ export default {
 </style>
 
 <style scoped>
-.confirm-panel{background:var(--ng-glass-blue-bg);background-image:none;border:0;box-shadow:var(--ng-glass-shadow),inset 0 1rpx 0 rgba(255,255,255,.95),0 18px 54px rgba(59,43,110,.22),0 3px 12px rgba(59,43,110,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}.confirm-actions .confirm-cancel{background:#fff;border-color:#ddd7f3}.confirm-actions .confirm-primary{background:#4f46e5;color:#fff;border-color:transparent}.confirm-actions .confirm-primary:active{background:#4338ca;color:#fff}
+.confirm-panel{background:var(--ng-glass-blue-bg);background-image:none;border:0;box-shadow:var(--ng-glass-shadow),inset 0 1rpx 0 rgba(255,255,255,.95),0 18px 54px rgba(59,43,110,.22),0 3px 12px rgba(59,43,110,.1);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}.confirm-actions .confirm-cancel{background:#fff;border-color:#ddd7f3}.confirm-actions .confirm-primary{background:#f0ebff;color:#5c4bc0;border-color:rgba(139,120,230,.35)}.confirm-actions .confirm-primary:active{background:#e8e0ff;color:#4a3aa8}
 .confirm-panel.confirm-panel-plain{background:#ffffff;background-image:none;border:1rpx solid #e3ddf3;box-shadow:0 18px 54px rgba(59,43,110,.18),0 3px 12px rgba(59,43,110,.08)}
-.confirm-panel-plain .confirm-primary{background:var(--ng-glass-blue-bg);color:var(--ng-soft-blue-text);border:0;box-shadow:var(--ng-glass-shadow),inset 0 1rpx 0 rgba(255,255,255,.92)}
-.confirm-panel-plain .confirm-primary:active{background:#e6f0ff;color:var(--ng-soft-blue-text)}
+.confirm-panel-plain .confirm-primary{background:#f0ebff;color:#5c4bc0;border:1rpx solid rgba(139,120,230,.35);box-shadow:inset 0 1rpx 0 #fff,0 8rpx 18rpx -14rpx rgba(90,70,180,.35)}
+.confirm-panel-plain .confirm-primary:active{background:#e8e0ff;color:#4a3aa8}
 </style>

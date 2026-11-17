@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 OFFICIAL = "https://www.summerpalace.net.cn/"
 PARK = "https://gygl.beijing.gov.cn/"
 SOURCES = {
+    "guide_map": ("颐和园官网导览地图", "https://www.summerpalace.net.cn/guide_map.html"),
     "overview": ("北京市公园管理中心·颐和园", PARK+"mlgy/mlgy_lsmy/201911/t20191129_732237.html"),
     "heritage": ("UNESCO·颐和园世界遗产", "https://whc.unesco.org/en/list/880/"),
     "court": ("北京市文物局·颐和园历史与保护", "https://wwj.beijing.gov.cn/bjww/wwjzzcslm/1729028/1729037/1729027/543436648/index.html"),
@@ -255,15 +256,15 @@ def build():
     for index, raw in enumerate(DOSSIERS, 1):
         name = raw["name"]
         record = dict(raw)
-        record["source_ids"] = raw["sources"]
-        record["sources"] = [dict(id=k, title=SOURCES[k][0], url=SOURCES[k][1]) for k in raw["sources"]]
+        record["source_ids"] = list(dict.fromkeys(raw["sources"] + ["guide_map"]))
+        record["sources"] = [dict(id=k, title=SOURCES[k][0], url=SOURCES[k][1]) for k in record["source_ids"]]
         record["verified_on"] = "2026-10-11"
         record["location"] = locations[name]["location"]
         record["photography"] = record.pop("photo")
         record["accessibility"] = record.pop("access")
         record["duration"] = "游览时长为路线策展估算，包含观察与一般停留，不是官方规定，也不含现场排队时间。可按体力、拍照与休息需求缩短或延长。"
         record["season"] = "四季都可观察建筑与山水，春秋通常更适合步行。花期、积雪、倒影和夕阳效果受天气影响；季节建议不代表今日气象。"
-        record["facilities"] = "资料尚未核实本景点最近的卫生间、饮水点、餐饮店、寄存点及无障碍设施的准确位置和当日开放情况。需要时优先看园内导览牌或询问工作人员；不能凭历史商铺名称推断今天的服务。"
+        record["facilities"] = "颐和园全园设施包括" + "、".join(item["label"] for item in json.loads((ROOT/"data/summer_palace_services.json").read_text(encoding="utf8"))["categories"]) + "。具体点位见官网导览图，当前景点周边位置及当日开放情况以园内指引为准。"
         record["opening"] = "开放时间、园中园票务和临时封闭是动态信息。本系统不提供实时开放判断，请在颐和园官网的导览和最新公告中核对；公园可入园不等于每个内院或园中园可进入。"
         record["boat"] = "本系统未接入当天码头航线与运营状态，不能保证现场可乘船。请看颐和园官网游船信息及码头公告；大风、降雨等情况可能影响运营，历史码头名也不能作为正在售票的证据。"
         record["narration"] = record["overview"] + "\n可以先看：" + "；".join(record["highlights"][:2])

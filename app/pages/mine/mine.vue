@@ -11,13 +11,7 @@
     </view>
 
     <!-- 自定义导航栏（毛体标题） -->
-    <view class="nav" :style="{paddingTop:statusH+'px'}">
-      <!-- 扫码领取：扫描电脑网页上的路线二维码，直接领取网页上选好的路线 -->
-      <view class="nav-scan" hover-class="nav-scan-press" :hover-stay-time="70" role="button" :aria-label="t('扫码')" @tap="scanRoute">
-        <text class="scan-icon iconfont icon-scan" aria-hidden="true"></text>
-        <text class="nav-scan-label">{{ t('扫码') }}</text>
-      </view>
-    </view>
+    <view class="nav" :style="{paddingTop:statusH+'px'}"></view>
 
     <!-- 头像卡片 -->
     <view class="profile-card">
@@ -28,16 +22,20 @@
         </view>
       </view>
       <view class="pc-name-row">
-        <text class="pc-name">{{ username || t('游客') }}</text>
+        <text class="pc-name">{{ profileLoading ? t('加载中…') : (profileError || username || t('游客')) }}</text>
       </view>
-      <text class="pc-id">ID: {{ userId }}</text>
+      <text v-if="userId" class="pc-id">ID: {{ userId }}</text>
+      <text v-if="profileError" class="pc-id" @tap="loadProfile">{{ t('点击重试') }}</text>
     </view>
 
     <!-- 菜单 -->
     <view class="menu-section">
       <view class="menu-group">
         <view class="menu-item" @tap="goHistory">
-          <view class="mi-left"><text class="mi-icon iconfont icon-liulanjilu"></text><text class="mi-label">{{ t('游览记录') }}</text></view>
+          <view class="mi-left">
+            <view class="mi-icon mi-checkin-icon" aria-hidden="true"></view>
+            <text class="mi-label">{{ t('我的打卡') }}</text>
+          </view>
           <text class="mi-arrow iconfont icon-chevron-right" aria-hidden="true"></text>
         </view>
 
@@ -83,8 +81,7 @@
 <script>
 import NocturneConfirm from '../../components/NocturneConfirm.vue'
 import AuthPage from '../auth/auth.vue'
-import { BASE_URL, assetUrl, isLocalStationOrigin } from '../../common/config.js'
-import { CLAIM_ROUTE, clearPendingClaim, saveClaim } from '../../common/station-claim.js'
+import { BASE_URL, assetUrl } from '../../common/config.js'
 import { localizeChatMessages, warmChatTranslations, getChatTranslationCache } from '../../common/chat-language.js'
 import { LANGUAGE_STORAGE_KEY, translateTour } from '../../common/tour-language.js'
 export default {
@@ -94,7 +91,8 @@ export default {
       // 与 pages/tour/tour.vue 共用同一个 storage key，切换后全 App 一致。
 
       username: '', userId: '', avatarUrl: '', statusH: 20,
-      scanning: false,
+      profileLoading: true, profileError: '', profileToken: '',
+
       showAbout: false, showLogout: false, loginRevealOpen: false, revealOriginX: 206, revealOriginY: 640,
     }
   },
@@ -103,6 +101,38 @@ export default {
     avatarText: function () { var name = (this.username || '').trim(); return name ? name.charAt(0).toUpperCase() : '游' },
   },
   methods: {
+    syncProfileSession: function () {
+      const token = uni.getStorageSync('token') || ''
+      if (token !== this.profileToken) {
+        this.username = ''; this.userId = ''; this.avatarUrl = ''
+        this.profileError = ''; this.profileLoading = true
+        this.profileToken = token
+      }
+    },
+    loadProfile: function () {
+      this.syncProfileSession()
+      const token = uni.getStorageSync('token')
+      const version = this._profileVersion = (this._profileVersion || 0) + 1
+      const current = () => version === this._profileVersion && token === uni.getStorageSync('token')
+      if (!token) { this.profileLoading = false; uni.reLaunch({url:'/pages/auth/auth'}); return }
+      this.profileLoading = !this.username; this.profileError = ''
+      uni.request({url:BASE_URL+'/user/me?client_type=app',timeout:15000,header:{Authorization:'Bearer '+token},
+        success:r=>{
+          if (!current()) return
+          this.profileLoading = false
+          const d = r.data || {}
+          if (r.statusCode === 401 || r.statusCode === 403) {
+            this.clearSession(); uni.reLaunch({url:'/pages/auth/auth'}); return
+          }
+          if (r.statusCode !== 200 || !d.success || !d.data) { this.profileError = this.t('个人资料加载失败'); return }
+          this.username = d.data.username || ''
+          this.userId = d.data.user_no || d.data.user_id || ''
+          this.avatarUrl = assetUrl(d.data.avatar || '')
+          uni.setStorageSync('username', this.username)
+          uni.setStorageSync('avatar', d.data.avatar || '')
+        },
+        fail:()=>{if(current()){this.profileLoading=false;this.profileError=this.t('个人资料加载失败，请检查网络')}}})
+    },
     // 与网页端 LanguageSwitch 行为一致：切换界面语言并持久化，用户自填内容保持原样。
     setTourLanguage: function (language) {
       var next = language === 'en' ? 'en' : 'zh'
@@ -111,7 +141,7 @@ export default {
       uni.setStorageSync(LANGUAGE_STORAGE_KEY, next)
       if (previous !== next) this.translateAiChatHistory(next)
     },
-    // 切换语言时，把本地保存的 AI 小导游问答一起转换成新语言。
+    // 切换语言时，把本地保存的 AI 导游问答一起转换成新语言。
     translateAiChatHistory:async function(target,background=false){
       const version=this._historyTranslationVersion=(this._historyTranslationVersion||0)+1
       const ownerId=uni.getStorageSync('user_id'),ownerName=uni.getStorageSync('username')
@@ -134,24 +164,7 @@ export default {
       return translateTour(value, this.tourLanguage, params || {})
     },
     goTab:function(p){uni.reLaunch({url:p})},
-    goHistory:function(){uni.navigateTo({url:'/pages/mine/history'})},
-    // 扫码只打开路线确认页，由游客选择数字人后再创建导览。
-    scanRoute: function () {
-      if(this.scanning)return
-      this.scanning=true
-      uni.scanCode({onlyFromCamera:false,scanType:['qrCode'],
-        success:result=>{
-          let claim
-          try{claim=saveClaim(result&&result.result)}
-          catch(_){uni.showToast({title:this.t('请扫描网页上的路线领取码'),icon:'none'});return}
-          if(claim.origin&&!isLocalStationOrigin(claim.origin)){uni.showToast({title:this.t('只允许连接局域网电脑的18000端口'),icon:'none'});return}
-          const query='claim='+encodeURIComponent(claim.token||'')+'&server='+encodeURIComponent(claim.origin||'')
-          uni.navigateTo({url:CLAIM_ROUTE+'?'+query,fail:()=>uni.showToast({title:this.t('打开领取页失败，请重试'),icon:'none'})})
-        },
-        fail:err=>{if(!String(err&&err.errMsg||'').includes('cancel'))uni.showToast({title:this.t('扫码失败，请检查相机权限'),icon:'none'})},
-        complete:()=>{this.scanning=false}
-      })
-    },
+    goHistory:function(){uni.navigateTo({url:'/pages/mine/checkins'})},
     handleLogout: function () { this.showLogout=true },
     // 退出登录：清完会话后让登录页从「退出登录」这一行弹性展开，动画结束再切真实登录页，避免生硬换页。
     confirmLogout: function () {
@@ -174,6 +187,8 @@ export default {
       this._revealFallback=setTimeout(start,140)
     },
     clearSession: function () {
+      this._profileVersion = (this._profileVersion || 0) + 1
+      this.username = ''; this.userId = ''; this.avatarUrl = ''; this.profileToken = ''
       uni.setStorageSync('login_auto_disabled',true)
       uni.removeStorageSync('token')
       uni.removeStorageSync('avatar')
@@ -188,23 +203,18 @@ export default {
   mounted:function(){
     this.statusH=(uni.getSystemInfoSync().statusBarHeight||20)+6
   },
+  onBackPress:function(){
+    if(this.showLogout){this.showLogout=false;return true}
+    if(this.showAbout){this.showAbout=false;return true}
+    // 「我的」作为 tabs 标签页时（页面栈只有一层），系统返回键先回首页，而不是直接退出应用
+    const stack=(typeof getCurrentPages==='function')?getCurrentPages():[]
+    if(!stack||stack.length<=1){uni.$emit('tabs:select','home');return true}
+  },
   onHide:function(){this.showAbout=false;this.showLogout=false},
   onUnload:function(){clearTimeout(this._revealTimer);clearTimeout(this._revealFallback)},
   onShow: function () {
     this.showAbout=false;this.translateAiChatHistory(this.tourLanguage,true)
-    var token = uni.getStorageSync('token')
-    if (!token) { uni.reLaunch({ url: '/pages/auth/auth' }); return }
-    uni.request({url:BASE_URL+'/user/me?client_type=app',header:{Authorization:'Bearer '+token},
-      success:r=>{
-        const d=r.data||{}
-        if(r.statusCode===401||r.statusCode===403){uni.removeStorageSync('token');uni.removeStorageSync('user_id');uni.removeStorageSync('username');uni.reLaunch({url:'/pages/auth/auth'});return}
-        if(r.statusCode!==200||!d.success||!d.data){uni.showToast({title:this.t('个人资料加载失败'),icon:'none'});return}
-        this.username=d.data.username||''
-        this.userId=d.data.user_no||d.data.user_id||''
-        this.avatarUrl=assetUrl(d.data.avatar||'')
-        uni.setStorageSync('username',this.username)
-        uni.setStorageSync('avatar',d.data.avatar||'')
-      },fail:()=>{uni.showToast({title:this.t('个人资料加载失败，请检查网络'),icon:'none'})}})
+    this.loadProfile()
   },
 }
 </script>
@@ -245,6 +255,7 @@ export default {
 .language-menu-item { flex-wrap:wrap; gap:20rpx; }
 .language-menu-item .lang-switch { flex-shrink:0; margin-left:auto; }
 .mi-icon { font-size:32rpx; }
+.mi-checkin-icon { width:32rpx; height:32rpx; flex:none; background-color:#655574; -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z'/%3E%3Cpath d='M9 10l2 2 4-4'/%3E%3C/svg%3E") center / contain no-repeat; mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 21s7-5.2 7-11a7 7 0 1 0-14 0c0 5.8 7 11 7 11z'/%3E%3Cpath d='M9 10l2 2 4-4'/%3E%3C/svg%3E") center / contain no-repeat; }
 .mi-label { font-size:28rpx; font-weight:600; color:var(--ng-text); }
 .mi-arrow { font-size:32rpx; color:var(--ng-secondary); }
 

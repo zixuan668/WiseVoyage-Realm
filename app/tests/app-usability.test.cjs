@@ -3,7 +3,7 @@ function page(file){
  const storage=new Map([['user_id',17],['token','old-token']]),calls=[],origins=[],nav=[]
  const uni={getStorageSync:k=>storage.get(k),setStorageSync:(k,v)=>storage.set(k,v),removeStorageSync:k=>storage.delete(k),request:o=>{calls.push(o);return{abort(){}}},navigateBack:()=>nav.push('back'),showToast(){},getSystemInfoSync:()=>({})}
  uni.reLaunch=o=>nav.push(o.url);uni.navigateTo=o=>nav.push(o.url)
- const c={uni,console,Date,Promise,setTimeout,clearTimeout,BrandLogo:{},AuthPage:{},NocturneConfirm:{},BASE_URL:'http://old/api/v1',SERVER_ORIGIN:'http://192.168.1.2:18000',LOGIN_PROVIDER:'password',assetUrl:x=>x,isBeijingCity:()=>true,isLocalStationOrigin:x=>/^http:\/\/192\.168\.1\.\d+:18000$/.test(x),translateTour:x=>x,LANGUAGE_STORAGE_KEY:'language',normalizeServiceOrigin:x=>/^(https:\/\/[a-z.]+|http:\/\/192\.168\.1\.\d+:18000)$/.test(x)?x:''}
+ const c={uni,console,Date,Promise,setTimeout,clearTimeout,BrandLogo:{},ParkHero:{},DashboardIcon:{},AuthPage:{},NocturneConfirm:{},BASE_URL:'http://old/api/v1',SERVER_ORIGIN:'http://192.168.1.2:18000',LOGIN_PROVIDER:'password',assetUrl:x=>x,isBeijingCity:()=>true,isLocalStationOrigin:x=>/^http:\/\/192\.168\.1\.\d+:18000$/.test(x),translateTour:x=>x,LANGUAGE_STORAGE_KEY:'language',normalizeServiceOrigin:x=>/^(https:\/\/[a-z.]+|http:\/\/192\.168\.1\.\d+:18000)$/.test(x)?x:''}
  c.setServiceOrigin=origin=>{origins.push(origin);c.SERVER_ORIGIN=origin;storage.delete('token')}
  vm.createContext(c)
  vm.runInContext(fs.readFileSync(path.join(__dirname,'../common/station-claim.js'),'utf8').replace(/export /g,''),c)
@@ -75,6 +75,6 @@ test('pickup waits for sign-in while retaining the scanned route',async()=>{
  const h=page('pages/claim/claim.vue');h.storage.delete('token');h.s.code='ABCD2345EFGH';await h.s.prepare();assert.equal(h.calls.length,0);assert.equal(h.storage.get('station-pending-claim').token,'ABCD2345EFGH');assert.equal(h.nav.at(-1),'/pages/auth/auth')
 })
 
-test('Mine scanner opens guide selection instead of silently receiving a default tour',()=>{
- const h=page('pages/mine/mine.vue');let scanner;h.uni.scanCode=o=>scanner=o;h.s.scanRoute();scanner.success({result:'ABCD2345EFGH'});scanner.complete();assert.equal(h.calls.length,0);assert.match(h.nav.at(-1),/^\/pages\/claim\/claim\?claim=ABCD2345EFGH/)
+test('Home scanner opens guide selection instead of silently receiving a default tour',()=>{
+ const h=page('pages/home/home.vue');let scanner;h.uni.scanCode=o=>scanner=o;h.s.open('scan');scanner.success({result:'ABCD2345EFGH'});scanner.complete();assert.equal(h.calls.length,0);assert.match(h.nav.at(-1),/^\/pages\/claim\/claim\?claim=ABCD2345EFGH/)
 })

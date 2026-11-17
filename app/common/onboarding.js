@@ -4,6 +4,6 @@ export const ONBOARDING_ROUTE = 'pages/onboarding/onboarding'
 
 export function appEntry(storage, loginProvider) {
   return storage.getStorageSync('token') && storage.getStorageSync('login_provider') === loginProvider
-    ? '/pages/tabs/tabs?tab=tour'
+    ? '/pages/tabs/tabs?tab=home'
     : '/pages/auth/auth'
 }

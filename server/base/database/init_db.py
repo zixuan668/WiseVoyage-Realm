@@ -106,6 +106,7 @@ def _migrate_add_missing_columns():
     """补充新增字段——生产环境请用 Alembic 管理迁移"""
     from sqlalchemy import text as sa_text
     migrations = [
+        {"table":"scenicdraftsettings","columns":[("avoid_steps","BOOLEAN NOT NULL DEFAULT FALSE"),("start_area","TEXT NOT NULL DEFAULT 'auto'"),("end_area","TEXT NOT NULL DEFAULT 'auto'")]},
         {"table":"tour_session_info","columns":[("dialogue_context", "TEXT NOT NULL DEFAULT '{}'")]},
         {"table":"visitor_interaction","columns":[("answer_metadata", "TEXT NOT NULL DEFAULT '{}'")]},
         {"table":"digital_guide_info","columns":[("is_enabled", "BOOLEAN NOT NULL DEFAULT TRUE")]},

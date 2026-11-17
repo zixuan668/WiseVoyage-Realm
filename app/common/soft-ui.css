@@ -2,7 +2,7 @@
 page .auth-page .ambient-field > view,
 page .page .aurora-background > view {opacity:0;animation:none}
 page {
-  --app-font-family:"SimSun", "宋体", "Songti SC", "STSong", serif;
+  --app-font-family:"MiSans","HarmonyOS Sans SC","PingFang SC","Noto Sans CJK SC","Source Han Sans SC","Microsoft YaHei",system-ui,-apple-system,sans-serif;
   --ng-night:#f8fafc;
   --ng-surface:#ffffff;
   --ng-raised:#eef2ff;

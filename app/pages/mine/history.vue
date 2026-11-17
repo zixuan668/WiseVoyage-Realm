@@ -4,9 +4,9 @@
     <view class="app-status-bar-shield" aria-hidden="true"></view>
     <!-- #endif -->
     <view class="aurora-background" aria-hidden="true"></view>
-    <view class="nav" :style="{paddingTop:headerTop+'px'}"><text class="nav-back iconfont icon-chevron-left" @tap="goBack" :aria-label="t('返回')" role="button"></text><text class="nav-title">{{ t(selected?'对话记录':'游览记录') }}</text></view>
+    <view class="nav" :style="{paddingTop:headerTop+'px'}"><view class="nav-back app-back-btn" @tap="goBack" :aria-label="t('返回')" role="button"><view class="app-back-icon" aria-hidden="true"></view></view><text class="nav-title">{{ t(selected?'对话记录':'游览记录') }}</text></view>
     <scroll-view v-show="!selected" scroll-y class="main history-list">
-      <view v-if="loading" class="empty">{{ t("加载中…") }}</view>
+      <view v-if="loading" class="skeleton-list" aria-busy="true"><SkeletonCard v-for="n in 3" :key="n" photo :widths="['62%','92%','46%']" /></view>
       <view v-else-if="error" class="empty" @tap="loadData">{{ t(error) }}{{ t("，点击重试") }}</view>
       <view v-else-if="list.length===0 && !browseList.length && !browseError" class="empty"><image class="empty-art" src="/static/empty-state.png" mode="widthFix"></image><text>{{ t("暂无游览记录，浏览景点或开始导览后会自动记录") }}</text></view>
       <text v-if="list.length" class="history-section-title">{{ t("导览行程") }}</text>
@@ -37,7 +37,7 @@
     <scroll-view v-if="selected" scroll-y class="main history-detail-scroll">
       <view class="history-detail">
         <text class="c-name">{{ t(selected.name) }}</text>
-        <view v-if="messagesLoading" class="empty">{{ t("对话加载中…") }}</view>
+        <view v-if="messagesLoading" class="skeleton-list" aria-busy="true"><SkeletonCard v-for="n in 2" :key="n" :widths="['40%','88%']" /></view>
         <view v-else-if="messagesError" class="empty" @tap="openSession(selected)">{{ t(messagesError) }}{{ t('，点击重试') }}</view>
         <view v-else-if="!messages.length" class="empty">{{ t("这次导览暂无对话记录") }}</view>
         <view v-for="(m,i) in messages" :key="i" class="history-message"><text class="c-desc">{{ m.role==='user' ? t('我') : t('导游') }} · {{ m.send_time }}</text><text class="message-text">{{ m.message }}</text></view>
@@ -47,7 +47,9 @@
 </template>
 <script>
 import { BASE_URL, assetUrl, isBeijingCity } from '../../common/config.js'
+import SkeletonCard from '../../components/SkeletonCard.vue'
 export default {
+  components:{SkeletonCard},
   data:function(){return{headerTop:48,list:[],ratings:{},ratingOwner:'',browseList:[],browseError:'',loading:false,error:'',selected:null,messages:[],messagesLoading:false,messagesError:''}},
   onLoad:function(){var info=uni.getSystemInfoSync();this.headerTop=Math.max(info.statusBarHeight||0,info.safeArea&&info.safeArea.top||0)+16},
   methods:{
@@ -102,7 +104,7 @@ export default {
 .ink-bg{position:absolute;inset:0;pointer-events:none;z-index:0}.ink-mt{position:absolute;left:0;right:0;background:var(--ng-night);border-radius:55% 75% 0 0}.ink-mt-1{bottom:20%;height:220rpx;opacity:.04;transform:scaleX(1.3)}.ink-mt-2{bottom:25%;height:160rpx;opacity:.025;transform:scaleX(1.5) translateX(-8%)}
 .page-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 .nav{position:relative;z-index:1;display:flex;flex-shrink:0;align-items:center;padding:50rpx 24rpx 16rpx}
-.nav-back{font-size:56rpx;color:var(--ng-text);padding-right:20rpx;line-height:1}
+.nav-back{margin-right:16rpx;flex-shrink:0}
 .nav-title{flex:1;font-size:34rpx;font-weight:600;color:var(--ng-text);letter-spacing:0;font-family:var(--app-font-family);text-align:center}
 .main{position:relative;z-index:1;padding:0 24rpx;height:0;min-height:0;flex:1;box-sizing:border-box;width:100%}
 .empty{text-align:center;padding:100rpx;color:var(--ng-secondary);font-size:28rpx}

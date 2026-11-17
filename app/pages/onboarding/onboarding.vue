@@ -1,5 +1,6 @@
 <template>
   <view class="onboarding" :class="{ 'is-english': english, 'is-bursting': bursting, 'is-opening': showLogin, 'is-pressing': pressing, 'is-skipping': skipping }">
+    <template>
     <view class="intro-header">
       <button class="skip" :disabled="leaving" hover-class="none" @tap="skipIntro">{{ english ? 'Skip' : '跳过' }}</button>
       <button class="lang-switch" :class="{ 'is-eng': !english }" hover-class="none" :aria-label="english ? '切换到中文' : 'Switch to English'" :aria-pressed="english" @tap="toggleLanguage">{{ english ? '中' : 'ENG' }}</button>
@@ -39,6 +40,7 @@
     <view v-if="bursting" class="burst-layer" aria-hidden="true">
       <view v-for="particle in particles" :key="particle.id" class="burst-particle" :style="particle.style" />
     </view>
+    </template>
   </view>
 </template>
 

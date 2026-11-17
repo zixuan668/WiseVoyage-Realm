@@ -14,7 +14,7 @@
 
     <!-- 标题 -->
     <view class="nav" :style="{paddingTop:statusH+'px'}">
-      <view class="nav-back" @tap="goBack" :aria-label="$t('返回')"><text class="iconfont icon-chevron-left" aria-hidden="true"></text></view>
+      <view class="nav-back app-back-btn" @tap="goBack" :aria-label="$t('返回')"><view class="app-back-icon" aria-hidden="true"></view></view>
       <view class="nav-spacer"></view>
       <text class="nav-clear" v-if="msgs.length" @tap="clearHistory">{{ $t("清空") }}</text>
       <button v-if="chatMode==='guide'" class="qh-spot" :disabled="loading||recognizing" @tap="pickSpot" :aria-label="$t('选择问答景点')">
@@ -38,7 +38,9 @@
     <view class="conversation-stage">
     <scroll-view :scroll-y="!voicePressing" class="chat-area" :class="{'welcome-active':msgs.length===0&&!loading&&chatMode==='guide'}" :scroll-top="chatScrollTop" :scroll-with-animation="scrollAnim" @scroll="onChatScroll">
       <view v-if="msgs.length===0&&!loading&&chatMode==='guide'" class="guide-welcome">
-        <view v-if="qaCatalogLoading" class="welcome-loading" aria-live="polite">{{ $t('正在加载景点…') }}</view>
+        <view v-if="qaCatalogLoading" class="welcome-skeleton" aria-live="polite" aria-busy="true">
+          <SkeletonCard v-for="n in 2" :key="n" :widths="['48%','82%','60%']" />
+        </view>
         <view v-else-if="catalogError" class="welcome-unavailable">
           <text>{{ $t(catalogError) }}</text>
           <button @tap="loadWelcomeCatalog">{{ $t('重试') }}</button>
@@ -161,6 +163,8 @@
 
     <NocturneSelect v-if="showQASpots" ref="spotPicker" :title="$t('选择问答景点')" :options="qaOptions" :selected-index="qaSpots.findIndex(spot=>spot.spot_id===qaSpotId)" :anchor="spotAnchor" @change="selectQuestionSpot" @close="closeSpotPicker" />
 
+
+
     <view v-if="undoVisible" class="undo-notice" role="status" :style="keyboardHeight?{bottom:(keyboardHeight+84)+'px'}:null">
       <text>{{ $t(undoKind==='history'?'已清除历史记录':'已清空当前对话') }}</text>
       <button @tap="undoClear">{{ $t('撤销') }}</button>
@@ -195,6 +199,7 @@
 import { localizeChatMessages, warmChatTranslations, getChatTranslationCache } from '../../common/chat-language.js'
 import { BASE_URL, assetUrl, isBeijingCity } from '../../common/config.js'
 import NocturneSelect from '../../components/NocturneSelect.vue'
+import SkeletonCard from '../../components/SkeletonCard.vue'
 import TourXingyun from '../../components/tour-xingyun.vue'
 import { planningMessage, recommendationText, questionLanguage, findQuestionSpot, photoIdentificationText } from '../../common/planning-language.js'
 import { translateTour, LANGUAGE_STORAGE_KEY } from '../../common/tour-language.js'
@@ -229,7 +234,7 @@ function request(options) {
 }
 
 export default {
-  components:{NocturneSelect,TourXingyun},
+  components:{NocturneSelect,TourXingyun,SkeletonCard},
   data: function () {
     return {
       chatMode:'guide',qaSpots:[],qaGuides:[],qaSpotId:null,spotAnchor:null,qaSession:null,qaCatalogLoading:false,catalogError:'',showQASpots:false,requestEpoch:0,historyOwner:null,applyingRoute:false,
@@ -293,7 +298,8 @@ export default {
     goBack:function(){
       const stack=(typeof getCurrentPages==='function')?getCurrentPages():[]
       if(stack&&stack.length>1){uni.navigateBack({delta:1});return}
-      uni.$emit('tabs:select','tour')
+      // AI 已是 tabs 里的标签页（没有上一页），返回键回到首页标签
+      uni.$emit('tabs:select','home')
     },
     openHistory:function(){this.showHistory=true;this.localizeHistory()},
     closeHistory:function(){this.showHistory=false},
@@ -566,6 +572,13 @@ export default {
       this.inputHeight=rpx?(uni.upx2px?uni.upx2px(rpx):Math.round(rpx/2)):0
     },
     onInputKeyboardHeight:function(event){this.updateKeyboardHeight(event.detail.height)},
+    // 从首页「拍照问导游」进来时直接打开相机识景。
+    openCamera:function(){
+      if(this.recognizing)return
+      this.recognitionError=''
+      this.showPhotoChoices=false
+      this.openScenicSource('camera')
+    },
     chooseScenicPhoto:function(){
       if(this.recognizing)return
       uni.hideKeyboard()
@@ -881,7 +894,13 @@ export default {
     stopRecord:function(){this.voicePressing=false;if(this._voiceManager&&(this._recordStartedAt||this._recordRequestedAt))this._voiceManager.stop()},
     cancelRecord:function(){this._recordCancelled=true;this.voicePressing=false;this.recording=false;if(this._voiceManager&&(this._recordStartedAt||this._recordRequestedAt))this._voiceManager.stop()},
   },
-  onBackPress:function(){if(this.showQASpots){this.showQASpots=false;return true}if(this.showPhotoChoices){this.showPhotoChoices=false;return true}},
+  onBackPress:function(){
+    if(this.showQASpots){this.showQASpots=false;return true}
+    if(this.showPhotoChoices){this.showPhotoChoices=false;return true}
+    // AI 作为 tabs 标签页时（页面栈只有一层），系统返回键先回首页，而不是直接退出应用
+    const stack=(typeof getCurrentPages==='function')?getCurrentPages():[]
+    if(!stack||stack.length<=1){uni.$emit('tabs:select','home');return true}
+  },
   onHide:function(){this.cancelRecord();this.stopTTS();this.keyboardVisible=false;this.keyboardHeight=0;this.showPhotoChoices=false;this.showQASpots=false},
   onShow:function(){this._translationDisposed=false;if(this.historyOwner!==this.storageOwner())this.loadHistory();if(this.chatMode==='guide'&&this._welcomeReady)this.loadWelcomeCatalog();else if(this.chatMode==='guide'&&this.qaSpotId&&!this.qaSpots.length)this.loadWelcomeCatalog();this.scrollChat()},
 }
@@ -903,6 +922,7 @@ export default {
 .photo-choice::after{border:0}
 .photo-choice:active{background:#f3effb}
 .photo-choice + .photo-choice{border-top:1rpx solid var(--ng-border,#eee)}
+
 .photo-popover-mask{position:fixed;inset:0;z-index:1200;background:rgba(20,24,40,.06);animation:photoMaskIn 180ms ease both}
 .photo-popover-mask.closing{animation:photoMaskOut 190ms ease both}
 @keyframes photoMaskOut{from{opacity:1}to{opacity:0}}
@@ -928,7 +948,7 @@ export default {
 .nav{position:relative;z-index:1;display:flex;align-items:center;justify-content:flex-end;padding:12rpx 24rpx;min-height:88rpx;box-sizing:border-box;flex-shrink:0}
 .nav-actions{display:flex;align-items:center;gap:16rpx;margin-left:auto}
 .nav-title { font-size:44rpx; font-weight:900; color:var(--ng-text); letter-spacing:8rpx; font-family:var(--app-font-family); }
-.nav-back{display:flex;align-items:center;justify-content:center;width:108rpx;height:108rpx;margin:-22rpx 10rpx -22rpx -8rpx;border-radius:24rpx;background:transparent;border:0;box-shadow:none;color:var(--ng-text);font-size:60rpx;line-height:1;margin-right:auto}
+.nav-back{margin:-4rpx 10rpx -4rpx -8rpx;margin-right:auto;flex-shrink:0}
 .nav-back:active{opacity:.5}
 .nav-back text{transform:translateY(-4rpx)}
 .nav-back text{transform:translateY(-3rpx)}
@@ -1057,7 +1077,7 @@ export default {
 .chat-wave-blue{left:-18%;bottom:140rpx;width:150%;height:560rpx;border-radius:65% 48% 0 0;transform:rotate(-15deg);background:linear-gradient(160deg,rgba(208,232,254,.1),rgba(207,235,254,.55))}
 .chat-wave-lilac{left:-30%;bottom:-130rpx;width:170%;height:460rpx;border-radius:54% 60% 0 0;transform:rotate(13deg);background:linear-gradient(155deg,rgba(221,211,250,.58),rgba(223,236,255,.2))}
 .chat-ref-page .nav{gap:14rpx;padding-left:26rpx;padding-right:26rpx;padding-bottom:20rpx;border-bottom:0!important}
-.nav-back{width:64rpx;height:72rpx;margin:0;flex-shrink:0;font-size:64rpx;color:#302563}.nav-spacer{flex:1;min-width:0}
+.nav-back{margin:0;flex-shrink:0}.nav-spacer{flex:1;min-width:0}
 .nav-history{width:72rpx;min-width:72rpx;height:72rpx;border-radius:50%;border:0;background:var(--ng-glass-blue-bg);box-shadow:var(--ng-glass-shadow),inset 0 1rpx 0 rgba(255,255,255,.9);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .hist-clock{font-size:22px;color:var(--ng-soft-blue-text)}
 .nav .qh-spot{display:flex;align-items:center;gap:12rpx;width:auto;flex:0 1 auto;max-width:450rpx;min-width:0;margin:0;padding:12rpx 18rpx 12rpx 10rpx;min-height:72rpx;line-height:1.4;border:1rpx solid rgba(255,255,255,.76);border-radius:40rpx;background:rgba(255,255,255,.64);box-shadow:0 6rpx 24rpx rgba(115,91,185,.07);text-align:left;box-sizing:border-box}
@@ -1095,10 +1115,39 @@ export default {
 @keyframes welcomeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7rpx)}}
 @keyframes welcomeTwinkle{0%,100%{opacity:.5;transform:scale(.9)}50%{opacity:1;transform:scale(1.06)}}
 @media (prefers-reduced-motion:reduce){.welcome-balloon,.welcome-sparkle,.history-panel,.photo-popover{animation:none!important}}
+/* 紫色描边白玻璃统一图标 */
+.chat-ref-page .topic-icon-wrap{background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,246,255,.9));border:1rpx solid rgba(139,120,230,.4);box-shadow:inset 0 1rpx 0 #fff,0 6rpx 14rpx -10rpx rgba(90,70,180,.3)}
+.chat-ref-page .topic-icon{color:#5c4bc0}
+.chat-ref-page .context-pin{background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,246,255,.9));border:1rpx solid rgba(139,120,230,.4);box-shadow:inset 0 1rpx 0 #fff;color:#5c4bc0}
+.chat-ref-page .context-pin .iconfont{color:#5c4bc0}
+.chat-ref-page .qh-spot{background:rgba(255,255,255,.92);border:1rpx solid rgba(139,120,230,.35);color:#4a3aa8}
+.chat-ref-page .nav-history{background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,246,255,.9));border:1rpx solid rgba(139,120,230,.4);box-shadow:inset 0 1rpx 0 #fff,0 6rpx 14rpx -10rpx rgba(90,70,180,.3)}
+.chat-ref-page .hist-clock{color:#5c4bc0}
+.chat-ref-page .photo-add,.chat-ref-page .voice-btn{background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,246,255,.9));border:1rpx solid rgba(139,120,230,.4);box-shadow:inset 0 1rpx 0 #fff,0 6rpx 14rpx -10rpx rgba(90,70,180,.3)}
+.chat-ref-page .photo-add .iconfont,.chat-ref-page .voice-btn .iconfont{color:#5c4bc0}
+.chat-ref-page .input-bar .send-btn{background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,246,255,.9));border:1rpx solid rgba(139,120,230,.4);color:#4a3aa8;box-shadow:inset 0 1rpx 0 #fff,0 6rpx 14rpx -10rpx rgba(90,70,180,.3)}
+.chat-ref-page .qh-chip{background:rgba(255,255,255,.9);border-color:rgba(139,120,230,.3);color:#4a3aa8}
 @media (max-width:360px){.chat-ref-page .nav{gap:10rpx;padding-left:18rpx;padding-right:18rpx}.nav .qh-spot{max-width:370rpx;padding-right:14rpx;gap:8rpx}.context-name{font-size:24rpx}.welcome-title{font-size:40rpx}.guide-welcome{padding-left:4rpx;padding-right:4rpx;padding-bottom:80rpx}.welcome-topic{padding:14rpx 16rpx;gap:10rpx}.topic-title{font-size:25rpx}.chat-ref-page .input-bar{gap:8rpx;padding-left:14rpx;padding-right:14rpx}.photo-add,.voice-btn{width:76rpx;height:76rpx}.input-bar .msg-input,.input-bar .voice-hold-btn,.send-btn{height:76rpx;line-height:76rpx}.send-btn{padding:0 20rpx}}
 </style>
 
 
 <style scoped>
 .chat-ref-page>.chat-voice-runtime{position:fixed!important;left:-1000px;top:0;width:240px;height:400px;pointer-events:none;opacity:0;overflow:hidden}
+/* 底部 tab 栏常驻：输入栏抬到 tab 栏之上，键盘弹起时 tab 栏收起、输入栏落回底部 */
+.chat-ref-page .conversation-stage { padding-bottom: calc(128rpx + 64px + env(safe-area-inset-bottom, 0px)); }
+.chat-ref-page .bottom-fixed { bottom: calc(64px + env(safe-area-inset-bottom, 0px)); padding-bottom: 0; }
+.chat-ref-page .bottom-fixed.keyboard-open { bottom: 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+
+/* 状态栏/导航栏保持白色；中间对话区铺紫色，左上右上圆角 */
+.chat-ref-page.aurora-page { background: #fff !important; }
+.chat-ref-page .chat-scenery,
+.chat-ref-page .ink-bg { display: none !important; }
+.chat-ref-page .app-status-bar-shield { background: #fff !important; }
+.chat-ref-page .nav { background: #fff !important; }
+.chat-ref-page .conversation-stage {
+  margin: 0 6rpx;
+  background: #f0eefb;
+  border-radius: 32rpx 32rpx 0 0;
+  overflow: hidden;
+}
 </style>

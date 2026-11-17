@@ -87,7 +87,7 @@ export default {
       uni.setStorageSync('login_provider',LOGIN_PROVIDER)
       uni.removeStorageSync('login_auto_disabled')
       this.logining=false
-      uni.reLaunch({url:pendingClaim()?CLAIM_ROUTE:'/pages/tabs/tabs?tab=tour',fail:e=>{this.logining=false;this.error='进入导览页面失败，请重试';console.error('Login navigation failed',e)}})
+      uni.reLaunch({url:pendingClaim()?CLAIM_ROUTE:'/pages/tabs/tabs?tab=home',fail:e=>{this.logining=false;this.error='进入导览页面失败，请重试';console.error('Login navigation failed',e)}})
     },
     restoreSession() {
       this.logining=true;this.error=''

@@ -373,6 +373,7 @@ class RouteRecommendRequest(BaseModel):
     city: str = ""
     time_budget_minutes: int = PydanticField(default=120, ge=15, le=480)
     pace: Literal['standard', 'relaxed'] = 'standard'
+    avoid_steps: bool = PydanticField(default_factory=lambda data: data.get('pace') == 'relaxed')
     start_area: Literal['auto', 'east', 'north', 'south'] = 'auto'
     end_area: Literal['auto', 'east', 'north', 'south'] = 'auto'
     queue_reserve_minutes: int = PydanticField(default=0, ge=0, le=120)
