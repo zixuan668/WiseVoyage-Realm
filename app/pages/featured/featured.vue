@@ -70,6 +70,9 @@
             </view>
           </view>
         </scroll-view>
+        <view class="sheet-footer">
+          <button class="plan-add-btn" :disabled="!(detail.spot_ids || []).length" @tap="addToPlan">{{ t('加入路径规划') }}</button>
+        </view>
       </view>
     </view>
   </view>
@@ -130,6 +133,20 @@ export default {
       return this.t('步行') + ' ' + minutes + this.t('分钟') + ' · ' + this.formatMeters(meters)
     },
     openRoute(route) { this.detail = route },
+    addToPlan() {
+      const ids = (this.detail && this.detail.spot_ids ? this.detail.spot_ids : [])
+        .map(Number)
+        .filter(id => Number.isInteger(id) && id > 0)
+      if (!ids.length) {
+        uni.showToast({ title: this.t('暂无可加入的景点'), icon: 'none' })
+        return
+      }
+      this.detail = null
+      uni.navigateTo({
+        url: '/pages/scenic/scenic?view=plan&spotIds=' + ids.join(','),
+        fail: () => uni.showToast({ title: this.t('打开路径规划失败，请重试'), icon: 'none' }),
+      })
+    },
     goBack() {
       uni.navigateBack({ delta: 1, fail: () => uni.reLaunch({ url: '/pages/tabs/tabs?tab=home' }) })
     },
@@ -205,5 +222,16 @@ export default {
 .stop-no { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: 50%; background: rgba(228, 218, 249, .92); color: #5b48a4; font-size: 12px; }
 .stop-name { flex: 1; min-width: 0; line-height: 24px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .stop-metric { flex: none; margin-left: auto; line-height: 24px; font-size: 12px; color: #7b7291; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sheet-footer { flex: none; padding-top: 12px; }
+.plan-add-btn {
+  width: 100%; height: 46px; display: flex; align-items: center; justify-content: center;
+  border-radius: 23px; font-size: 15px; font-weight: 600; letter-spacing: .3px;
+  color: #5b3fa8; background: rgba(255, 255, 255, .82);
+  border: 1px solid rgba(139, 120, 230, .72);
+  box-shadow: 0 8px 24px -14px rgba(91, 63, 168, .55), inset 0 1px 0 rgba(255, 255, 255, .95);
+  -webkit-backdrop-filter: blur(16px) saturate(1.2); backdrop-filter: blur(16px) saturate(1.2);
+}
+.plan-add-btn:active { background: rgba(139, 120, 230, .12); }
+.plan-add-btn[disabled] { opacity: .5; }
 @media (prefers-reduced-motion: reduce) { .sk-cover, .sk-line { animation: none; } .featured-page button:active { transform: none; } }
 </style>
