@@ -149,9 +149,14 @@ def scenic_audio(spot_id: int):
         record = db.get(ScenicAudio, spot_id)
         binding = db.get(XingyunGuideBinding, record.guide_id) if record else None
         directory = Path(WEB_CONFIGS.SERVER_FILE_ROOT) / WEB_CONFIGS.TOUR_FILE_DIR / 'scenic-audio'
-        if (not record or not binding or not recording_file(directory, record)
-                or record.revision != narration_revision(narration_text(spot), voice_identity(binding))):
+        if not record or not recording_file(directory, record):
             raise HTTPException(409, '该景点完整讲解尚未生成，请稍后再试')
+        reusable = bool(binding) and record.revision == narration_revision(narration_text(spot), voice_identity(binding))
+        if not reusable:
+            # 换机部署、或绑定了另一套星云应用时，仍然播放仓库自带的讲解音频；
+            # 标记为 bundled-recording，避免声称与当前数字人声音一致。
+            return {'url': f'/tour-experience/scenic-audio/{spot_id}/file?v={record.revision}',
+                    'duration': record.duration, 'source': 'bundled-recording', 'bundled': True}
         return {'url': f'/tour-experience/scenic-audio/{spot_id}/file?v={record.revision}',
                 'duration': record.duration, 'source': record.source}
 
