@@ -69,7 +69,7 @@ export default {
 }
 </script>
 <style scoped>
-.dock{position:fixed;bottom:0;left:0;right:0;z-index:999;background:var(--ng-surface);border-top:1rpx solid var(--ng-border);will-change:transform,opacity;transform-origin:50% 100%;transition:transform .22s ease,opacity .22s ease}
+.dock{position:fixed;bottom:0;left:0;right:0;z-index:999;background:var(--ng-surface);border-top:1px solid #dcd3ee;box-shadow:none;will-change:transform,opacity;transform-origin:50% 100%;transition:transform .22s ease,opacity .22s ease}
 .dock-inner{position:relative;display:flex;align-items:stretch;padding:6px;min-height:64px;box-sizing:border-box}
 .dock-item{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:50px;gap:3px;padding:0;background:transparent;-webkit-tap-highlight-color:transparent;transition:transform .16s cubic-bezier(.2,0,0,1)}
 .dock-item:active{transform:scale(.96)}

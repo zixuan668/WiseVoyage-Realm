@@ -95,8 +95,15 @@ const comparedVersion = ref('')
 const acceptedGroupIds = ref<number[] | null>(null)
 watch([groupMode, companions], () => { acceptedGroupIds.value = null }, { deep: true, flush: 'sync' })
 const groupReady = computed(() => !groupMode.value || companions.value.every(m => m.first > 0))
+function interestKeyFromWeights(): 'all' | 'history' | 'nature' | 'photo' | 'family' {
+  const entries = Object.entries(prefs.interest_weights || {})
+    .filter(([, value]) => Number(value) > 0)
+    .sort((a, b) => Number(b[1]) - Number(a[1]))
+  const key = entries[0]?.[0]
+  return key === 'photography' ? 'photo' : key === 'history' || key === 'nature' || key === 'family' ? key : 'all'
+}
 function planningInput(): StationPlanningInput {
-  const input = { ...prefs, language: locale.value }
+  const input = { ...prefs, interest: interestKeyFromWeights(), language: locale.value }
   if (groupMode.value && groupReady.value) {
     const party = companions.value.map(m => ({ ...m }))
     return { ...input, party, spot_ids: acceptedGroupIds.value || [...new Set(party.map(m => m.first))], fill_time: false,
@@ -587,11 +594,19 @@ async function calculate(choice?: RouteAdjustment) {
         input = interpreted.value.input
       } else {
         interpreting.value = true
-        const changes = await interpretStationRoute(v, note, input, controller.signal)
-        if (disposed || own !== version || submitted !== planningSignature.value) return
-        interpreting.value = false
-        input = { ...input, ...changes }
-        interpreted.value = { signature: submitted, input }
+        try {
+          const changes = await interpretStationRoute(v, note, input, controller.signal)
+          if (disposed || own !== version || submitted !== planningSignature.value) return
+          input = { ...input, ...changes }
+          interpreted.value = { signature: submitted, input }
+        } catch (e: any) {
+          // 旧版后端没有 /route-intent：忽略自然语言解析，仍用当前表单条件继续排路线；
+          // 额外需求原文会随二维码带到 App。
+          if (e?.code === 'ERR_CANCELED' || ![404, 405, 501].includes(e?.response?.status)) throw e
+          interpreted.value = { signature: submitted, input }
+        } finally {
+          interpreting.value = false
+        }
       }
     }
     if (choice) input = { ...input, ...choice.changes, expected_network_version: comparedVersion.value }
@@ -849,10 +864,31 @@ async function share() {
     const origin = await lanOrigin()
     const server = new URL(origin)
     server.port = '18000'
-    const url = 'zhiyouguide://claim?claim=' + encodeURIComponent(data.token) + '&code=' + encodeURIComponent(data.pickup_code) + '&server=' + encodeURIComponent(server.origin)
+    // 把本次规划条件一起放进二维码，App 扫码后可直接回填到「路径规划」页。
+    const theme = interestKeyFromWeights()
+    const webPrefs = plan.value.preferences
+    // 只带和 App 默认值不同的字段，二维码越小越容易扫。
+    const payload: Record<string, unknown> = {}
+    if (Number(webPrefs.budget) && Number(webPrefs.budget) !== 120) payload.b = Number(webPrefs.budget)
+    if (webPrefs.end_area && webPrefs.end_area !== 'east') payload.e = webPrefs.end_area
+    if (webPrefs.avoid_steps) payload.s = 1
+    if (webPrefs.pace === 'relaxed') payload.p = 'relaxed'
+    if (theme !== 'all') payload.i = theme
+    if (groupMode.value) payload.g = 1
+    // 自选景点优先；没手动选点时，把方案实际游览的景点带过去，App 侧照着回填。
+    const manualIds = (webPrefs.spot_ids || []).map(Number).filter((id) => Number.isInteger(id) && id > 0)
+    const routeIds = ((plan.value.route && plan.value.route.stops) || [])
+      .map((stop) => Number(stop.spot_id))
+      .filter((id) => Number.isInteger(id) && id > 0)
+    const pickedIds = manualIds.length ? manualIds : routeIds
+    if (pickedIds.length) payload.ids = pickedIds
+    const note = extraRequest.value.trim()
+    if (note) payload.x = note
+    const url = 'zhiyouguide://claim?claim=' + encodeURIComponent(data.token) + '&code=' + encodeURIComponent(data.pickup_code) + '&server=' + encodeURIComponent(server.origin) + '&p=' + encodeURIComponent(JSON.stringify(payload))
     const qr = await QRCode.toDataURL(url, {
-      width: 320,
+      width: 460,
       margin: 2,
+      errorCorrectionLevel: 'L',
       color: { dark: '#252243', light: '#ffffff' }
     })
     if (disposed || own !== version || generation !== shareGeneration || !showShare.value) return

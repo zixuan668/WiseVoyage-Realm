@@ -1,6 +1,12 @@
 // DOM-only map renderer shared by H5 and App renderjs. No native map view is
 // inserted into scroll-view: the map, SVG paths and labels scroll together.
-import { WALK_TILES, WALK_ATTRIBUTION } from '../../shared/pedestrian-map.js'
+import { wgs84ToGcj02 } from '../../shared/coordinates.js'
+
+// OSM 瓦片在部分网络下不可达，路线底图改用国内可访问的高德栅格瓦片；
+// 路线与点位从 WGS84 转成 GCJ02 后再绘制，避免偏移。
+const AMAP_TILES = 'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}'
+const AMAP_ATTRIBUTION = '&copy; 高德地图'
+const gcj = (latitude, longitude) => wgs84ToGcj02(latitude, longitude)
 
 export function routeLineStyle(original, active) {
   return { color: original ? '#8b96ac' : active ? '#513dbe' : '#a69acb', weight: active ? 6 : 4,
@@ -42,11 +48,15 @@ export function createRouteMap(element, report = () => {}, win = window, doc = d
   element.addEventListener('touchcancel', gestureEnd, true)
   const fitAll = () => {
     if (!map || !payload || disposed || !element.isConnected) return
-    const points = payload.data.points.map(p => [p.latitude, p.longitude])
+    const points = payload.data.points.map(p => gcj(p.latitude, p.longitude))
     map.stop()
     map.closePopup()
     map.invalidateSize({ pan: false })
-    if (points.length) map.fitBounds(win.L.latLngBounds(points), { padding: [28, 28], maxZoom: 17, animate: false })
+    if (points.length) {
+      map.fitBounds(win.L.latLngBounds(points), { padding: [28, 28], maxZoom: 17, animate: false })
+      // 默认把地图放到能看清路线细节的层级，避免整段路线缩得太小
+      if (map.getZoom() < 15) map.setZoom(15, { animate: false })
+    }
   }
   const destroy = () => {
     if (disposed) return
@@ -73,7 +83,7 @@ export function createRouteMap(element, report = () => {}, win = window, doc = d
       if (!map) {
         map = L.map(element, { zoomControl: false, attributionControl: true, scrollWheelZoom: false, zoomAnimation: false, dragging: true, touchZoom: true, bounceAtZoomLimits: false })
         map.attributionControl.setPrefix(false)
-        tiles = L.tileLayer(WALK_TILES, { maxZoom: 19, attribution: WALK_ATTRIBUTION }).addTo(map)
+        tiles = L.tileLayer(AMAP_TILES, { maxZoom: 19, subdomains: ['1', '2', '3', '4'], attribution: AMAP_ATTRIBUTION }).addTo(map)
         tiles.on('tileload', () => { tileLoaded++; if (!disposed && tileLoaded === 1) report({ state: 'ready' }) })
         tiles.on('tileerror', () => { if (!disposed && ++tileErrors >= 3 && !tileLoaded) report({ state: 'tiles-error' }) })
         group = L.layerGroup().addTo(map)
@@ -88,19 +98,24 @@ export function createRouteMap(element, report = () => {}, win = window, doc = d
       const lines = next.data.polyline.map((line, index) => ({ line, leg: next.data.legIndexes?.[index] ?? index }))
       lines.sort((a, b) => Number(a.leg === next.activeLeg) - Number(b.leg === next.activeLeg))
       lines.forEach(({ line, leg }) => {
-        L.polyline(line.points.map(p => [p.latitude, p.longitude]), routeLineStyle(next.original, leg === next.activeLeg))
+        L.polyline(line.points.map(p => gcj(p.latitude, p.longitude)), routeLineStyle(next.original, leg === next.activeLeg))
           .on('click', () => report({ state: 'leg', index: leg })).addTo(group)
       })
       next.data.markers.forEach(marker => {
         const gate = marker.id >= 1000, active = marker.id === next.currentMarker
+        const selected = (next.selectedMarkers || []).includes(marker.id)
         const icon = L.divIcon({ className: gate ? 'route-gate-marker' : 'route-order-marker',
-          html: '<span class="route-map-pin' + (active ? ' current' : '') + (gate ? ' gate' : '') + '">' + (gate ? '↗' : Number(marker.id)) + '</span>',
+          html: '<span class="route-map-pin' + (active ? ' current' : '') + (selected ? ' selected' : '') + (gate ? ' gate' : '') + '">' + (gate ? '↗' : Number(marker.id)) + '</span>',
           iconSize: [36, 36], iconAnchor: [18, 18] })
         const label = doc.createElement('span'); label.textContent = next.markerLabels[marker.id] || ''
-        L.marker([marker.latitude, marker.longitude], { icon, title: label.textContent }).bindPopup(label).addTo(group)
+        L.marker(gcj(marker.latitude, marker.longitude), { icon, title: label.textContent }).bindPopup(label).addTo(group)
       })
-      const key = JSON.stringify([next.data.points, next.data.markers.map(m => m.id), next.original])
-      if (key !== boundsKey || next.fitCounter !== fitCounter) { boundsKey = key; fitCounter = next.fitCounter; fitAll() }
+      const focus = next.focus && Number.isFinite(Number(next.focus.latitude)) && Number.isFinite(Number(next.focus.longitude)) ? next.focus : null
+      const key = JSON.stringify([next.data.points, next.data.markers.map(m => m.id), next.original, focus && [focus.latitude, focus.longitude]])
+      if (key !== boundsKey || next.fitCounter !== fitCounter) {
+        boundsKey = key; fitCounter = next.fitCounter; fitAll()
+        if (focus) { map.setView(gcj(Number(focus.latitude), Number(focus.longitude)), Math.max(map.getZoom(), 16), { animate: true }) }
+      }
       report({ state: 'ready' })
     } catch (error) { if (!disposed && own === version) report({ state: 'error', message: error.message }) }
   }

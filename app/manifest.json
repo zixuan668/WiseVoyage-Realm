@@ -6,6 +6,7 @@
     "versionCode": "157",
     "transformPx": false,
     "app-plus": {
+        "softinputMode": "adjustPan",
         "usingComponents": true,
         "nvueStyleCompiler": "uni-app",
         "compilerVersion": 3,

@@ -15,6 +15,7 @@ import AiChat from '../ai-chat/ai-chat.vue'
 import Mine from '../mine/mine.vue'
 import TabDock from '../../components/TabDock.vue'
 import FloatingTourButton from '../../components/FloatingTourButton.vue'
+import { loadScenicDraft } from '../../common/scenic-api.js'
 
 const TAB_KEYS = ['home', 'ai', 'mine']
 const validIndex = index => Number.isInteger(index) && index >= 0 && index < TAB_KEYS.length
@@ -142,10 +143,19 @@ export default {
       // 等翻页动画落定再拉起相机，避免相机盖在切换动画上。
       setTimeout(open, 300)
     },
-    syncTourOrb() {
+    async syncTourOrb() {
       var saved = null
       try { saved = uni.getStorageSync('active-tour-session') } catch (error) {}
-      this.tourOrb = !!(saved && saved.sid)
+      if (!saved || !saved.sid) { this.tourOrb = false; return }
+      // 本次打开 App 还没手动选过景点时，绝不显示悬浮球。
+      if (!uni.getStorageSync('scenic-selection-touched')) { this.tourOrb = false; return }
+      // 只有当前规划里确实有景点时才显示悬浮球；清空/没选/规划结束都不显示。
+      try {
+        const draft = await loadScenicDraft()
+        this.tourOrb = !!(draft && draft.stops && draft.stops.length)
+      } catch (error) {
+        this.tourOrb = false
+      }
     },
     resumeTour() {
       var saved = null

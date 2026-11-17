@@ -2,58 +2,47 @@
   <view class="guide-page" :class="{ 'guide-notice-page': notices }">
     <view class="guide-header">
       <button class="guide-back app-back-btn" :aria-label="t('返回')" @tap="back"><view class="app-back-icon" aria-hidden="true"></view></button>
-      <text class="guide-title" role="heading">{{ t(notices ? '官方通知' : '景区导览地图') }}</text>
+      <text class="guide-title" role="heading">{{ t(notices ? '官方通知' : '景区地图') }}</text>
     </view>
 
     <scroll-view v-if="notices" scroll-y class="notice-scroll" :show-scrollbar="false">
-      <view class="notice-inner">
-        <view class="notice-hero">
-          <view class="notice-date">
-            <text class="notice-month">{{ noticeCalendar.month }}</text>
-            <view class="notice-day">
-              <text class="notice-day-num">{{ noticeCalendar.day }}</text>
-              <text v-if="noticeCalendar.dayUnit" class="notice-day-unit">{{ t(noticeCalendar.dayUnit) }}</text>
-            </view>
+      <view class="notice-panel">
+        <view class="notice-panel-head">
+          <view class="notice-panel-titles">
+            <text class="notice-panel-title">{{ t('官方通知') }}</text>
+
           </view>
-          <view class="notice-week">
-            <view v-for="day in noticeCalendar.week" :key="day.key" class="notice-week-cell" :class="{ on: day.selected, today: day.today }" role="button" :aria-label="day.ariaLabel" @tap="selectNoticeDay(day)">
-              <text class="notice-week-num">{{ day.day }}</text>
-              <text class="notice-week-label">{{ day.label }}</text>
-            </view>
+          <view class="notice-filters" role="group" :aria-label="t('通知分类')">
+            <button v-for="cat in noticeCategories" :key="cat.value" class="notice-filter" :class="{ on: noticeFilter === cat.value }" :aria-pressed="noticeFilter === cat.value" @tap="noticeFilter = cat.value">{{ lang(cat.label) }}</button>
           </view>
         </view>
 
-        <template v-if="visibleNotices.length">
-          <view class="notice-toolbar">
-            <text class="notice-count">{{ t('共 {count} 条', { count: visibleNotices.length }) }}</text>
-          </view>
-
-          <view class="notice-timeline">
-            <view class="notice-rail" aria-hidden="true"></view>
-            <view v-for="(item, index) in visibleNotices" :key="item.id" class="notice-row" :class="{ featured: index === 0 }">
-              <view class="notice-node" aria-hidden="true"></view>
-              <button class="notice-card" @tap="openNotice(item)">
-                <view class="notice-card-head">
-                  <view class="notice-icon"><DashboardIcon :name="item.icon" /></view>
-                  <view class="notice-heading">
-                    <view class="notice-kicker">
-                      <text class="notice-category">{{ lang(item.category) }}</text>
-                      <text class="notice-sep" aria-hidden="true">|</text>
-                      <text class="notice-title">{{ lang(item.title) }}</text>
-                    </view>
-                    <text class="notice-detail">{{ lang(item.summary) }}</text>
+        <view v-if="visibleNotices.length" class="notice-timeline">
+          <view class="notice-rail" aria-hidden="true"></view>
+          <view v-for="(item, index) in visibleNotices" :key="item.id" class="notice-row" :class="{ featured: index === 0 }">
+            <view class="notice-node" aria-hidden="true"></view>
+            <button class="notice-card" @tap="openNotice(item)">
+              <view class="notice-card-head">
+                <view class="notice-icon"><DashboardIcon :name="item.icon" /></view>
+                <view class="notice-heading">
+                  <view class="notice-kicker">
+                    <text class="notice-title">{{ lang(item.title) }}</text>
+                    <text class="notice-category">{{ lang(item.category) }}</text>
                   </view>
+                  <text class="notice-detail">{{ lang(item.summary) }}</text>
                 </view>
-                <view class="notice-card-foot">
-                  <text class="notice-source">{{ t('来源：颐和园官网') }}</text>
-                  <text class="notice-read">{{ t('阅读全文') }}<text class="notice-chevron">›</text></text>
-                </view>
-              </button>
-            </view>
+              </view>
+              <view class="notice-card-foot">
+                <text class="notice-source">{{ t('来源：颐和园官网') }}</text>
+                <text class="notice-read">{{ t('阅读全文') }}<text class="notice-chevron">›</text></text>
+              </view>
+            </button>
           </view>
-        </template>
+        </view>
+        <view v-else class="notice-empty">{{ t('暂无通知') }}</view>
       </view>
     </scroll-view>
+    <PageDock v-if="notices" :active="0" :inline="false" />
     <template v-else>
       <movable-area class="guide-stage" :scale-area="true">
         <movable-view :key="resetVersion" direction="all" :scale="true"
@@ -71,6 +60,7 @@
         </view>
         <text class="guide-source">{{ t('来源：颐和园官网') }}</text>
       </view>
+      <PageDock :active="0" />
     </template>
 
     <!-- 公告详情：卡片变整页（原卡片区域放大 → 内容替换 → 逐行错峰） -->
@@ -114,6 +104,7 @@
 <script>
 import WanderIcon from '../../components/WanderIcon.vue'
 import DashboardIcon from '../../components/DashboardIcon.vue'
+import PageDock from '../../components/PageDock.vue'
 import { NOTICE_CHECKED_ON, noticeArticles } from '../../common/park-notices.js'
 
 const site = 'https://www.summerpalace.net.cn'
@@ -123,12 +114,12 @@ const WEEK_LABELS_EN = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 export default {
-  components: { WanderIcon, DashboardIcon },
+  components: { WanderIcon, DashboardIcon, PageDock },
   data() {
     return {
       officialNotices: noticeArticles,
       noticeCheckedOn: NOTICE_CHECKED_ON,
-      selectedDayKey: 0,
+      selectedDayKey: 0, noticeFilter: 'all',
       activeNotice: null, detailReady: false, detailClosing: false, noticeBusy: false,
       detailOriginStyle: {}, noticeSeason: 'peak',
       notices: false,
@@ -167,12 +158,17 @@ export default {
         week,
       }
     },
+    noticeCategories() {
+      const seen = new Map()
+      this.officialNotices.forEach(item => {
+        const key = item.category.zh
+        if (!seen.has(key)) seen.set(key, { value: key, label: item.category })
+      })
+      return [{ value: 'all', label: { zh: '全部', en: 'All' } }, ...Array.from(seen.values())]
+    },
     visibleNotices() {
-      const now = new Date()
-      const todayKey = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime()
-      const selectedKey = this.selectedDayKey || todayKey
-      // 目前内置的两条公告属于“今天”；切到其他日期时列表留空。
-      return selectedKey === todayKey ? this.officialNotices : []
+      if (this.noticeFilter === 'all') return this.officialNotices
+      return this.officialNotices.filter(item => item.category.zh === this.noticeFilter)
     },
     noticeSeasonRows() {
       const hours = this.activeNotice && this.activeNotice.hours
@@ -238,15 +234,17 @@ export default {
       })
     },
     closeNotice() {
-      if (!this.activeNotice || this.noticeBusy) return
-      this.noticeBusy = true
+      if (!this.activeNotice) return
+      // 允许在打开动画尚未结束时直接返回：中断计划中的“正文入场”，立即开始收起
+      this.noticeBusy = false
+      this.detailReady = false
       this.detailClosing = true
       clearTimeout(this._noticeTimer)
       this._noticeTimer = setTimeout(() => {
         this.activeNotice = null
         this.detailClosing = false
         this.noticeBusy = false
-      }, 230)
+      }, 200)
     },
     onScale(event) {
       const value = Number(event.detail?.scale)
@@ -339,10 +337,10 @@ export default {
 .notice-card-head { display: flex; align-items: flex-start; gap: 10px; }
 .notice-icon { flex: none; width: 40px; height: 40px; border-radius: 13px; display: grid; place-items: center; background: #f0ebff; color: #6a5ae0; }
 .notice-heading { flex: 1; min-width: 0; }
-.notice-kicker { display: flex; align-items: baseline; flex-wrap: wrap; column-gap: 5px; row-gap: 2px; }
-.notice-category { font-size: 13px; font-weight: 600; color: #6a5ae0; }
+.notice-kicker { display: flex; align-items: center; flex-wrap: nowrap; gap: 8px; }
+.notice-category { flex: none; margin-left: auto; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(139, 120, 230, .35); background: #f6f2ff; color: #6a5ae0; font-size: 10.5px; font-weight: 600; line-height: 1.6; white-space: nowrap; }
 .notice-sep { font-size: 11px; color: #cdc4e4; }
-.notice-title { font-size: 14.5px; font-weight: 700; color: #2a2438; line-height: 1.35; }
+.notice-title { flex: 1; min-width: 0; font-size: 14.5px; font-weight: 700; color: #2a2438; line-height: 1.35; }
 .notice-detail { display: -webkit-box; margin-top: 5px; font-size: 11.5px; line-height: 1.55; color: #7d748c; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .notice-badge { flex: none; padding: 2px 7px; border-radius: 999px; background: #f3efff; color: #6a5ae0; font-size: 9.5px; line-height: 1.7; }
 .notice-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 10px; padding-top: 8px; border-top: 1px dashed rgba(139, 120, 230, .2); }
@@ -352,7 +350,7 @@ export default {
 /* 首条强调：深紫渐变卡片 */
 .notice-row.featured .notice-card { background: linear-gradient(140deg, #5b46c9 0%, #6c55d8 54%, #8b78e6 100%); border-color: transparent; box-shadow: 0 20px 36px -22px rgba(80, 58, 190, .85); }
 .notice-row.featured .notice-icon { background: rgba(255, 255, 255, .18); color: #fff; }
-.notice-row.featured .notice-category { color: #eae4ff; }
+.notice-row.featured .notice-category { background: rgba(255, 255, 255, .18); border-color: rgba(255, 255, 255, .42); color: #fff; }
 .notice-row.featured .notice-sep { color: rgba(255, 255, 255, .4); }
 .notice-row.featured .notice-title { color: #fff; }
 .notice-row.featured .notice-detail { color: rgba(255, 255, 255, .82); }
@@ -373,10 +371,10 @@ export default {
   from { clip-path: inset(var(--notice-top, 34%) var(--notice-right, 10%) var(--notice-bottom, 46%) var(--notice-left, 10%) round 16px); opacity: .82; }
   to { clip-path: inset(0 0 0 0 round 0); opacity: 1; }
 }
-.notice-page.is-closing { animation: noticeCollapse 230ms cubic-bezier(.4, 0, .62, 1) both; }
+.notice-page.is-closing { pointer-events: none; will-change: transform, opacity; animation: noticeCollapse 200ms cubic-bezier(.4, 0, .62, 1) both; }
 @keyframes noticeCollapse {
-  from { clip-path: inset(0 0 0 0 round 0); opacity: 1; }
-  to { clip-path: inset(var(--notice-top, 34%) var(--notice-right, 10%) var(--notice-bottom, 46%) var(--notice-left, 10%) round 16px); opacity: .65; }
+  from { transform: translateZ(0) scale(1); opacity: 1; }
+  to { transform: translateZ(0) scale(.965); opacity: 0; }
 }
 .notice-detail-head { position: relative; flex: none; height: 56px; display: flex; align-items: center; justify-content: center; padding: 0 16px; }
 .notice-detail-back { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); }
@@ -419,4 +417,85 @@ export default {
 .notice-article-text { display: block; margin-top: 8px; font-size: 13px; line-height: 1.85; color: #5f576f; }
 .notice-article-note { margin-top: 24px; padding: 12px 14px; border-radius: 14px; background: rgba(139, 120, 230, .08); }
 .notice-article-note text { font-size: 11px; line-height: 1.7; color: #7d748c; }
+.notice-panel { background: #fff; border-radius: 26px 26px 0 0; margin: 0 8px; padding: 24px 16px calc(28px + env(safe-area-inset-bottom)); min-height: calc(100vh - 150px); box-sizing: border-box; box-shadow: 0 -8px 28px rgba(60, 40, 120, .06); }
+.notice-panel-head { display: flex; flex-direction: column; gap: 14px; }
+.notice-panel-titles { display: flex; flex-direction: column; gap: 6px; }
+.notice-panel-title { font-size: 24px; font-weight: 700; color: #282332; }
+.notice-panel-sub { font-size: 13px; color: #7b7291; }
+.notice-filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.notice-filter { padding: 7px 16px; border-radius: 999px; background: #f4f0fc; color: #6b5f86; font-size: 13px; line-height: 1.3; }
+.notice-filter.on { background: #6a5ae0; color: #fff; }
+.notice-empty { padding: 80px 0; text-align: center; color: #8b8495; font-size: 14px; }
+.guide-notice-page{background:#f3eefc!important}
+.guide-notice-page .guide-header{background:#fff!important}
+.guide-notice-page .notice-panel{margin:0!important;border-radius:26px 26px 0 0!important;min-height:calc(100vh - 96px)!important;padding-bottom:calc(102px + env(safe-area-inset-bottom))!important;box-sizing:border-box!important}
+.guide-notice-page{background:#fff!important}
+.guide-notice-page .guide-header{background:#fff!important;border-bottom:1px solid #ece8f5!important}
+.guide-notice-page .notice-panel{background:#fff!important;border-radius:26px 26px 0 0!important;margin:0!important;box-shadow:none!important;padding-top:8px!important}
+.guide-notice-page .notice-panel-title{display:none!important}
+.guide-notice-page .notice-panel-head{padding:0 2px!important;gap:8px!important}
+.guide-notice-page .notice-filters{margin-top:10px}
+.guide-notice-page .notice-timeline{margin-top:6px}
+.guide-notice-page .notice-rail,.guide-notice-page .notice-node{display:none!important}
+.guide-notice-page .notice-row{padding:0!important}
+.guide-notice-page .notice-card{background:transparent!important;border:0!important;border-bottom:1px solid #ece8f5!important;border-radius:0!important;box-shadow:none!important;padding:16px 2px!important;display:block!important}
+.guide-notice-page .notice-icon{display:none!important}
+.guide-notice-page .notice-card-head{padding:0!important}
+.guide-notice-page .notice-kicker{display:block}
+.guide-notice-page .notice-category{font-size:10.5px;color:#6a5ae0;font-weight:600}
+.guide-notice-page .notice-sep{display:none}
+.guide-notice-page .notice-title{display:block;margin-top:6px;font-size:16px;font-weight:600;color:#282332;line-height:1.5}
+.guide-notice-page .notice-detail{margin-top:6px;font-size:13px;line-height:1.7;color:#7b7487}
+.guide-notice-page .notice-card-foot{margin-top:10px;padding-top:0}
+.guide-notice-page .notice-row.featured .notice-title{color:#282332!important}
+.guide-notice-page .notice-row.featured .notice-detail{color:#7b7487!important}
+.guide-notice-page .notice-row.featured .notice-category{color:#8b8495!important}
+.guide-notice-page .notice-row.featured .notice-source{color:#9a93a6!important}
+.guide-notice-page .notice-row.featured .notice-read{color:#6a5ae0!important}
+.guide-notice-page .notice-row.featured .notice-card-foot{border-top-color:#ece8f5!important}
+.guide-notice-page .guide-header{position:relative;border-bottom:0!important}
+.guide-notice-page .guide-header::after{display:none!important}
+.guide-notice-page .notice-panel{border-top:1px solid #d9cdf8!important;border-radius:26px 26px 0 0!important}
+.guide-notice-page .notice-panel{border-radius:26px 26px 0 0!important}
+.guide-notice-page .notice-filters{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;gap:10px!important;padding:0 2px 4px!important;-webkit-overflow-scrolling:touch}
+.guide-notice-page .notice-filter{flex:none!important;min-height:34px!important;padding:0 14px!important;border:1px solid #e8e2f5!important;border-radius:999px!important;background:#fff!important;color:#4b4459!important;font-size:13px!important;line-height:32px!important}
+.guide-notice-page .notice-filter.on{background:rgba(255,255,255,.78)!important;border:1.5px solid #8b78e6!important;color:#5b4a9e!important;font-weight:600!important;-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);box-shadow:0 4px 14px rgba(106,90,224,.10)!important}
+.notice-page{background:#fff!important}
+.notice-detail-head{margin:8px 14px 0!important;height:54px!important;border-radius:18px!important;background:#fff!important;border:1px solid #ece8f5!important;box-shadow:0 8px 20px -18px rgba(70,54,130,.35)!important}
+.notice-detail-scroll{margin-top:4px}
+.notice-detail-body{padding-top:10px!important}
+.notice-detail-tag{background:#f4f1f9!important;color:#6f6685!important}
+.notice-hours{background:#fff!important;border:1px solid #ece8f5!important;box-shadow:none!important}
+.guide-notice-page .notice-card-foot{align-items:center!important;min-height:28px!important;padding:9px 0!important;margin-top:10px!important}
+.guide-notice-page .notice-source,.guide-notice-page .notice-read,.guide-notice-page .notice-read .notice-chevron,.guide-notice-page .notice-row.featured .notice-read,.guide-notice-page .notice-row.featured .notice-read .notice-chevron{color:#6f6685!important}
+.notice-detail-head{margin:0!important;height:56px!important;border-radius:0!important;background:transparent!important;border:0!important;box-shadow:none!important}
+/* 列表更紧凑 */
+.guide-notice-page .notice-card{padding:12px 2px 8px!important}
+.guide-notice-page .notice-title{margin-top:4px!important;font-size:15.5px!important;line-height:1.42!important}
+.guide-notice-page .notice-detail{margin-top:4px!important;line-height:1.55!important}
+.guide-notice-page .notice-card-foot{margin-top:7px!important;padding:6px 0 0!important;min-height:20px!important}
+.guide-notice-page .notice-kicker{display:flex!important;align-items:center!important;flex-wrap:nowrap!important;gap:8px!important}
+.guide-notice-page .notice-title{display:block!important;flex:1!important;min-width:0!important;margin-top:0!important}
+.guide-notice-page .notice-category{flex:none!important;margin-left:auto!important}
+.guide-notice-page .notice-row.featured .notice-category{background:#f6f2ff!important;border-color:rgba(139,120,230,.35)!important;color:#6a5ae0!important}
+.guide-notice-page .notice-timeline{margin-top:4px!important}
+.guide-notice-page .notice-panel{padding-top:4px!important}
+/* 详情页复用列表的圆角描边面板 */
+.notice-detail-scroll{flex:1!important;margin:8px 12px 0!important;border:1px solid #e5dcf5!important;border-bottom:0!important;border-radius:26px 26px 0 0!important;background:#fff!important;min-height:0!important;box-sizing:border-box!important}
+.notice-detail-body{padding:18px 18px calc(env(safe-area-inset-bottom) + 28px)!important}
+.notice-detail-scroll{margin:8px 0 0!important;border:0!important;border-top:1px solid #e5dcf5!important;border-radius:26px 26px 0 0!important;background:#fff!important}
+.notice-detail-head{height:62px!important;margin:0!important;padding:0 14px!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.notice-detail-head-title{font-size:18px!important;font-weight:600!important;letter-spacing:.02em!important;color:#2a2438!important}
+.notice-detail-back{left:14px!important;top:50%!important;transform:translateY(-50%)!important}
+.notice-detail-scroll{margin:0!important;border:0!important;border-top:1px solid #d9cdf8!important;border-radius:26px 26px 0 0!important}
+.notice-detail-body{padding-top:20px!important}
+.guide-page:not(.guide-notice-page) .guide-header{justify-content:center!important;padding:0 14px!important}
+.guide-page:not(.guide-notice-page) .guide-title{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;font-size:18px!important;font-weight:600!important;color:#2a2438!important;letter-spacing:.02em!important}
+.guide-page:not(.guide-notice-page) .guide-footer{padding-bottom:0!important;gap:6px!important}
+.guide-page .guide-header{justify-content:center!important;padding:0 14px!important}
+.guide-page .guide-header .guide-title{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;flex:none!important;margin:0!important;font-size:18px!important;font-weight:600!important;color:#2a2438!important;letter-spacing:.02em!important;line-height:1.4!important}
+.guide-page .guide-header .guide-back{position:absolute!important;left:14px!important;top:50%!important;transform:translateY(-50%)!important;margin:0!important}
+.guide-page:not(.guide-notice-page) .guide-stage{border-radius:26px 26px 0 0!important;overflow:hidden!important}
+.guide-page:not(.guide-notice-page) .guide-header::after{display:none!important}
+.guide-page:not(.guide-notice-page) .guide-footer::before{display:none!important}
 </style>

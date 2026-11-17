@@ -50,6 +50,8 @@ export default {
   onLoad: function (opts) {
     const s = uni.getSystemInfoSync(); this.statusH = (s.statusBarHeight || 20) + 6
     this.sid = Number((opts && opts.sid) || 0)
+    // 导览结束：清掉待继续路线和讲解会话，首页悬浮球不再出现
+    try { uni.removeStorageSync('pending-tour-route'); uni.removeStorageSync('xingyun-last-session') } catch (e) {}
   },
   methods: {
     goBack: function () {

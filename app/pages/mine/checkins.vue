@@ -117,8 +117,8 @@ export default {
     onEnd: function () {
       if (!this.dragging) return
       this.dragging = false
-      var threshold = 100
-      if (Math.abs(this.dx) < threshold) { this.dx = 0; this.dy = 0; return }
+      var threshold = 24
+      if (Math.abs(this.dx) < threshold || Math.abs(this.dx) < Math.abs(this.dy) * 0.8) { this.dx = 0; this.dy = 0; return }
       var self = this
       this.flying = true
       setTimeout(function () {

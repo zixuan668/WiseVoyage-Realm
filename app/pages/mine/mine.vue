@@ -18,11 +18,11 @@
       <view class="pc-avatar-wrap">
         <image v-if="avatarUrl" :src="avatarUrl" class="pc-avatar" mode="aspectFill" @error="avatarUrl=''"></image>
         <view v-else class="pc-avatar-df">
-          <text class="pca-txt">{{ avatarText }}</text>
+          <text v-if="username || !profileLoading" class="pca-txt">{{ avatarText }}</text>
         </view>
       </view>
       <view class="pc-name-row">
-        <text class="pc-name">{{ profileLoading ? t('加载中…') : (profileError || username || t('游客')) }}</text>
+        <text v-if="username || !profileLoading" class="pc-name">{{ username || t('游客') }}</text>
       </view>
       <text v-if="userId" class="pc-id">ID: {{ userId }}</text>
       <text v-if="profileError" class="pc-id" @tap="loadProfile">{{ t('点击重试') }}</text>
@@ -115,7 +115,18 @@ export default {
       const version = this._profileVersion = (this._profileVersion || 0) + 1
       const current = () => version === this._profileVersion && token === uni.getStorageSync('token')
       if (!token) { this.profileLoading = false; uni.reLaunch({url:'/pages/auth/auth'}); return }
-      this.profileLoading = !this.username; this.profileError = ''
+      // 只展示当前 token 对应的缓存资料，避免切换账号时闪一下上一个账号。
+      const cached = uni.getStorageSync('profile-cache:' + token)
+      if (cached && cached.username) {
+        this.username = cached.username
+        this.userId = cached.userId || ''
+        this.avatarUrl = assetUrl(cached.avatar || '')
+        this.profileLoading = false
+      } else {
+        this.username = ''; this.userId = ''; this.avatarUrl = ''
+        this.profileLoading = true
+      }
+      this.profileError = ''
       uni.request({url:BASE_URL+'/user/me?client_type=app',timeout:15000,header:{Authorization:'Bearer '+token},
         success:r=>{
           if (!current()) return
@@ -130,6 +141,7 @@ export default {
           this.avatarUrl = assetUrl(d.data.avatar || '')
           uni.setStorageSync('username', this.username)
           uni.setStorageSync('avatar', d.data.avatar || '')
+          try { uni.setStorageSync('profile-cache:' + token, { username: this.username, userId: this.userId, avatar: d.data.avatar || '' }) } catch (_) {}
         },
         fail:()=>{if(current()){this.profileLoading=false;this.profileError=this.t('个人资料加载失败，请检查网络')}}})
     },
@@ -221,7 +233,7 @@ export default {
 
 <style scoped>
 .page.aurora-page .profile-card{background:transparent;border:0;box-shadow:none}
-.page { min-height:100vh; background-color:var(--ng-surface); position:relative; overflow:hidden; padding-bottom:140rpx; }
+.page { height:100vh; background-color:var(--ng-surface); position:relative; overflow-y:auto; overflow-x:hidden; overscroll-behavior:contain; -webkit-overflow-scrolling:auto; padding-bottom:140rpx; }
 .page-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 .ink-bg { position:absolute; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
 .ink-mountain { position:absolute; left:0; right:0; background:var(--ng-night); border-radius:50% 70% 0 0; }

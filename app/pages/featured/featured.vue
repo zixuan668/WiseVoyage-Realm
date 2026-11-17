@@ -8,7 +8,6 @@
 
     <scroll-view scroll-y class="route-scroll" :show-scrollbar="false">
       <view class="route-inner">
-        <text class="route-lead">{{ t('精选动线，按时间与兴趣出发') }}</text>
 
         <view v-if="loading" class="route-skeleton" aria-busy="true" aria-label="主题路线加载中">
           <view v-for="n in 3" :key="n" class="sk-card">
@@ -37,12 +36,6 @@
             </view>
             <view class="route-body">
               <text class="route-name">{{ t(r.name) }}</text>
-              <view class="route-meta-row">
-                <text class="route-meta">{{ (r.spot_ids || []).length }} {{ t('个景点') }} · {{ distanceText(r) }}</text>
-                <view class="route-chips">
-                  <text v-for="name in (r.spot_names || []).slice(0, 4)" :key="name">{{ t(name) }}</text>
-                </view>
-              </view>
               <text v-if="r.description" class="route-desc">{{ t(r.description) }}</text>
             </view>
           </button>
@@ -55,11 +48,10 @@
     <view v-if="detail" class="sheet-mask" @tap="detail = null">
       <view class="sheet" @tap.stop>
         <view class="sheet-head">
-          <text>{{ t('路线详情') }}</text>
+          <text class="sheet-head-title">{{ t(detail.name) }}</text>
           <button :aria-label="t('关闭')" @tap="detail = null">×</button>
         </view>
         <scroll-view scroll-y class="sheet-scroll" :show-scrollbar="false">
-          <text class="sheet-title">{{ t(detail.name) }}</text>
           <text class="sheet-meta">{{ (detail.spot_ids || []).length }} {{ t('个景点') }}<template v-if="detail.estimated_time_minutes"> · {{ detail.estimated_time_minutes }} {{ t('分钟') }}</template></text>
           <text v-if="detail.description" class="sheet-desc">{{ t(detail.description) }}</text>
           <view class="stop-list">
@@ -80,6 +72,7 @@
 
 <script>
 import { BASE_URL, assetUrl } from '../../common/config.js'
+import { scenicRequest, loadScenicDraft } from '../../common/scenic-api.js'
 import PageDock from '../../components/PageDock.vue'
 
 export default {
@@ -133,7 +126,7 @@ export default {
       return this.t('步行') + ' ' + minutes + this.t('分钟') + ' · ' + this.formatMeters(meters)
     },
     openRoute(route) { this.detail = route },
-    addToPlan() {
+    async addToPlan() {
       const ids = (this.detail && this.detail.spot_ids ? this.detail.spot_ids : [])
         .map(Number)
         .filter(id => Number.isInteger(id) && id > 0)
@@ -142,10 +135,27 @@ export default {
         return
       }
       this.detail = null
-      uni.navigateTo({
-        url: '/pages/scenic/scenic?view=plan&spotIds=' + ids.join(','),
-        fail: () => uni.showToast({ title: this.t('打开路径规划失败，请重试'), icon: 'none' }),
-      })
+      uni.showLoading({ title: this.t('正在加入…'), mask: true })
+      try {
+        // 直接写进当前路线的草稿，路径规划页之后会自动读到，不跳转。
+        const draft = await loadScenicDraft()
+        for (const id of ids) {
+          if (!draft.stops.some(stop => stop.id === id)) {
+            await scenicRequest('/scenic-selection?spot_id=' + id, { method: 'PUT' })
+          }
+        }
+        for (const stop of draft.stops) {
+          if (!ids.includes(stop.id)) await scenicRequest('/scenic-selection/' + stop.id, { method: 'DELETE' })
+        }
+        await scenicRequest('/scenic-settings', { method: 'PUT', data: { spot_ids: ids } })
+        try { uni.setStorageSync('scenic-selection-touched', 1) } catch (_) {}
+        uni.hideLoading()
+        // 加入成功后不提示，直接进入路径规划页
+        uni.navigateTo({ url: '/pages/scenic/scenic?view=plan' })
+      } catch (error) {
+        uni.hideLoading()
+        uni.showToast({ title: this.t('加入失败，请重试'), icon: 'none' })
+      }
     },
     goBack() {
       uni.navigateBack({ delta: 1, fail: () => uni.reLaunch({ url: '/pages/tabs/tabs?tab=home' }) })
@@ -158,7 +168,7 @@ export default {
 .featured-page {
   --feat-ink: #282332; --feat-accent: #6a5ae0;
   height: 100vh; height: 100dvh; display: flex; flex-direction: column; overflow: hidden;
-  background: radial-gradient(ellipse at 50% 0%, #fbfaff 0%, #f4f1fd 55%, #efeaf9 100%);
+  background: #fff;
   color: var(--feat-ink);
   box-sizing: border-box; font-family: var(--app-font-family, sans-serif);
 }
@@ -172,7 +182,6 @@ export default {
 .route-scroll { flex: 1; height: 0; min-height: 0; }
 .route-inner { padding: 6px 16px calc(92px + env(safe-area-inset-bottom)); max-width: 560px; margin: 0 auto; box-sizing: border-box; }
 .dock-fixed { position: fixed; left: 0; right: 0; bottom: 0; z-index: 950; background: #fff; }
-.route-lead { display: block; font-size: 13px; color: #7a708f; margin: 2px 2px 14px; }
 .route-list { display: flex; flex-direction: column; gap: 16px; }
 .route-card { display: block; width: 100%; text-align: left; border-radius: 22px; overflow: hidden; background: #fff; box-shadow: 0 10px 28px -18px rgba(55, 36, 110, .35); }
 .route-cover { position: relative; height: 172px; overflow: hidden; background: #ded6f4; }
@@ -183,11 +192,7 @@ export default {
 .route-index { position: absolute; right: 14px; bottom: 10px; font-size: 30px; font-weight: 700; color: rgba(255, 255, 255, .82); letter-spacing: 1px; font-variant-numeric: tabular-nums; }
 .route-body { padding: 14px 16px 16px; }
 .route-name { display: block; font-size: 19px; font-weight: 650; letter-spacing: .2px; }
-.route-meta-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 5px; }
-.route-meta { flex: none; font-size: 13px; color: #6e6587; }
 .route-desc { display: -webkit-box; margin-top: 8px; font-size: 13px; line-height: 1.65; color: #5d5573; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.route-chips { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
-.route-chips text { padding: 2px 7px; border-radius: 999px; background: #f2eefc; color: #63538f; font-size: 10px; line-height: 1.4; }
 .state { display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 60px 20px; font-size: 14px; color: #6e6587; }
 .state button { padding: 8px 20px; border-radius: 999px; background: #eae3fb; color: #5b48a4; }
 .route-skeleton { display: flex; flex-direction: column; gap: 16px; }
@@ -200,12 +205,11 @@ export default {
 .sheet {
   width: 100%; max-height: 78vh; display: flex; flex-direction: column; box-sizing: border-box;
   border-radius: 26px 26px 0 0; padding: 14px 18px calc(18px + env(safe-area-inset-bottom));
-  background: linear-gradient(165deg, rgba(255, 255, 255, .92) 0%, rgba(250, 246, 255, .86) 55%, rgba(243, 236, 255, .84) 100%);
-  border: 1px solid rgba(126, 102, 222, .46); border-bottom: 0;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, .35), 0 -22px 60px -34px rgba(58, 36, 120, .6), inset 0 1px 0 rgba(255, 255, 255, .95);
-  -webkit-backdrop-filter: blur(26px) saturate(1.25); backdrop-filter: blur(26px) saturate(1.25);
+  background: #fff;
+  border: 1px solid rgba(126, 102, 222, .5); border-bottom: 0;
+  box-shadow: 0 -18px 48px -30px rgba(58, 36, 120, .55);
 }
-.sheet-head { display: flex; align-items: center; justify-content: space-between; font-size: 14px; color: #7b7291; }
+.sheet-head { display: flex; align-items: center; justify-content: flex-end; min-height: 40px; }
 .sheet-head button { width: 40px; height: 40px; font-size: 22px; color: #4d4562; }
 .sheet-scroll { flex: 1; min-height: 0; max-height: 60vh; }
 .sheet-title { display: block; font-size: 22px; font-weight: 700; margin: 2px 0 6px; }
@@ -215,9 +219,8 @@ export default {
 .stop-item {
   display: flex; align-items: center; gap: 10px; min-height: 48px; box-sizing: border-box;
   padding: 10px 12px; border-radius: 16px; font-size: 14px;
-  background: rgba(255, 255, 255, .62); border: 1px solid rgba(126, 102, 222, .26);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), 0 10px 22px -20px rgba(74, 53, 142, .55);
-  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  background: #fff; border: 1px solid rgba(126, 102, 222, .42);
+  box-shadow: 0 6px 16px -14px rgba(74, 53, 142, .38);
 }
 .stop-no { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: 50%; background: rgba(228, 218, 249, .92); color: #5b48a4; font-size: 12px; }
 .stop-name { flex: 1; min-width: 0; line-height: 24px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -234,4 +237,11 @@ export default {
 .plan-add-btn:active { background: rgba(139, 120, 230, .12); }
 .plan-add-btn[disabled] { opacity: .5; }
 @media (prefers-reduced-motion: reduce) { .sk-cover, .sk-line { animation: none; } .featured-page button:active { transform: none; } }
+.sheet-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;min-height:44px!important;padding:2px 0 4px!important}
+.sheet-head-title{flex:1!important;min-width:0!important;font-size:20px!important;font-weight:700!important;color:#241c36!important;overflow:hidden!important;text-overflow:ellipsis!important;white-space:nowrap!important;line-height:1.4!important}
+.stop-item{background:#f6f2ff!important;border:1px solid rgba(126,102,222,.12)!important;box-shadow:none!important}
+.plan-add-btn{background:#fff!important;border:2px solid #6a5ae0!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;color:#5b3fa8!important}
+.plan-add-btn:active{background:#f1ecff!important}
+.plan-add-btn{border:3px solid #6a5ae0!important;box-shadow:none!important}
+.plan-add-btn{border:3px solid #b8a8ef!important;color:#6b5aa8!important}
 </style>

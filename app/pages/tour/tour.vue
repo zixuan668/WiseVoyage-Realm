@@ -1,12 +1,13 @@
 <template>
-  <view class="page">
+  <view class="page tour-page">
 
     <view class="tour-gradient" aria-hidden="true"></view>
 
     <NocturneConfirm v-if="showEndConfirm" plain :title="t('结束导览')" :content="t('确定要结束本次导览吗？')" :cancel-label="t('取消')" :confirm-label="t('确定')" @cancel="showEndConfirm=false" @confirm="endTour" />
     <!-- 导航栏 -->
     <view class="nav" :style="{paddingTop:statusH+'px'}">
-      <view class="nav-collapse app-back-btn" @tap="collapseTour" role="button" :aria-label="t('收起导览')"><view class="collapse-icon app-back-icon" aria-hidden="true"></view></view>
+      <view class="nav-orb-spacer" aria-hidden="true"></view>
+      <FloatingHomeOrb :top="statusH+8" />
       <view class="nav-right">
         <view v-if="remainingDuration>0" class="nav-remaining"><text class="nav-remaining-text">{{ t('预计剩余约 {minutes} 分钟',{minutes:remainingDuration}) }}</text></view>
         <view class="nav-end" @tap="confirmEnd" role="button" :aria-label="t('结束导览')"><text class="nav-end-text">{{ t('结束') }}</text></view>
@@ -51,8 +52,8 @@
     <button v-if="guideProvider==='xingyun'" class="xingyun-open" @tap="openXingyun">{{ t('打开数字人导览') }}</button>
     <!-- #endif -->
     <!-- 景点切换卡片 -->
-    <view class="spot-switch" v-if="spotCards.length">
-      <view class="ss-card" @touchstart="onSpotTouchStart" @touchmove="onSpotTouchMove" @touchend="onSpotTouchEnd" @touchcancel="onSpotTouchEnd">
+    <view class="spot-switch" v-if="spotCards.length" @touchstart="onSpotTouchStart" @touchmove="onSpotTouchMove" @touchend="onSpotTouchEnd" @touchcancel="onSpotTouchCancel">
+      <view class="ss-card">
         <image v-if="currentSpot.image_path||currentSpot.route_cover_image" :src="fixImg(currentSpot.image_path||currentSpot.route_cover_image)" class="ss-img" mode="aspectFill"></image>
         <view v-else class="ss-img ss-img-df"></view>
         <view class="ss-info">
@@ -131,7 +132,7 @@
     </scroll-view>
 
     <!-- 底部输入区 -->
-    <view class="bottom-bar" :class="{'keyboard-open':keyboardHeight>0}" :style="keyboardHeight>0?{paddingBottom:keyboardHeight+'px'}:{}">
+    <view class="bottom-bar" :class="{'keyboard-open':keyboardHeight>0}" :style="keyboardHeight>0?{transform:'translateY(-'+keyboardHeight+'px)'}:{}">
       <view class="input-row">
         <view class="voice-btn" :class="{rec:voiceMode}" @tap="toggleVoiceMode">
           <text class="iconfont" :class="voiceMode ? 'icon-liaotian' : 'icon-yuyin'"></text>
@@ -143,7 +144,7 @@
         <view v-if="!voiceMode" class="send-btn" @tap="onSend" :class="{disabled:!text||loading||transcribing}">{{ t('发送') }}</view>
       </view>
     </view>
-    <PageDock :active="0" />
+
   </view>
 </template>
 
@@ -153,7 +154,7 @@ import RouteOverview from '../../components/RouteOverview.vue'
 import TourRouteRepair from '../../components/TourRouteRepair.vue'
 import { isRouteChange, repairDefaults } from '../../common/route-planning.js'
 import TourXingyun from '../../components/tour-xingyun.vue'
-import PageDock from '../../components/PageDock.vue'
+import FloatingHomeOrb from '../../components/FloatingHomeOrb.vue'
 import { prepareNativeGuideAudio } from '../../common/avatar-audio.js'
 import { BASE_URL, assetUrl, isBeijingCity } from '../../common/config.js'
 import { appendTourChatMessage } from '../../common/tour-chat-log.js'
@@ -194,7 +195,7 @@ var api = {
 }
 
 export default {
-  components: {NocturneConfirm,TourXingyun,RouteOverview,TourRouteRepair,PageDock,
+  components: {NocturneConfirm,TourXingyun,RouteOverview,TourRouteRepair,FloatingHomeOrb,
   },
   data: function() {
     return {
@@ -404,10 +405,13 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
     },
     takePhoto: function () {
       var self = this
+      try { uni.setStorageSync('picker-resume-guard', Date.now()) } catch (_) {}
+      var clearGuard = function () { try { uni.removeStorageSync('picker-resume-guard') } catch (_) {} }
       uni.chooseImage({ count: 1, sourceType: ['camera', 'album'], success: function (res) {
+        clearGuard()
         var path = res.tempFilePaths && res.tempFilePaths[0]
         if (path) self.cardPhoto = path
-      } })
+      }, fail: clearGuard })
     },
     shareCard: function () {
       var self = this
@@ -823,6 +827,7 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
     goBack: function() { this.leaveTour() },
     // 规划已进入导览即视为“用完”：清空景区已选景点，下次规划从空白开始。
     clearScenicSelection: function() {
+      try { uni.removeStorageSync('scenic-selection-touched') } catch (error) {}
       try {
         var self = this
         var auth = { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (uni.getStorageSync('token') || '') }
@@ -842,24 +847,39 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
     onSpotTouchStart: function(event) {
       var touch = event && event.touches && event.touches[0]
       if (!touch) return
-      this._spotTouch = { x: touch.clientX, y: touch.clientY, lastX: touch.clientX, lastY: touch.clientY }
+      this._spotTouch = { x: touch.clientX, y: touch.clientY, lastX: touch.clientX, lastY: touch.clientY, movedX: 0, movedY: 0 }
     },
     onSpotTouchMove: function(event) {
       var touch = event && event.touches && event.touches[0]
       if (!touch || !this._spotTouch) return
       this._spotTouch.lastX = touch.clientX
       this._spotTouch.lastY = touch.clientY
+      this._spotTouch.movedX = touch.clientX - this._spotTouch.x
+      this._spotTouch.movedY = touch.clientY - this._spotTouch.y
+    },
+    onSpotTouchCancel: function() {
+      this._spotTouch = null
     },
     onSpotTouchEnd: function(event) {
       var start = this._spotTouch
       this._spotTouch = null
       if (!start) return
       var touch = event && event.changedTouches && event.changedTouches[0]
-      var endX = touch ? touch.clientX : start.lastX
-      var endY = touch ? touch.clientY : start.lastY
-      var dx = endX - start.x
-      var dy = endY - start.y
-      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return
+      // 部分安卓机 touchend 的 clientX 会缺失或为 0，这时用 touchmove 记录的总位移判断方向，
+      // 否则左右滑动会被算成同一个方向（表现为只能单边切换景点）。
+      var dx = Number(start.movedX) || 0
+      var dy = Number(start.movedY) || 0
+      var endX = touch && Number(touch.clientX)
+      var endY = touch && Number(touch.clientY)
+      if (Number.isFinite(endX) && Number.isFinite(endY) && endX !== 0) {
+        var cdX = endX - start.x
+        var cdY = endY - start.y
+        if (Math.abs(cdX) >= Math.abs(dx)) { dx = cdX; dy = cdY }
+      }
+      var absX = Math.abs(dx)
+      var absY = Math.abs(dy)
+      if (!Number.isFinite(dx) || !Number.isFinite(dy)) return
+      if (absX < 30 || absX <= absY * 1.2) return
       if (dx < 0) this.nextSpot()
       else this.prevSpot()
     },
@@ -1040,6 +1060,7 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
     this.appXingyun=true
     // #endif
     this.sid = Number(opts.sessionId || 0)
+      try{ if(this.sid) uni.setStorageSync('xingyun-last-session', { sessionId: this.sid, at: Date.now() }) }catch(e){}
     if (this.sid) this.clearScenicSelection()
     try{ this.fallbackPoster = opts.poster ? decodeURIComponent(opts.poster) : ''; this.fallbackName = opts.guideName ? decodeURIComponent(opts.guideName) : '' }catch(e){}
     try{ if(this.sid&&opts.access){ uni.setStorageSync('xingyun-tour-'+this.sid, decodeURIComponent(opts.access)) } }catch(e){}
@@ -1069,7 +1090,7 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
 .stage-location{display:flex;align-items:center;justify-content:flex-end;gap:10rpx;max-width:70%;margin-left:auto}
 .guide-stage{flex-shrink:0}
 .avatar-video{width:100%;height:100%}.avatar-notice{font-size:24rpx;line-height:1.7;color:var(--ng-secondary);padding:0 28rpx;text-align:center;max-width:560rpx}
-.page{height:100vh;height:100dvh;width:100%;min-width:0;box-sizing:border-box;display:flex;flex-direction:column;background-color:var(--ng-surface);position:relative;overflow:hidden}
+.page{height:100vh;height:100dvh;width:100%;min-width:0;box-sizing:border-box;display:flex;flex-direction:column;background-color:#fff;position:relative;overflow:hidden}
 .avatar-runtime-status,.xingyun-open,.tour-progress,.spot-media{position:relative;z-index:1}
 .nav-spacer{flex:1;min-width:0}
 .nav .nav-progress{position:relative;flex:1 1 0%;width:0;min-width:0;overflow:hidden;padding:4rpx 0}
@@ -1078,7 +1099,7 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
 .nav-progress .tp-stat{font-size:18rpx}
 .nav-distance{max-width:56vw;font-size:20rpx;line-height:1.4;color:var(--ng-accent-text)}
 .stage-guide-name{position:absolute;left:20rpx;top:16rpx;z-index:4;padding:8rpx 18rpx;border-radius:14rpx;background:transparent;color:#000;font-size:28rpx;font-weight:600;max-width:36%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.tour-gradient{position:absolute;inset:0;pointer-events:none;z-index:0;background:linear-gradient(135deg,#eee8ff 0%,#f6f2ff 28%,#fbfbff 52%,#eef8fc 76%,#eee8ff 100%);background-size:220% 220%;animation:tourGradientFlow 16s ease-in-out infinite alternate}
+.tour-gradient{position:absolute;inset:0;pointer-events:none;z-index:0;background:#ffffff}
 @keyframes tourGradientFlow{from{background-position:0% 0%}to{background-position:100% 100%}}
 .page-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 
@@ -1203,6 +1224,7 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
 
 /* 底部输入 */
 .bottom-bar{position:relative;width:100%;box-sizing:border-box;z-index:2;flex-shrink:0;border-top:1rpx solid var(--ng-border);background:var(--ng-surface);padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-orb-spacer{width:52px;height:52px;flex:none;visibility:hidden}
 /* 输入区尺寸与 AI 导游页保持一致（84/88rpx、胶囊圆角） */
 .input-row{width:100%;min-width:0;box-sizing:border-box;display:flex;align-items:flex-end;gap:12rpx;padding:16rpx 18rpx 18rpx}
 .ss-checkin{height:56rpx;padding:0 18rpx;border-radius:16rpx;display:flex;align-items:center;gap:8rpx;background:#fff;border:1rpx solid rgba(139,120,230,.35);box-shadow:inset 0 1rpx 0 #fff,0 6rpx 16rpx -12rpx rgba(90,70,180,.3);flex:none;margin-left:auto;transition:transform 160ms cubic-bezier(.2,.8,.2,1),background-color 160ms,border-color 160ms}
@@ -1287,6 +1309,7 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
 .tp-track.fade-left:not(.fade-right){-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 44rpx,#000 100%);mask-image:linear-gradient(90deg,transparent 0,#000 44rpx,#000 100%)}
 .tp-track.fade-right:not(.fade-left){-webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 44rpx),transparent 100%);mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 44rpx),transparent 100%)}
 .tp-dot{transition:background .3s ease,border-color .3s ease,box-shadow .3s ease}
+.bottom-bar{transition:transform .12s ease-out}
 .bottom-bar.keyboard-open{z-index:10001;box-shadow:0 -8rpx 24rpx rgba(15,23,42,.08)}
 .arrival-narration{flex-shrink:0;position:relative;z-index:1;display:flex;align-items:center;gap:16rpx;padding:8rpx 24rpx}
 .arrival-narration button{margin:0;min-height:44px;display:flex;align-items:center;padding:0 20rpx;border:0;border-radius:20rpx;background:#eee9fa;color:#6957cd;font-size:24rpx;line-height:1.4}

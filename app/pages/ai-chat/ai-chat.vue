@@ -73,7 +73,8 @@
           <button v-if="m.recognitionEvidence" class="photo-evidence-toggle" @tap="toggleEvidence(m)">{{ $t(m.showEvidence?'收起识别依据':'查看识别依据（原文）') }}</button>
           <text v-if="m.showEvidence&&m.recognitionEvidence" class="photo-evidence">{{ m.recognitionEvidence }}</text>
           <view v-if="m.role==='ai' && m.content && !m.cursor" class="msg-speaker" :class="{on:isReplyPlaying(i)}" :aria-label="$t(isReplyPlaying(i) ? '暂停语音播报' : '继续播放')" @tap="replayTTS(m.content,i)">
-            <text v-if="!isReplyPlaying(i)" class="playback-glyph iconfont icon-play" aria-hidden="true"></text>
+            <text v-if="isReplyLoading(i)" class="playback-spinner" aria-hidden="true"></text>
+            <text v-else-if="!isReplyPlaying(i)" class="playback-glyph iconfont icon-play" aria-hidden="true"></text>
             <text v-else class="playback-glyph iconfont icon-pause" aria-hidden="true"></text>
           </view>
         </view>
@@ -621,9 +622,12 @@ export default {
       this.pickScenicImage(source,epoch,owner)
     },
     pickScenicImage:function(source,epoch=this.requestEpoch,owner=this.storageOwner()){
+      // 系统相册/相机是另一个 Activity，返回时 App 会触发 onShow；打标记避免被当成重启跳回欢迎页。
+      try{uni.setStorageSync('picker-resume-guard',Date.now())}catch(_){}
+      const clearGuard=()=>{try{uni.removeStorageSync('picker-resume-guard')}catch(_){}}
       uni.chooseImage({count:1,sizeType:['compressed'],sourceType:[source],
-        success:res=>{if(this.isCurrentRequest(epoch,owner)&&res.tempFilePaths&&res.tempFilePaths[0]){this.pendingPhoto=res.tempFilePaths[0];this.recognitionError='';this.voiceMode=false}},
-        fail:e=>{if(!this.isCurrentRequest(epoch,owner))return;console.error('Choose scenic photo failed',e);if(!/cancel/i.test(e.errMsg||''))this.recognitionError=(source==='camera'?'相机':'相册')+'打开失败：'+(e.errMsg||'请检查手机权限')}})
+        success:res=>{clearGuard();if(this.isCurrentRequest(epoch,owner)&&res.tempFilePaths&&res.tempFilePaths[0]){this.pendingPhoto=res.tempFilePaths[0];this.recognitionError='';this.voiceMode=false}},
+        fail:e=>{clearGuard();if(!this.isCurrentRequest(epoch,owner))return;console.error('Choose scenic photo failed',e);if(!/cancel/i.test(e.errMsg||''))this.recognitionError=(source==='camera'?'相机':'相册')+'打开失败：'+(e.errMsg||'请检查手机权限')}})
     },
     previewChatPhoto:function(path){uni.previewImage({urls:[path],current:path})},
     sendPhoto:async function(){
@@ -647,7 +651,8 @@ export default {
         let reply=prefix
         if(result.status==='candidate'&&Number.isInteger(result.spot_id)&&result.spot_id>0){
           try{
-            const question=translateTour('介绍「{spot}」的历史、典故和看点。',language,{spot:result.spot_name||''})
+            // 游客自己写了附言时，直接按他的原话回答（比如“这个地是哪，景致如何？”）。
+            const question=caption.trim()?caption.trim():translateTour('介绍「{spot}」的历史、典故和看点。',language,{spot:result.spot_name||''})
             const answer=await this.sendGuideQuestion(question,language,epoch,owner,result.spot_id)
             if(answer)reply+='\n\n'+answer
           }catch(error){
@@ -781,7 +786,8 @@ export default {
       if(this._ttsAudio){this._ttsAudio.destroy();this._ttsAudio=null}
       this.speaking=false;this.ttsLoading=false;this.ttsPaused=false;this.speakingIndex=-1
     },
-    isReplyPlaying:function(index){return this.speakingIndex===index&&!this.ttsPaused&&(this.speaking||this.ttsLoading)},
+    isReplyPlaying:function(index){return this.speakingIndex===index&&!this.ttsPaused&&this.speaking},
+    isReplyLoading:function(index){return this.speakingIndex===index&&this.ttsLoading&&!this.speaking&&!this.ttsPaused},
     replayTTS: function (text,index) {
       if(this.speakingIndex===index){
         if(this.ttsLoading){this.stopTTS();return}
@@ -846,7 +852,7 @@ export default {
         audio.onPlay(function(){if(requestId!==self._ttsRequestId||self._ttsAudio!==audio)return;if(self.ttsPaused){audio.pause();return}self.ttsLoading=false;self.speaking=true})
         audio.onEnded(function(){if(requestId===self._ttsRequestId)self.stopTTS()})
         audio.onError(function(){if(requestId!==self._ttsRequestId)return;self.stopTTS();uiToast({title:'语音播放失败，请检查网络后重试',icon:'none'})})
-        audio.src = url; self.ttsLoading=false; if(!self.ttsPaused)audio.play()
+        audio.src = url; if(!self.ttsPaused)audio.play()
       }).catch(function (error) {if(requestId!==self._ttsRequestId)return;self.stopTTS();uiToast({title:error.message||'语音播报失败，请稍后重试',icon:'none'})})
     },
 
@@ -965,7 +971,7 @@ export default {
 .hp-clear{font-size:24rpx;color:var(--ng-secondary);padding:8rpx 18rpx;border-radius:12rpx;background:rgba(99,102,241,0.08)}
 .hp-title{font-size:30rpx;font-weight:700;color:var(--ng-text)}
 .hp-close{width:60rpx;height:60rpx;border-radius:16rpx;display:flex;align-items:center;justify-content:center;background:rgba(99,102,241,0.08);font-size:34rpx;line-height:1;color:var(--ng-secondary)}
-.hp-body{max-height:calc(74vh - 110rpx);overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:auto;touch-action:pan-y;padding:0 24rpx 24rpx;box-sizing:border-box}
+.hp-body{max-height:calc(74vh - 110rpx);overflow-y:auto;-webkit-overflow-scrolling:auto;overscroll-behavior:contain;touch-action:pan-y;padding:0 24rpx 24rpx;box-sizing:border-box}
 .hp-empty{padding:60rpx 0;text-align:center;color:var(--ng-secondary);font-size:26rpx}
 .hp-translating{padding:4rpx 4rpx 14rpx;color:var(--ng-secondary);font-size:23rpx}
 .hp-item{margin-top:18rpx;padding:18rpx;border-radius:20rpx;background:rgba(99,102,241,0.05);border:1rpx solid rgba(99,102,241,0.12)}
@@ -1013,7 +1019,9 @@ export default {
 .msg-speaker .vm-pause{display:flex;align-items:center;gap:6rpx;padding:8rpx 10rpx;border-radius:20rpx;background:rgba(99,102,241,.12)}
 .msg-speaker .vm-bar{width:7rpx;height:22rpx;border-radius:4rpx;background:#4f46e5;display:block}
 .msg-speaker .vm-play{width:0;height:0;border-left:18rpx solid #4f46e5;border-top:11rpx solid transparent;border-bottom:11rpx solid transparent;margin-left:4rpx}
-.msg-speaker.on{animation:spkPulse .6s ease-in-out infinite}
+.msg-speaker.on{animation:none}
+.msg-speaker .playback-spinner{display:block;width:22rpx;height:22rpx;border:3rpx solid rgba(99,102,241,.25);border-top-color:#4f46e5;border-radius:50%;animation:spkSpin .8s linear infinite}
+@keyframes spkSpin{to{transform:rotate(360deg)}}
 @keyframes spkPulse{0%,100%{opacity:1}50%{opacity:.4}}
 
 .result-bar { position:relative; z-index:1; display:flex; align-items:center; justify-content:space-between; padding:14rpx 20rpx; margin:0 20rpx 8rpx; background:rgba(99,102,241,0.15); border:1rpx solid rgba(99,102,241,0.25); border-radius:14rpx; font-size:24rpx; color:var(--ng-text); font-weight:600; }
@@ -1047,7 +1055,7 @@ export default {
 @keyframes tabBounce{0%{transform:scale(1)}30%{transform:scale(1.15)}60%{transform:scale(.95)}100%{transform:scale(1)}}
 
 /* 路线预览时间轴 */
-.route-preview { position:relative; z-index:1; flex-shrink:0; max-height:24vh; overflow-y:auto; box-sizing:border-box; margin:0 20rpx 8rpx; padding:18rpx 20rpx; background:var(--ng-surface); border:1rpx solid var(--ng-border); border-radius:16rpx; }
+.route-preview { position:relative; z-index:1; flex-shrink:0; max-height:24vh; overflow-y:auto; overscroll-behavior:contain; box-sizing:border-box; margin:0 20rpx 8rpx; padding:18rpx 20rpx; background:var(--ng-surface); border:1rpx solid var(--ng-border); border-radius:16rpx; }
 .rp-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14rpx; }
 .rp-title { font-size:28rpx; font-weight:800; color:var(--ng-text); letter-spacing:2rpx; }
 .rp-count { font-size:22rpx; color:var(--ng-secondary); }
@@ -1083,7 +1091,8 @@ export default {
 .nav .qh-spot{display:flex;align-items:center;gap:12rpx;width:auto;flex:0 1 auto;max-width:450rpx;min-width:0;margin:0;padding:12rpx 18rpx 12rpx 10rpx;min-height:72rpx;line-height:1.4;border:1rpx solid rgba(255,255,255,.76);border-radius:40rpx;background:rgba(255,255,255,.64);box-shadow:0 6rpx 24rpx rgba(115,91,185,.07);text-align:left;box-sizing:border-box}
 .qh-spot::after{border:0}.context-pin{display:flex;align-items:center;justify-content:center;width:46rpx;height:46rpx;flex-shrink:0;border-radius:50%;background:var(--ng-glass-blue-bg);box-shadow:0 1rpx 2rpx rgba(70,105,170,.06),0 4rpx 8rpx -4rpx rgba(70,105,170,.12),inset 0 1rpx 0 rgba(255,255,255,.9)}.context-pin .iconfont{font-size:31rpx;color:var(--ng-soft-blue-text)}
 .context-name{flex:1;min-width:0;font-size:25rpx;font-weight:500;color:#261956;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nav-clear{flex-shrink:0;margin:0;padding:8rpx;font-size:23rpx;background:transparent}
-.conversation-stage{position:relative;flex:1;min-height:0;overflow:hidden;padding-bottom:128rpx}.conversation-stage .chat-area{position:absolute;inset:0;width:100%;height:100%;padding:0 28rpx 24rpx}
+.conversation-stage{position:relative;flex:1;min-height:0;overflow:hidden;padding-bottom:128rpx}.conversation-stage .chat-area{position:absolute;inset:0;width:100%;height:100%;padding:48rpx 28rpx 24rpx}
+.conversation-stage .msg-row:first-child{margin-top:20rpx}
 .welcome-active :deep(.uni-scroll-view-content){display:flex;flex-direction:column;min-height:100%}
 .guide-welcome{flex:0 0 auto;min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:160rpx 12rpx 120rpx;box-sizing:border-box}
 .guide-welcome>view,.guide-welcome>text{flex-shrink:0}

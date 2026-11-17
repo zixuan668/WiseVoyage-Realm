@@ -2,6 +2,7 @@
   <view class="park-hero" :class="{ 'hero-running': running }" role="img"
     :aria-label="t('昆明湖、十七孔桥与佛香阁')">
     <image class="hero-art" src="/static/park-dashboard/hero.webp" mode="aspectFill" @load="artReady = true" />
+    <view class="hero-sky-tint" aria-hidden="true"></view>
     <view class="hero-mist" aria-hidden="true"></view>
     <image class="hero-ripples" src="/static/park-dashboard/ripples.webp" mode="scaleToFill" aria-hidden="true" />
     <image class="hero-willow" src="/static/park-dashboard/willow.webp" mode="scaleToFill" aria-hidden="true" />
@@ -48,10 +49,11 @@ export default {
 <style scoped>
 .park-hero {
   position: relative; width: 100%; aspect-ratio: 812 / 463;
-  overflow: hidden; border-radius: 37rpx; isolation: isolate; background: #e5e7f8;
+  overflow: hidden; border-radius: 37rpx; isolation: isolate; background: #e4edf4;
 }
-.hero-art, .hero-mist, .hero-ripples, .hero-willow, .hero-flight { position: absolute; pointer-events: none; }
+.hero-art, .hero-sky-tint, .hero-mist, .hero-ripples, .hero-willow, .hero-flight { position: absolute; pointer-events: none; }
 .hero-art { inset: 0; width: 100%; height: 100%; animation: hero-arrive .75s ease-out both; }
+.hero-sky-tint{inset:0;background:linear-gradient(180deg,rgba(185,216,236,.95),rgba(194,222,238,.72) 24%,rgba(204,228,240,.18) 43%,transparent 55%);mix-blend-mode:color}
 .hero-mist {
   top: 9%; left: 19%; width: 62%; height: 17%;
   background: radial-gradient(ellipse closest-side, #fff8ea66, transparent);

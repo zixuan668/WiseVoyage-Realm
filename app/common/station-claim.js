@@ -11,16 +11,24 @@ export function pendingClaim() {
   return raw
 }
 export function clearPendingClaim() { uni.removeStorageSync(KEY) }
+function readClaimPrefs(value) {
+  if (!value) return null
+  try {
+    const parsed = JSON.parse(value)
+    return parsed && typeof parsed === 'object' ? parsed : null
+  } catch (_) { return null }
+}
 export function parseClaim(value) {
   const raw = String(value || '').trim()
-  if (/^[A-HJ-NP-Z2-9]{12}$/i.test(raw)) return { token: raw.toUpperCase(), origin: '' }
+  if (/^[A-HJ-NP-Z2-9]{12}$/i.test(raw)) return { token: raw.toUpperCase(), origin: '', prefs: null }
   if (!/^(zhiyouguide:\/\/claim|https?:\/\/[^/]+\/m\/receive)[?#]/.test(raw)) return null
   const params = {}
   raw.replace(/[#?&]([^=&#]+)=([^&#]*)/g, (_, key, val) => { params[key] = decodeURIComponent(val) })
-  if (params.manual === '1' && params.server) return { token: '', origin: params.server }
+  const prefs = readClaimPrefs(params.p)
+  if (params.manual === '1' && params.server) return { token: '', origin: params.server, prefs }
   const token = params.claim || params.code || ''
   if (!/^[A-Za-z0-9_-]{32,100}$/.test(token) && !/^[A-HJ-NP-Z2-9]{12}$/i.test(token)) return null
-  return { token, origin: params.server || '' }
+  return { token, origin: params.server || '', prefs }
 }
 export function saveClaim(value) {
   const result = parseClaim(value)

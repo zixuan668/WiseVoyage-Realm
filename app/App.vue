@@ -6,6 +6,11 @@ export default {
   onLaunch: function() {
     console.log('App Launch')
     clearPendingClaim()
+    // 每次打开 App，路径规划都从空开始；只有本次手动加入的景点才算。
+    try { uni.removeStorageSync('scenic-selection-touched') } catch (_) {}
+    try { uni.removeStorageSync('scenic-settings-touched') } catch (_) {}
+    // 每次重新打开 App 清除上次的路线，首页不显示“继续导览”悬浮球。
+    try { uni.removeStorageSync('pending-tour-route') } catch (_) {}
   },
   onHide: function() {
     // 记录是从主界面切到后台的，回来时重新展示欢迎页。
@@ -28,6 +33,9 @@ export default {
     }
     // 冷启动先停在欢迎页，由欢迎页自己决定下一步，避免被登录/引导重定向打断。
     if (currentPage === 'pages/welcome/welcome') return
+    // 打开系统相册/相机时 App 会短暂 onHide，回来不该当成重新启动而跳欢迎页。
+    var pickerGuard = Number(uni.getStorageSync('picker-resume-guard') || 0)
+    if (pickerGuard && Date.now() - pickerGuard < 120000) return
     if (this._hiddenFromMain) {
       this._hiddenFromMain = false
       // 从后台回到主界面时也先看「Hi 颐和园」，再决定进哪个主页面。
@@ -145,4 +153,8 @@ page .page .aurora-background{background:var(--app-page-gradient)!important;back
 button.app-back-btn::after, button.nav-back::after, button.planning-back::after,
 button.detail-back::after, button.guide-back::after, button.wander-back::after { border: 0 !important; }
 
+
+/* 全局：滚动到边界不要弹簧回弹（AI导游、我的等所有页面） */
+page,html,body,uni-page-body{overscroll-behavior:none!important}
+.uni-scroll-view,.uni-page-body,.uni-page-wrapper{overscroll-behavior:none!important}
 </style>

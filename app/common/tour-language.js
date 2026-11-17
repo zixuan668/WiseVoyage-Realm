@@ -83,6 +83,7 @@ const appEnglish = {
   '景点知识': 'About this stop',
   '确定要结束本次导览吗？': 'End this tour?',
   '路线示意图': 'Route illustration',
+  '查看路线': 'View route',
   '数字导游': 'Digital guide',
   '景区导览中': 'Scenic tour',
   '回复失败': 'Could not get an answer',

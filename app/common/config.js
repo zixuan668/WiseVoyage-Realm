@@ -12,7 +12,7 @@ usbDevelopment = import.meta.env.MODE === 'development' &&
 // Android USB debugging uses adb reverse; iPhone must reach the PC over the LAN.
 let appUsbDevelopment = false
 // #ifdef APP-PLUS
-appUsbDevelopment = import.meta.env.MODE === 'development' && uni.getSystemInfoSync().platform === 'android'
+appUsbDevelopment = uni.getSystemInfoSync().platform === 'android'
 // #endif
 // A stable HTTPS endpoint can be supplied when building; local testing keeps its existing default.
 const releaseOrigin = normalizeServiceOrigin(import.meta.env.VITE_APP_SERVER_ORIGIN || '')
@@ -20,13 +20,6 @@ export let SERVER_ORIGIN = normalizeServiceOrigin(uni.getStorageSync('station-se
   ? 'http://127.0.0.1:18000'
   : LAN_SERVER_ORIGIN)
 export let BASE_URL = SERVER_ORIGIN + '/api/v1'
-
-// 景点详情页（Web 内嵌页）地址：开发时后端 18000、前端 Vite 5173。
-export function scenicWebOrigin() {
-  const explicit = String(import.meta.env.VITE_APP_SCENIC_ORIGIN || '').trim().replace(/\/$/, '')
-  if (explicit) return explicit
-  return SERVER_ORIGIN.replace(/:18000$/, ':5173')
-}
 
 export function isLocalStationOrigin(value) {
   const match = /^http:\/\/(\d{1,3}(?:\.\d{1,3}){3}):18000$/.exec(value)

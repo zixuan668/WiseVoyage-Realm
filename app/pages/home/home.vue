@@ -23,13 +23,13 @@
       <view class="dashboard-grid">
         <button v-for="item in entries" :key="item.key" class="dashboard-tile"
           :aria-label="t(item.label)" @tap="open(item.key)">
-          <DashboardIcon :name="item.icon" />
+          <view class="dashboard-tile-icon" :class="{'planning-icon':item.key==='plan'}"><DashboardIcon :name="item.icon" /></view>
           <text>{{ t(item.label) }}</text>
         </button>
       </view>
       <button class="dashboard-map" :aria-label="t('查看景区地图')" @tap="open('map')">
-        <image src="/static/park-dashboard/guide-banner.webp" mode="scaleToFill" aria-hidden="true" />
-        <text v-if="t('查看景区地图') !== '查看景区地图'" class="dashboard-map-translated">{{ t('查看景区地图') }} ›</text>
+        <view class="dashboard-map-art" aria-hidden="true"><image src="/static/park-dashboard/guide-banner.webp" mode="scaleToFill" /></view>
+        <view class="dashboard-map-content"><DashboardIcon name="map" /><view class="dashboard-divider" aria-hidden="true"></view><text>{{ t('查看景区地图') }}</text><DashboardIcon name="next" /></view>
       </button>
       <button class="dashboard-notice" :aria-label="t('官方通知')" @tap="open('notice')">
         <view class="dashboard-notice-icon"><DashboardIcon name="bell" /></view>
@@ -40,19 +40,20 @@
       </button>
     </view>
   </scroll-view>
+  <FloatingTourButton v-if="pendingRoute" :label="t('继续导览')" @activate="resumeRoute" />
 </template>
 
 <script>
-import { loadScenicCatalog } from '../../common/scenic-api.js'
+import { loadScenicCatalog, nativeCompanionUrl } from '../../common/scenic-api.js'
 import ParkHero from '../../components/ParkHero.vue'
 import DashboardIcon from '../../components/DashboardIcon.vue'
-import { CLAIM_ROUTE, parseClaim } from '../../common/station-claim.js'
+import FloatingTourButton from '../../components/FloatingTourButton.vue'
+import { CLAIM_ROUTE, parseClaim, saveClaim } from '../../common/station-claim.js'
 import { isLocalStationOrigin } from '../../common/config.js'
-import { sharedPlanUrl } from '../../common/wander-handoff.js'
 
 const entries = [
   { key: 'catalog', label: '景点图鉴', icon: 'pavilion' },
-  { key: 'plan', label: '路径规划', icon: 'itinerary' },
+  { key: 'plan', label: '路径规划', icon: 'planning' },
   { key: 'wander', label: '随心逛', icon: 'compass' },
   { key: 'featured', label: '推荐主题路线', icon: 'layers' },
   { key: 'notice', label: '官方通知', icon: 'megaphone' },
@@ -68,13 +69,18 @@ const destinations = {
 }
 
 export default {
-  components: { ParkHero, DashboardIcon },
+  components: { ParkHero, DashboardIcon, FloatingTourButton },
   props: { active: { type: Boolean, default: true } },
   emits: ['ai', 'map-change'],
   data() {
-    return { entries, pageShown: false, introStarted: false, scanning: false }
+    return { entries, pageShown: false, introStarted: false, scanning: false, pendingRoute: null }
   },
-  onShow() { this.pageShown = true; this.introStarted = true; loadScenicCatalog().catch(() => {}) },
+  onShow() {
+    this.pageShown = true
+    this.introStarted = true
+    this.loadPendingRoute()
+    loadScenicCatalog().catch(() => {})
+  },
   onHide() { this.pageShown = false },
   methods: {
     chooseRegion() { uni.showActionSheet({ itemList: [this.t('北京 · 颐和园')] }) },
@@ -84,12 +90,34 @@ export default {
       if (destinations[key]) uni.navigateTo({ url: destinations[key] })
     },
     openPlan() {
-      let url = destinations.plan
+      // 不带任何“看过”的景点；路径规划只显示用户手动加入的景点。
+      uni.navigateTo({ url: destinations.plan })
+    },
+    loadPendingRoute() {
       try {
-        const handoff = uni.getStorageSync('wander-last-handoff')
-        if (handoff) url = sharedPlanUrl(handoff)
-      } catch (_) {}
-      uni.navigateTo({ url })
+        const route = uni.getStorageSync('pending-tour-route')
+        const ids = Array.isArray(route?.ids) ? route.ids : []
+        this.pendingRoute = ids.length ? route : null
+      } catch (_) { this.pendingRoute = null }
+    },
+    resumeRoute() {
+      const route = this.pendingRoute
+      if (!route?.ids?.length) return
+      try {
+        // 已经进入过数字人讲解页时，悬浮球直接回到讲解页，不再经过「选择伴游」
+        let last = null
+        try { last = uni.getStorageSync('xingyun-last-session') } catch (_) {}
+        const sid = Number(last && last.sessionId)
+        if (Number.isInteger(sid) && sid > 0) {
+          uni.navigateTo({ url: '/pages/tour/tour?sessionId=' + sid })
+          return
+        }
+        // 没有讲解会话：打开「生成方案」后的路线结果页（含景点列表和开始导览）
+        uni.navigateTo({ url: '/pages/scenic/scenic?view=plan&result=1' })
+      } catch (error) {
+        uni.showToast({ title: this.t('路线已失效，请重新规划'), icon: 'none' })
+        this.pendingRoute = null
+      }
     },
     scan() {
       if (this.scanning) return
@@ -109,8 +137,9 @@ export default {
             uni.showToast({ title: this.t('请扫描网页上的路线领取码'), icon: 'none' })
             return
           }
-          const query = 'claim=' + encodeURIComponent(claim.token) + '&server=' + encodeURIComponent(claim.origin || '')
-          uni.navigateTo({ url: CLAIM_ROUTE + '?' + query })
+          // 走统一的 pending 记录，保留二维码里的网页端规划条件（prefs）。
+          try { saveClaim(result?.result || '') } catch (_) {}
+          uni.navigateTo({ url: CLAIM_ROUTE })
         },
         fail: error => {
           if (!String(error?.errMsg || '').includes('cancel')) uni.navigateTo({ url: CLAIM_ROUTE })
@@ -125,9 +154,9 @@ export default {
 
 <style scoped>
 .dashboard {
-  --dash-ink: #261955; --dash-accent: #7861cc;
+  --dash-ink: #282332; --dash-accent: #7861bd;
   width: 100%; height: 100%; color: var(--dash-ink);
-  background: radial-gradient(ellipse at 48% 5%, #fcfbff, #f5f3fd 68%);
+  background: #ffffff;
 }
 .dashboard-content {
   padding: var(--status-bar-height, 0px) 0 calc(76px + env(safe-area-inset-bottom));
@@ -143,6 +172,7 @@ export default {
   height: 137rpx; display: flex; align-items: flex-start; padding: 12rpx 38rpx 0;
   gap: 24rpx; box-sizing: border-box; position: relative; isolation: isolate;
 }
+.dashboard-brand,.dashboard-blossom,.dashboard-headline{filter:brightness(1.06)}
 .dashboard-brand { width: 208rpx; height: 82rpx; flex: none; }
 .dashboard-blossom {
   width: 269rpx; height: 131rpx; position: absolute; top: 0; right: 0;
@@ -168,37 +198,47 @@ export default {
 .dashboard-subtitle { display: block; margin: 14rpx 16rpx 23rpx; font-size: 25rpx; color: #8975be; letter-spacing: .055em; }
 .dashboard-grid {
   display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 20rpx 17rpx;
-  margin: 0 25rpx; padding: 20rpx 17rpx; border-radius: 30rpx;
-  background: #f9f7ffbb; box-shadow: 0 3rpx 14rpx #7461a912;
+  margin: 0 25rpx; padding: 0; border-radius: 0;
+  background: transparent; box-shadow: none;
 }
 .dashboard .dashboard-tile {
   border-radius: 31rpx; min-height: 143rpx; min-width: 0; display: flex;
-  flex-direction: column; align-items: center; justify-content: center; gap: 5rpx;
-  background: linear-gradient(145deg,#f2effd,#eeeafa); padding: 8rpx 2rpx;
+  flex-direction: column; align-items: center; justify-content: center; gap: 8rpx;
+  background: #ffffff; color: #282332; border: 1px solid #dcd3ee;
+  box-shadow: none; padding: 10rpx 2rpx;
   box-sizing: border-box; text-align: center; font-size: 24.5rpx; font-weight: 600;
   transition: transform .16s ease;
 }
+.dashboard .dashboard-tile text { color: #282332; }
 .dashboard .dashboard-tile:active, .dashboard .dashboard-map:active, .dashboard .dashboard-notice:active { transform: scale(.97); }
-.dashboard-tile :deep(.wander-icon) { width: 65rpx; height: 65rpx; color: var(--dash-accent); }
+.dashboard-tile-icon {
+  width: 70rpx; height: 70rpx; display: flex; align-items: center; justify-content: center;
+  border-radius: 22rpx; background: #f5f5f7; flex: none;
+}
+.dashboard-tile-icon.planning-icon{border-radius:50%;background:#f5f5f7;color:#7861bd}
+.dashboard-tile-icon.planning-icon :deep(.wander-icon){color:#7861bd}
+.dashboard-tile :deep(.wander-icon) { width: 46rpx; height: 46rpx; color: var(--dash-accent); }
 .dashboard .dashboard-map {
   width: calc(100% - 50rpx); height: 123rpx; display: block; position: relative;
-  margin: 29rpx 25rpx 0; border-radius: 29rpx; overflow: hidden; background: #e6e7fa;
+  margin: 29rpx 25rpx 0; border-radius: 29rpx; overflow: hidden; background: #ffffff; border:1px solid #dcd3ee;box-sizing:border-box;
   transition: transform .16s ease;
 }
 .dashboard-map image, .dashboard-map uni-image { width: 100%; height: 100%; display: block; }
-.dashboard-map-translated {
-  position: absolute; top: 0; left: 0; width: 58%; height: 100%; display: flex; align-items: center;
-  padding-left: 36rpx; box-sizing: border-box; background: linear-gradient(90deg,#e8e9fc,#e8e9fcf0);
-  font-size: 27rpx; font-weight: 600;
-}
+.dashboard-map-art{position:absolute;top:0;right:0;width:38%;height:100%;overflow:hidden;pointer-events:none;-webkit-mask-image:linear-gradient(90deg,transparent,#000 48%);mask-image:linear-gradient(90deg,transparent,#000 48%)}
+.dashboard .dashboard-map-art image{position:absolute;right:0;top:0;width:263.16%;height:100%;filter:brightness(1.06)}
+.dashboard-map-content{position:relative;z-index:1;display:flex;align-items:center;gap:18rpx;height:100%;padding:0 42rpx;color:#536379}
+.dashboard-map-content>text{font-size:30rpx;font-weight:600;white-space:nowrap;color:#282332}
+.dashboard-map-content>.dashboard-divider{height:48rpx;background:#a7b3c2}
+.dashboard-map-content :deep(.wander-icon){width:44rpx;height:44rpx;flex:none}
+.dashboard-map-content :deep(.wander-icon:first-child){width:54rpx;height:54rpx;color:var(--dash-accent)}
 .dashboard .dashboard-notice {
   display: flex; align-items: center; gap: 12rpx; width: calc(100% - 50rpx); min-height: 80rpx;
   margin: 28rpx 25rpx 0; padding: 7rpx 15rpx; border-radius: 29rpx; box-sizing: border-box;
-  border: 1px solid #e4dafa; background: #f7f3feaa; box-shadow: 0 2rpx 5rpx #7357ab18; transition: transform .16s ease;
+  border: 1px solid #dcd3ee; background: #ffffff; box-shadow: none; transition: transform .16s ease;
 }
 .dashboard-notice-icon {
   display: grid; place-items: center; width: 59rpx; height: 59rpx; flex: none;
-  border-radius: 50%; color: #7459cf; background: #eee8fd; box-shadow: 0 2rpx 5rpx #7758bd33;
+  border-radius: 50%; color: #7861bd; background: #f5f5f7; box-shadow: none;
 }
 .dashboard-notice-icon :deep(.wander-icon) { width: 33rpx; height: 33rpx; }
 .dashboard-notice-title { font-size: 25rpx; font-weight: 700; white-space: nowrap; }

@@ -10,13 +10,13 @@
 import { createRouteMap } from '../common/route-map-runtime.js'
 // #endif
 export default {
-  props:{expanded:Boolean,data:Object,original:Boolean,activeLeg:Number,currentMarker:Number,markerLabels:Object},emits:['leg','interacting'],
+  props:{expanded:Boolean,data:Object,original:Boolean,activeLeg:Number,currentMarker:Number,markerLabels:Object,selectedMarkers:Array,focus:Object},emits:['leg','interacting'],
   data(){let assetBase='./static/vendor/leaflet/'
     // #ifdef H5
     assetBase=(import.meta.env.BASE_URL||'/')+'static/vendor/leaflet/'
     // #endif
     return{assetBase,mapId:'route-road-'+Date.now()+'-'+Math.random().toString(36).slice(2,9),fitCounter:0,revision:0,loading:true,error:''}},
-  computed:{payload(){return{mapId:this.mapId,assetBase:this.assetBase,data:this.data,original:this.original,activeLeg:this.activeLeg,currentMarker:this.currentMarker,markerLabels:this.markerLabels||{},fitCounter:this.fitCounter,revision:this.revision,zoomIn:this.t('放大地图'),zoomOut:this.t('缩小地图')}}},
+  computed:{payload(){return{mapId:this.mapId,assetBase:this.assetBase,data:this.data,original:this.original,activeLeg:this.activeLeg,currentMarker:this.currentMarker,markerLabels:this.markerLabels||{},selectedMarkers:this.selectedMarkers||[],fitCounter:this.fitCounter,focus:this.focus||null,revision:this.revision,zoomIn:this.t('放大地图'),zoomOut:this.t('缩小地图')}}},
   watch:{payload:{deep:true,handler(value){
     // #ifdef H5
     this._mapController?.update(value)
@@ -63,7 +63,11 @@ update(value,old,owner){
 .route-map-wrapper{margin-top:20rpx;min-width:0;position:relative}.route-dom-map{height:460px;height:min(50vh,460px);min-height:300px;border-radius:18rpx;overflow:hidden;position:relative;isolation:isolate;background:#eff1f6}.route-map-canvas{width:100%;height:100%;position:relative;z-index:0}.route-map-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12rpx;margin-top:12rpx;color:var(--ng-secondary);font-size:22rpx;flex-wrap:wrap}.route-map-fit{margin:0;padding:3rpx 16rpx;line-height:2;font-size:24rpx;border-radius:12rpx;background:#eee9f8;color:#5d469e}.route-map-message{display:block;color:var(--ng-secondary);font-size:24rpx;line-height:1.7;margin:12rpx 0}.route-map-message button{font-size:24rpx;margin:10rpx 0;background:#f2eef8;color:#5d469e}
 .map-expanded .route-dom-map{height:78vh;min-height:240px;max-height:calc(100vh - 150px - var(--status-bar-height));border-radius:18px}
 .route-dom-map,.route-map-canvas{touch-action:none;overscroll-behavior:contain}
+.route-map-canvas :deep(.route-map-pin.selected){background:#fff;color:#5b4a9e;border:2.5px solid #6a5ae0}
 </style>
 <style scoped>
-.route-map-canvas :deep(.route-map-pin){display:grid;place-items:center;box-sizing:border-box;width:30px;height:30px;border:2.5px solid #fff;border-radius:50%;box-shadow:0 2px 8px #50428155;background:#6652bd;color:#fff;font:600 12px Arial,sans-serif}.route-map-canvas :deep(.route-map-pin.current){background:#23816b}.route-map-canvas :deep(.route-map-pin.gate){border-radius:10px;background:#23816b;font-size:18px}.route-map-canvas :deep(.leaflet-control-zoom a){color:#5b4697}.route-map-canvas :deep(.leaflet-popup-content){font:14px/1.6 system-ui,sans-serif;overflow-wrap:anywhere}.route-map-canvas :deep(.leaflet-control-container){font-family:system-ui,sans-serif}
+.route-map-canvas :deep(.route-map-pin){display:grid;place-items:center;box-sizing:border-box;width:30px;height:30px;border:2.5px solid #fff;border-radius:50%;box-shadow:0 2px 8px #50428155;background:#fff;color:#282332;border:2px solid #d9cdf8;font:600 12px Arial,sans-serif}.route-map-canvas :deep(.route-map-pin.current){background:#23816b}.route-map-canvas :deep(.route-map-pin.gate){border-radius:10px;background:#23816b;font-size:18px}.route-map-canvas :deep(.leaflet-control-zoom a){color:#5b4697}.route-map-canvas :deep(.leaflet-popup-content){font:14px/1.6 system-ui,sans-serif;overflow-wrap:anywhere}.route-map-canvas :deep(.leaflet-control-container){font-family:system-ui,sans-serif}
+.route-map-canvas :deep(.route-map-pin.selected){background:#fff;color:#5b4a9e;border:2.5px solid #6a5ae0}
+.route-map-canvas :deep(.leaflet-control-attribution){font-size:8px!important;line-height:1.2!important;color:rgba(80,78,92,.45)!important;background:rgba(255,255,255,.55)!important;padding:1px 4px!important;border-radius:4px 0 0 0!important;opacity:.75}
+.route-map-canvas :deep(.leaflet-control-attribution a){color:inherit!important;text-decoration:none!important}
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <TabDock :current="active" :progress="active" :hidden="hidden" inline @select="pick" />
+  <TabDock :current="active" :progress="active" :hidden="hidden" :inline="inline" @select="pick" />
 </template>
 <script>
 import TabDock from './TabDock.vue'
@@ -11,6 +11,8 @@ export default {
   props: {
     active: { type: Number, default: -1 },
     hidden: { type: Boolean, default: false },
+    // 二级页默认 inline；需要常驻底部时传 false。
+    inline: { type: Boolean, default: true },
   },
   methods: {
     pick(i) {

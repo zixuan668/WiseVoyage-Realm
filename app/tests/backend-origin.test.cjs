@@ -2,7 +2,7 @@ const {test}=require('node:test'),assert=require('node:assert/strict'),fs=requir
 function config(platform,mode='development',saved='',releaseOrigin=''){
   const source=fs.readFileSync(path.join(__dirname,'../common/config.js'),'utf8')
     .replace(/\/\/ #ifdef H5[\s\S]*?\/\/ #endif/g,'')
-    .replace(/import\.meta\.env\.MODE/g,JSON.stringify(mode)).replace(/import\.meta\.env\.VITE_APP_SERVER_ORIGIN/g,JSON.stringify(releaseOrigin)).replace(/import\.meta\.env\.VITE_APP_SCENIC_ORIGIN/g,"''").replace(/export /g,'')
+    .replace(/import\.meta\.env\.MODE/g,JSON.stringify(mode)).replace(/import\.meta\.env\.VITE_APP_SERVER_ORIGIN/g,JSON.stringify(releaseOrigin)).replace(/export /g,'')
   const storage=new Map([['station-server-origin',saved],['token','old-token'],['login_provider','password']])
   const context={uni:{getSystemInfoSync:()=>({platform}),getStorageSync:k=>storage.get(k),setStorageSync:(k,v)=>storage.set(k,v),removeStorageSync:k=>storage.delete(k)}}
   vm.createContext(context);vm.runInContext(source+'\nglobalThis.result={SERVER_ORIGIN,BASE_URL,LAN_SERVER_ORIGIN,assetUrl,normalizeServiceOrigin,setServiceOrigin}',context)

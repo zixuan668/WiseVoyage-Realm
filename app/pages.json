@@ -87,8 +87,9 @@
     {
       "path": "pages/mine/mine",
       "style": {
+        "app-plus": {"bounce": "none"},
         "navigationStyle": "custom",
-        "disableScroll": false,
+        "disableScroll": true,
         "navigationBarBackgroundColor": "#f8fafc",
         "navigationBarTextStyle": "black",
         "backgroundColor": "#f8fafc",
@@ -121,7 +122,10 @@
         "disableScroll": true,
         "navigationBarTextStyle": "black",
         "navigationBarBackgroundColor": "#ffffff",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#ffffff",
+        "app-plus": {
+          "softinputMode": "adjustNothing"
+        }
       }
     },
     {

@@ -82,6 +82,7 @@ export interface StationPlanningInput {
   skip_ids?: number[]
   dwell_minutes?: Record<number, number>
   interest_weights?: Partial<Record<StationTheme, number>>
+  interest?: 'all' | 'history' | 'nature' | 'photo' | 'family'
   fill_time?: boolean
   start_time?: string
   exit_by?: string

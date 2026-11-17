@@ -57,6 +57,7 @@ export function nativeCompanionUrl(ids, plan = {}) {
     + '&startArea=' + (areas.includes(plan.start_area) ? plan.start_area : 'auto')
     + '&endArea=' + (areas.includes(plan.end_area) ? plan.end_area : 'auto')
     + '&avoidSteps=' + (plan.avoid_steps ? '1' : '0') + '&pace=' + (plan.pace === 'relaxed' ? 'relaxed' : 'standard')
+    + '&autoStart=1'
 }
 export function parseNativePlan(query) {
   if (query?.nativePlan !== '1') return null
@@ -65,4 +66,48 @@ export function parseNativePlan(query) {
   const areas = ['auto','east','north','south']
   return {spot_ids:ids, start_area:areas.includes(query.startArea)?query.startArea:'auto',
     end_area:areas.includes(query.endArea)?query.endArea:'auto', avoid_steps:query.avoidSteps === '1',pace:query.pace === 'relaxed'?'relaxed':'standard'}
+}
+export async function startTourSession(ids, planning = {}, pickedGuideId = 0) {
+  const token = uni.getStorageSync('token') || ''
+  if (!token) throw new Error('请先登录')
+  const request = (path, options = {}) => new Promise((resolve, reject) => {
+    uni.request({
+      url: SERVER_ORIGIN + '/tour-session' + path,
+      method: options.method || 'GET',
+      data: options.data || {},
+      timeout: 15000,
+      header: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token, ...(options.headers || {}) },
+      success(response) {
+        if (response.statusCode >= 200 && response.statusCode < 300) { resolve(response.data); return }
+        const body = response.data || {}, detail = body.detail || body.message
+        reject(new Error(typeof detail === 'string' ? detail : '服务暂不可用，请重试'))
+      },
+      fail() { reject(new Error('网络连接失败，请重试')) },
+    })
+  })
+  const guides = await request('/guides?language=zh')
+  const list = guides?.data?.guide_list || guides?.guide_list || []
+  if (!list.length) throw new Error('暂无可用伴游')
+  // 游客在「伴游选择」里挑的数字人优先，没挑时用默认第一位。
+  const picked = list.find((guide) => Number(guide.guide_id) === Number(pickedGuideId))
+  const guideId = (picked || list[0]).guide_id
+  const payload = {
+    preferences: ['comprehensive'],
+    time_budget_minutes: Math.min(480, Math.max(15, Math.ceil(Number(planning.total_minutes) || 120))),
+    pace: planning.pace === 'relaxed' ? 'relaxed' : 'standard',
+    start_area: planning.start_area || 'auto',
+    end_area: planning.end_area || 'auto',
+    avoid_steps: !!planning.avoid_steps,
+  }
+  const created = await request('/visitor-create?name=' + encodeURIComponent('游客导览') + '&guide_id=' + guideId
+    + '&visitor_preferences=' + encodeURIComponent('')
+    + '&spot_ids=' + encodeURIComponent(JSON.stringify(ids || []))
+    + '&planning=' + encodeURIComponent(JSON.stringify(payload)), { method: 'POST' })
+  const body = created?.data || created || {}
+  const sid = body.session_id
+  if (!sid) throw new Error(body.message || '创建导览失败，请重试')
+  const access = body.avatar_access_token || ''
+  if (access) { try { uni.setStorageSync('xingyun-tour-' + sid, access) } catch (_) {} }
+  await request('/start/' + sid, { method: 'PUT', headers: access ? { 'X-Tour-Access': access } : {} })
+  return sid
 }

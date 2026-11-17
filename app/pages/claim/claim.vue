@@ -25,13 +25,13 @@
 import { BASE_URL, SERVER_ORIGIN, setStationServerOrigin, isLocalStationOrigin, assetUrl } from '../../common/config.js'
 import { pendingClaim, saveClaim, clearPendingClaim } from '../../common/station-claim.js'
 export default {
-  data() { return { code:'', origin:'', scanned:false, busy:false, error:'',snapshot:null,guides:[],pickedGuideId:0,failedImages:{} } },
+  data() { return { code:'', origin:'', scanned:false, busy:false, error:'',snapshot:null,guides:[],pickedGuideId:0,failedImages:{},claimPrefs:null } },
   // 支持两种进入方式：App 扫码后带参数跳转，或系统扫码/剪贴板唤起时读取待领取记录。
   onLoad(options) {
     const decode=v=>{try{return decodeURIComponent(String(v||''))}catch(_){return String(v||'')}}
     const query=options&&options.claim?{token:decode(options.claim),origin:decode(options.server||'')}:null
     const pending=query||pendingClaim()
-    if(pending) { this.code=pending.token||pending.code||''; this.origin=pending.origin||''; this.scanned=!!this.code }
+    if(pending) { this.code=pending.token||pending.code||''; this.origin=pending.origin||''; this.scanned=!!this.code; this.claimPrefs=pending.prefs||null }
   },
   onReady() { if(this.scanned) this.prepare() },
   onUnload() {this._disposed=true;this._version=(this._version||0)+1;(this._requests||[]).forEach(task=>task?.abort())},
@@ -64,7 +64,7 @@ export default {
     scan() {
       uni.scanCode({onlyFromCamera:true,success:result=>{
         if(this._disposed)return
-        try { const pending=saveClaim(result.result); this.code=pending.token; this.origin=pending.origin; this.scanned=true; this.error=''; this.prepare() }
+        try { const pending=saveClaim(result.result); this.code=pending.token; this.origin=pending.origin; this.claimPrefs=pending.prefs||null; this.scanned=true; this.error=''; this.prepare() }
         catch(e) { this.error=e.message }
       },fail:()=>{this.error='扫码未完成，可以输入领取码'}})
     },
@@ -76,6 +76,14 @@ export default {
       if(!/^[A-HJ-NP-Z2-9]{12}$/i.test(token)&&!/^[A-Za-z0-9_-]{32,100}$/.test(token)){this.error='领取码格式不正确';return}
       const origin=this.origin||SERVER_ORIGIN
       if(!isLocalStationOrigin(origin)){this.error='只允许连接局域网电脑的18000端口';return}
+      // 二维码里带了网页端的规划条件：直接进入 App「路径规划」页回填，伴游由游客自己选。
+      if(this.claimPrefs){
+        if(!uni.getStorageSync('token')){this.signIn();return}
+        try { uni.setStorageSync('web-plan-prefill', this.claimPrefs) } catch(_) {}
+        clearPendingClaim()
+        uni.reLaunch({ url: '/pages/scenic/scenic?view=plan&prefill=1' })
+        return
+      }
       const receipt=this.receipt(),version=this._version=(this._version||0)+1
       // 同一台电脑可能同时有局域网 IP 和 USB 反向代理地址；先看当前连接的电脑上有没有这张领取码，
       // 有就直接领取，避免无谓地切换地址并重新登录。

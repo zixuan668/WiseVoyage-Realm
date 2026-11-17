@@ -56,7 +56,7 @@ async def verify_answer(answer,grounded_answer,evidence,model, *, question=""):
         {'role':'user','content':json.dumps({'segments':[{ 'segment':i,'text':s} for i,s in enumerate(segments,1)],
                                           'evidence':records, 'question':question},ensure_ascii=False)}]
     try:
-        text=await asyncio.wait_for(model(prompt,timeout=12),timeout=13)
+        text=await asyncio.wait_for(model(prompt,timeout=25),timeout=26)
         text=re.sub(r'^```(?:json)?\s*|\s*```$','',text.strip())
         review=json.loads(text)
         passed=validate_review(review,segments,records) and (not question or review.get("answers_question") is True)

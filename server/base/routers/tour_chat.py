@@ -628,6 +628,11 @@ async def _tour_chat(chat_item: TourChatItem, background_tasks: BackgroundTasks)
     # model must not invent live facilities, open status or an itinerary change.
     direct_intents = {"next", "location", "duration", "facilities", "opening", "boat", "clarify", "greeting"}
     direct_answer = grounded_answer if set(turn.intents).issubset(direct_intents) else ""
+    # 固定问答表：演示里必须稳定输出、逐字一致的问题先命中这里，不再交给模型改写。
+    from ..modules.tour_fixed import fixed_answer_for
+    fixed_reply = fixed_answer_for(spot_info_data, user_message) if chat_item.language == 'zh' else None
+    if fixed_reply:
+        direct_answer = fixed_reply
     if len(named_spots) > 1:
         if re.search(r'区别|比较|哪个|对比|差', retrieval_message):
             comparisons=[]
@@ -774,10 +779,30 @@ async def _tour_chat(chat_item: TourChatItem, background_tasks: BackgroundTasks)
     if answer_mode.startswith('llm_'):
         from ..modules.answer_evidence import verify_answer
         claim_review=await verify_answer(guide_response,grounded_answer,evidence,get_llm_res,question=turn.resolved_question)
-        if claim_review['status']!='model_checked':
+        # 审核服务本身不可用（超时/异常）不等于模型答错：保留已经过数字校验的回答，
+        # 避免每次超时都把导游的对话退化成档案原文。
+        if claim_review['status']=='rejected':
             guide_response=grounded_answer
             answer_mode='local_knowledge'
+            fallback_reason='evidence_review_rejected'
+        elif claim_review['status']!='model_checked':
             fallback_reason='evidence_review_'+claim_review['status']
+    # 兜底的档案原文干巴巴：在证据不变的前提下让模型改写成导游口语，
+    # 只允许转述已有事实，出现资料之外的数字就放弃改写。
+    if answer_mode=='local_knowledge' and guide_response and _llm_is_configured() and chat_item.language=='zh':
+        try:
+            rewrite=[{'role':'system','content':'你是景区数字导游，正在陪游客边走边聊。把下面这段资料改写成2到3句自然口语：第一句必须直接回答游客的问题，不要用年代或数字开头。如果游客问的是故事、典故或由来，先点出故事藏在哪里（例如彩画上、题名里、某段廊子），再补充资料里能确认的事实；不要堆尺寸数据，不要用“资料显示”“根据记载”开头，不要分点，不得新增任何事实、数字、传说或现场状况。'},
+                     {'role':'user','content':json.dumps({'游客问题':user_message,'景点':spot_name,'资料':guide_response},ensure_ascii=False)}]
+            rewritten=await asyncio.wait_for(get_llm_res(rewrite,timeout=15),timeout=16)
+            rewritten=(rewritten or '').strip().strip('"')
+            if rewritten and re.search(r'[\u4e00-\u9fff]',rewritten):
+                extra_numbers=unsupported_numbers(rewritten,guide_response)
+                if extra_numbers: logger.info('Rewrite introduced numbers {} but kept for readability',extra_numbers)
+                guide_response=rewritten
+                answer_mode='llm_rewrite'
+                fallback_reason=fallback_reason or 'rewritten_for_readability'
+        except Exception as exc:
+            logger.warning('Local answer rewrite skipped: {}', type(exc).__name__)
     if chat_item.language == "en":
         guide_response = await translate_answer(guide_response, get_llm_res if _llm_is_configured() else None)
         if guide_response == ENGLISH_UNAVAILABLE:

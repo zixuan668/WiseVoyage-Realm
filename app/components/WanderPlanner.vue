@@ -24,7 +24,7 @@
         </view>
         <template v-if="stage==='explore'">
           <text class="wander-section-title style-heading">{{ t('这次想怎么逛？') }}</text>
-          <button v-for="option in walkingStyles" :key="option.value" class="wander-link style-choice" :aria-pressed="walkStyle===option.value" @tap="walkStyle=option.value">
+          <button v-for="option in walkingStyles" :key="option.value" class="wander-link style-choice" :aria-pressed="walkStyle===option.value" @tap="pickWalkStyle(option.value)">
             <view class="wander-symbol"><WanderIcon :name="option.icon" /></view><text>{{ t(option.label) }}</text>
             <WanderIcon :name="walkStyle===option.value?'check':'next'" />
           </button>
@@ -51,12 +51,13 @@
         </template>
 
         <template v-else-if="stage==='time'">
-          <view class="wander-intro"><view class="wander-intro-symbol"><WanderIcon name="leaf" /></view><text>{{ t('给自己留一点随意') }}</text></view>
-          <view class="wander-section-title"><WanderIcon name="clock" /><text>{{ t('想为这一段留多久？') }}</text></view>
-          <view class="wander-times">
-            <button v-for="option in durations" :key="option.value" :id="'wander-time-'+option.value" :aria-pressed="budget===option.value" @tap="budget=option.value">
-              <WanderIcon name="walk" />{{ t(option.label) }}
-            </button>
+          <view class="wander-time-stage">
+            <view class="wander-intro"><view class="wander-intro-symbol"><WanderIcon name="leaf" /></view><text>{{ t('给自己留一点随意') }}</text></view>
+            <view class="wander-times">
+              <button v-for="option in durations" :key="option.value" :id="'wander-time-'+option.value" :aria-pressed="budget===option.value" @tap="budget=option.value">
+                <WanderIcon name="walk" />{{ t(option.label) }}
+              </button>
+            </view>
           </view>
         </template>
 
@@ -121,10 +122,7 @@
       <text v-if="['recommended','preview'].includes(stage) && routeWarning" class="wander-notice">{{ t(routeWarning) }}</text>
       <button v-if="stage==='featuredDetail'" class="wander-primary" @tap="useFeatured">{{ t('选择此路线') }}</button>
       <button v-if="stage==='explore'" class="wander-primary" :disabled="!walkStyle" @tap="go('time')">{{ t('选择游览时长') }}</button>
-      <view v-if="stage==='time'" class="wander-time-actions">
-        <button class="wander-primary" :disabled="arranging || saved" @tap="chooseTimeCard">{{ t(saved?'已存入':(arranging?'正在安排…':'存入导览路线')) }}</button>
-        <button class="wander-secondary wander-home" @tap="$emit('exit')">{{ t('返回首页') }}</button>
-      </view>
+      <button v-if="stage==='time'" class="wander-primary" :disabled="arranging" @tap="viewRoute">{{ t(arranging?'正在规划…':'查看路线') }}</button>
       <button v-if="stage==='settings'" class="wander-primary" :disabled="arranging" @tap="generate()"><WanderIcon name="route" />{{ t(arranging?'正在安排…':'继续安排') }}</button>
       <view v-if="stage==='recommended'" class="wander-footer-row">
         <button class="wander-secondary" @tap="back">{{ t(mode==='blind'?'重新选择':'去修改') }}</button>
@@ -304,10 +302,30 @@ export default {
       this.budget=value
       return this.generate([],true)
     },
+    pickWalkStyle(value) {
+      if (!value) return
+      // 重复点击同一项保持选中，不再取消
+      this.walkStyle = value
+    },
     chooseTimeCard() {
       const value=this.budget
       this.cardOrigin('#wander-time-'+value,()=>{
         if (this.stage==='time' && this.budget===value) this.chooseTime(value)
+      })
+    },
+    viewRoute() {
+      if (this.arranging) return
+      this.generate([], false, true).then(result => {
+        if (!result || !this.ids.length) return
+        const areas=['auto','east','north','south'], plan=this.planning||{}
+        const handoff={ids:this.ids.slice(),planning:{...plan},senior:this.senior,child:this.child}
+        try { uni.setStorageSync('wander-last-handoff', handoff) } catch (_) {}
+        const url='/pages/scenic/scenic?view=plan&spotIds='+this.ids.join(',')
+          +'&elderly='+(this.senior?'1':'0')+'&children='+(this.child?'1':'0')
+          +'&avoidSteps='+(plan.avoid_steps?'1':'0')
+          +'&startArea='+(areas.includes(plan.start_area)?plan.start_area:'auto')
+          +'&endArea='+(areas.includes(plan.end_area)?plan.end_area:'auto')
+        uni.navigateTo({url,fail:()=>uni.showToast({title:this.t('打开路线失败，请重试'),icon:'none'})})
       })
     },
     locationEntry() {
@@ -416,7 +434,7 @@ export default {
       }
       return this.t('预计游览 {minutes} 分钟，适合这次的时长。',time)
     },
-    generate(skip=[], locate=false) {
+    generate(skip=[], locate=false, quiet=false) {
       if(this.mode==='featured')return this.arrange(version=>this.buildPreview(this.featured.spot_ids,version),'preview')
       return this.arrange(async version=>{
         if (locate) {
@@ -462,7 +480,7 @@ export default {
           const handoff = { ids:this.ids.slice(), planning:{...this.planning}, senior:this.senior, child:this.child }
           try { uni.setStorageSync('wander-last-handoff', handoff) } catch (_) {}
           this.saved = true
-          this.showWanderToast(this.t('已存入，可在首页「路径规划」查看'))
+          if (!quiet) this.showWanderToast(this.t('已存入，可在首页「路径规划」查看'))
         }
         return result
       })
@@ -713,4 +731,16 @@ export default {
   text-overflow: ellipsis;
 }
 
+.wander-planner .wander-header{height:62px!important;min-height:0!important;max-width:none!important;margin:0!important;padding:0 14px!important;display:flex!important;align-items:center!important}
+.wander-planner .wander-header>.wander-square.wander-back{position:absolute!important;left:14px!important;top:50%!important;transform:translateY(-50%)!important;margin:0!important;z-index:3!important}
+.wander-planner .wander-title{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;font-size:18px!important;font-weight:600!important;line-height:1.4!important;color:#2a2438!important;max-width:calc(100% - 120px)!important;white-space:nowrap!important;text-align:center!important}
+.wander-planner .wander-intro{text-align:center!important}
+.wander-planner .wander-section-title.time-heading{justify-content:center!important;text-align:center!important;gap:6px!important}
+.wander-planner .wander-times button{justify-items:center!important;align-content:center!important;justify-content:center!important;text-align:center!important;gap:8px!important}
+.wander-planner .wander-times button .wander-icon{margin:0 auto!important}
+.wander-planner .style-choice .wander-symbol{background:#fff!important;color:#6547ad!important;border:1px solid #cbbcf0!important;box-shadow:none!important}
+.wander-planner .style-choice[aria-pressed="true"]{background:#fff!important;box-shadow:inset 0 0 0 2rpx #6a5ae0, 0 10rpx 24rpx -28rpx rgba(64,44,120,.35)!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.wander-planner .style-choice[aria-pressed="true"] .wander-symbol{background:#fff!important;color:#5b49c9!important;border:1px solid #8b78e6!important;box-shadow:none!important}
+.wander-planner .wander-time-stage{display:flex!important;flex-direction:column!important;margin-top:14vh!important}
+.wander-planner .wander-time-stage .wander-intro{padding:0 0 22px!important;text-align:center!important}
 </style>

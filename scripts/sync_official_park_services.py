@@ -45,8 +45,6 @@ async def main():
     changed=[]
     with Session(DB_ENGINE) as db:
         spots=db.exec(select(ScenicSpotInfo).where(ScenicSpotInfo.delete==False)).all()
-        campus=next((s for s in spots if s.spot_name in ('致远楼','智远楼')),None)
-        test_point={'name':campus.spot_name,'id':campus.spot_id,'exists':True,'trigger_radius':campus.trigger_radius} if campus else {'exists':False}
         formal=[s for s in spots if s.spot_name in book['spots'] and s.city in ('北京','北京市') and 39.97<s.latitude<40.02 and 116.24<s.longitude<116.30]
         backup_rows=[s.model_dump(mode='json') for s in formal]
         (backup/'spots.json').write_text(json.dumps(backup_rows,ensure_ascii=False,indent=2),encoding='utf8')
@@ -99,7 +97,6 @@ async def main():
         db.commit()
     report={'checked_at':services['checked_at'],'formal_spots':changed,'facility_categories':len(services['categories']),
         'knowledge_index_version':prepared.index_version,'backup':str(backup),
-        'test_point':test_point,
         'note':'未将官网像素坐标转换为GPS，未将全园设施归属到单个景点。'}
     (ROOT/'outputs/scenic-knowledge-audit.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf8')
     print('Updated',len(changed),'formal scenic dossiers;',len(services['categories']),'official facility categories; index',prepared.index_version)

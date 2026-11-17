@@ -398,8 +398,10 @@ onMounted(() => {
   top: 0;
   z-index: 10;
   background: var(--glass);
-  padding: 10px 0;
-  border-bottom: 1px solid var(--glass-line);
+  padding: 10px 16px;
+  border: 1px solid var(--glass-line);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(15, 95, 102, 0.06);
 }
 
 .page-title {
