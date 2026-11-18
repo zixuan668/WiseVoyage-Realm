@@ -1122,12 +1122,13 @@ export default {
 .plan-facts view{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
 .plan-facts text{font-size:12px;color:#6f6685;line-height:1.5}
 .plan-facts .fact-value{font-size:18px;font-weight:600;color:#241c36;font-variant-numeric:tabular-nums;line-height:1.4}
-.plan-stops-scroll{height:clamp(240px,40vh,420px);margin:10px 12px 6px;border-radius:16px;background:#fff;overflow:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.plan-stops{margin:0;padding:0 14px;background:#fff;border-radius:16px}
+.plan-stops-scroll{height:clamp(240px,40vh,420px);width:calc(100% - 24px);margin:10px auto 6px;box-sizing:border-box;border-radius:16px;background:#fff;overflow:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.plan-stops{margin:0;padding:0 14px 26px;background:#fff;border-radius:16px}
 .plan-stop-grip{width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#241c36;opacity:.5;user-select:none;-webkit-user-select:none;transition:transform .12s ease,opacity .12s ease,background-color .12s ease}
 .plan-stop-grip-on,.plan-stop-grip.is-pressed{background:#f3efff;opacity:.85;transform:scale(.94)}
 .plan-stop-grip .iconfont,.plan-stop-remove .iconfont{font-size:18px;line-height:1;color:inherit}
 .plan-stop{display:flex;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid #f0edf7}
+.plan-stops > .plan-stop:first-child{border-top:1px solid #f0edf7}
 .plan-stop:last-child{border-bottom:0}
 .plan-stop-no{width:24px;height:24px;flex:none;display:grid;place-items:center;border-radius:50%;background:#ece7fb;color:#5b48a4;font-size:13px;font-variant-numeric:tabular-nums}
 .plan-stop-name{flex:1;min-width:0;font-size:16px;font-weight:500;color:#241c36;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

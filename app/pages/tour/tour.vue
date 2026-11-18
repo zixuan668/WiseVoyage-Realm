@@ -6,8 +6,8 @@
     <NocturneConfirm v-if="showEndConfirm" plain :title="t('结束导览')" :content="t('确定要结束本次导览吗？')" :cancel-label="t('取消')" :confirm-label="t('确定')" @cancel="showEndConfirm=false" @confirm="endTour" />
     <!-- 导航栏 -->
     <view class="nav" :style="{paddingTop:statusH+'px'}">
-      <view class="nav-orb-spacer" aria-hidden="true"></view>
-      <FloatingHomeOrb :top="statusH+8" />
+      <view class="nav-orb-spacer" :style="{width:orbSize+'px',height:orbSize+'px'}" aria-hidden="true"></view>
+      <FloatingHomeOrb :top="orbTop" :size="orbSize" />
       <view class="nav-right">
         <view v-if="remainingDuration>0" class="nav-remaining"><text class="nav-remaining-text">{{ t('预计剩余约 {minutes} 分钟',{minutes:remainingDuration}) }}</text></view>
         <view class="nav-end" @tap="confirmEnd" role="button" :aria-label="t('结束导览')"><text class="nav-end-text">{{ t('结束') }}</text></view>
@@ -155,6 +155,7 @@ import TourRouteRepair from '../../components/TourRouteRepair.vue'
 import { isRouteChange, repairDefaults } from '../../common/route-planning.js'
 import TourXingyun from '../../components/tour-xingyun.vue'
 import FloatingHomeOrb from '../../components/FloatingHomeOrb.vue'
+
 import { prepareNativeGuideAudio } from '../../common/avatar-audio.js'
 import { BASE_URL, assetUrl, isBeijingCity } from '../../common/config.js'
 import { appendTourChatMessage } from '../../common/tour-chat-log.js'
@@ -224,6 +225,8 @@ export default {
     'spotCards.length': function() { this._progressPos=0; this.progressScrollLeft=0; this.fadeLeft=false; this.fadeRight=false; this.progressContentW=0; this.progressActive=this.spotIdx; this.measureProgress() },
   },
   computed: {
+    orbSize(){const i=uni.getWindowInfo?uni.getWindowInfo():uni.getSystemInfoSync();return Math.round(72*(i.windowWidth||375)/750)},
+    orbTop(){return Number(this.statusH)||20},
     viewSpotId: function () {
       var s = this.spotCards && this.spotCards[this.spotIdx]
       return (s && s.spot_id) || this.liveCurrentId || 0
@@ -1128,6 +1131,7 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
 .nav-end{margin-left:auto;height:64rpx;min-width:64rpx;padding:0 24rpx;border-radius:32rpx;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(255,255,255,.96),rgba(248,246,255,.9));border:1rpx solid rgba(139,120,230,.4);box-shadow:inset 0 1rpx 0 #fff,0 8rpx 20rpx -12rpx rgba(90,70,180,.3);font-size:26rpx;color:#4a3aa8;flex-shrink:0;transition:transform 160ms cubic-bezier(.2,.8,.2,1)}
 .nav-end:active{transform:scale(.96)}
 .nav-end-text{font-size:26rpx;color:#4a3aa8}
+
 .nav-gps{width:56rpx;height:56rpx;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(99,102,241,0.06);font-size:26rpx;color:var(--ng-secondary);flex-shrink:0}
 .nav-gps.on{background:rgba(99,102,241,0.25);box-shadow:0 0 0 4rpx rgba(99,102,241,0.08)}
 
