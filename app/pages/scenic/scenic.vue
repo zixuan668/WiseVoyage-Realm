@@ -3,7 +3,7 @@
     <view class="scenic-nav" :class="{'nav-planner':panel==='plan'}">
       <button class="app-back-btn" :aria-label="t('返回')" @tap="goBack"><view class="app-back-icon"></view></button>
       <text class="nav-page-title">{{ t(panel==='plan'?'路径规划':panel==='catalog'?'全部景点':panel==='list'?'已选景点':'景点图鉴') }}</text>
-      <button v-if="panel==='plan'&&planOverview" class="nav-start" :disabled="busy||!planOverview.complete" @tap="chooseGuide"><text class="iconfont icon-play" aria-hidden="true"></text><text>{{ t('开始导览') }}</text></button>
+      <button v-if="panel==='plan'&&showPlanResult" class="nav-start" :disabled="busy||!planOverview||!planOverview.complete" @tap="chooseGuide"><text class="iconfont icon-play" aria-hidden="true"></text><text>{{ t('开始导览') }}</text></button>
       <view v-else-if="panel==='plan'" class="nav-placeholder" aria-hidden="true"></view>
       <button v-else class="nav-more" :aria-label="t('更多操作')" :aria-expanded="menuOpen" @tap="menuOpen=!menuOpen"><text class="iconfont icon-more" aria-hidden="true"></text></button>
     </view>
@@ -65,7 +65,7 @@
       <text v-if="!catalog.length&&loadingHintVisible&&!catalogError&&!loading" class="list-note">{{ t('暂无可用景点') }}</text>
     </scroll-view>
 
-    <scroll-view v-else class="plan-scroll" :scroll-y="stops.length>0&&!dragging&&!mapInteracting&&!planDragActive" :show-scrollbar="false">
+    <scroll-view v-else class="plan-scroll" :scroll-y="stops.length>0&&!dragging&&!mapInteracting&&!planDragActive&&!showPlanResult" :show-scrollbar="false">
       <view v-if="draftError" class="inline-error"><text>{{ t(draftError) }}</text><button @tap="refreshDraft">{{ t('重试') }}</button></view>
       <view v-if="!draftReady&&loadingHintVisible" class="planner-skeleton" aria-busy="true">
         <view class="ps-map sk-block"></view>
@@ -102,7 +102,7 @@
                 <text class="sp-field-label">想优先看什么</text>
                 <view class="sp-interest"><button v-for="item in spInterests" :key="item.v || 'all'" :class="{on:stationPlanner.interest===item.v}" @tap="pickStationInterest(item.v)">{{ t(item.l) }}</button></view>
                 <text class="sp-field-label">步行速度</text>
-                <view class="sp-gate-row"><button class="sp-gate-chip" :class="{on:stationPlanner.pace!=='relaxed'}" @tap="stationPlanner.pace='standard'">标准</button><button class="sp-gate-chip" :class="{on:stationPlanner.pace==='relaxed'}" @tap="stationPlanner.pace='relaxed'">慢行多休息</button></view>
+                <view class="sp-gate-row"><button class="sp-gate-chip" :class="{on:stationPlanner.pace!=='relaxed'}" @tap="pickStationPace('standard')">标准</button><button class="sp-gate-chip" :class="{on:stationPlanner.pace==='relaxed'}" @tap="pickStationPace('relaxed')">慢行多休息</button></view>
               </view>
             </view>
             <view v-show="spFilter==='spots'" class="sp-section">
@@ -112,25 +112,25 @@
               <view class="sp-spot-chips"><button v-for="place in catalog" :key="place.id" :class="{on:selectedIds.includes(place.id)}" @tap="quickToggleStop(place.id)">{{ t(place.name) }}</button></view>
             </view>
             <view v-show="spFilter==='extra'" class="sp-section">
-              <textarea :adjust-position="false" :disable-scroll="true" :cursor-spacing="0" class="sp-extra" :value="stationPlanner.extra" placeholder="（选填）例如：少走路、想看海棠、带婴儿车" @focus="onExtraFocus" @input="stationPlanner.extra=$event.detail.value" />
+              <view class="sp-extra-display">
+                <input class="sp-extra-input" :value="stationPlanner.extra" placeholder="（选填）例如：少走路、想看海棠、带婴儿车" placeholder-style="color:#a9a2ba;font-size:13px" @input="stationPlanner.extra=$event.detail.value" @focus="onExtraFocus" />
+              </view>
             </view>
             <view v-show="spFilter==='companion'" class="sp-section">
-              <view class="sp-guide-grid"><button v-for="g in guides" :key="g.guide_id" class="sp-guide-card" :class="{on:pickedGuide&&pickedGuide.guide_id===g.guide_id}" @tap="pickedGuide=g"><image v-if="g.poster_image||g.avatar" :src="g.poster_image||g.avatar" mode="aspectFit" /><text>{{ g.name }}</text></button></view>
+              <view class="sp-guide-grid"><button v-for="g in guides" :key="g.guide_id" class="sp-guide-card" :class="{on:pickedGuide&&pickedGuide.guide_id===g.guide_id}" @tap="pickGuide(g)"><image :src="guideImage(g)" mode="aspectFit" @error="failedGuideImages[g.guide_id]=true" /><text>{{ g.name }}</text></button></view>
             </view>
 
             <view v-if="stationPlans.length" class="sp-results">
-              <view class="sp-plan-tabs"><button v-for="(plan,index) in stationPlans" :key="plan.kind" :class="{on:stationPlanIndex===index}" @tap="chooseStationPlan(index)">{{ tourLanguage==='en'?(plan.title_en||plan.title):plan.title }}</button></view>
               <view v-if="stationPlan" class="sp-plan-summary">
                 <view><text>{{ t('全程步行') }}</text><text class="sp-fact">{{ t('{n} 分钟',{n:stationPlan.route.walking_minutes}) }}</text></view>
                 <view><text>{{ t('路线距离') }}</text><text class="sp-fact">{{ Math.round((stationPlan.route.walking_meters||0)/10)/100 }} km</text></view>
                 <view><text>{{ t('总时长') }}</text><text class="sp-fact">{{ t('{n} 分钟',{n:stationPlan.route.total_minutes}) }}</text></view>
               </view>
               <view v-if="stationPlan" class="sp-stops"><view v-for="(stop,index) in stationPlan.route.stops" :key="stop.spot_id" class="sp-stop"><text class="sp-stop-no">{{ index+1 }}</text><text class="sp-stop-name">{{ t(stop.spot_name) }}</text><text class="sp-stop-time">{{ t('{n} 分钟',{n:stop.visit_minutes}) }}</text></view></view>
-              <button class="sp-start" @tap="startStationPlan">{{ t('开始导览') }}</button>
             </view>
           </view>
           <view class="sp-foot">
-            <button class="sp-generate" :disabled="stationPlanBusy" @tap="generateStationPlans">{{ stationPlanBusy ? t('正在生成…') : t('查看路线') }}</button>
+            <button class="sp-generate" :class="{incomplete:!canGenerate}" :disabled="stationPlanBusy" @tap="onGenerateTap">{{ stationPlanBusy ? t('正在生成…') : t('查看路线') }}</button>
           </view>
         </view>
         <template v-else-if="showPlanResult">
@@ -146,13 +146,24 @@
                 <view><text>{{ t('路线距离') }}</text><text class="fact-value">{{ planDistance }}</text></view>
                 <view><text>{{ t('总时长') }}</text><text class="fact-value">{{ planFact(planOverview.total_minutes) }}</text></view>
               </view>
-              <view class="plan-stops" @touchmove.stop="onPlanDragMove" @touchend="onPlanDragEnd" @touchcancel="onPlanDragEnd">
-                <view v-for="(stop,index) in planStops" :key="stop.spot_id" class="plan-stop" :class="{dragging:planDragActive&&planDragIndex===index}" :style="planDragStyle(index) || planShiftStyle(index)" @touchstart="onPlanStopTouchStart" @touchmove.stop="onPlanDragMove" @touchend.stop="onPlanDragEnd" @touchcancel.stop="onPlanDragEnd" @longpress="startPlanDrag(index,$event)">
-                  <text class="plan-stop-no">{{ index+1 }}</text>
-                  <text class="plan-stop-name">{{ t(stop.spot_name) }}</text>
-                  <text class="plan-stop-stay">{{ planFact(stop.visit_minutes) }}</text>
-                  <button class="plan-stop-remove" :disabled="busy" :aria-label="t('移除')" @tap="toggleStop(stop.spot_id)"><text class="iconfont icon-close" aria-hidden="true"></text></button>
+              <scroll-view class="plan-stops-scroll" :scroll-y="true" :scroll-top="planScrollTop" :show-scrollbar="false" :enhanced="true" :bounces="false" @scroll="onPlanStopsScroll">
+                <view class="plan-stops">
+                  <view v-for="(stop,index) in planStops" :key="stop.spot_id" class="plan-stop" :class="{dragging:planDragActive&&planDragIndex===index,ghosted:!!planGhost&&planDragIndex===index}" :style="planShiftStyle(index)">
+                    <text class="plan-stop-no">{{ index+1 }}</text>
+                    <text class="plan-stop-name">{{ t(stop.spot_name) }}</text>
+                    <text class="plan-stop-stay">{{ planFact(stop.visit_minutes) }}</text>
+                    <view class="plan-stop-grip" :class="{'is-pressed':planDragActive&&planDragIndex===index}" hover-class="plan-stop-grip-on" :hover-stay-time="80" @touchstart.stop="onPlanGripTouchStart(index,$event)" @touchmove.stop="onPlanGripTouchMove($event)" @touchend.stop="onPlanGripTouchEnd($event)" @touchcancel.stop="onPlanGripTouchCancel($event)"><text class="iconfont icon-drag" aria-hidden="true"></text></view>
+                    <button class="plan-stop-remove" :disabled="busy" :aria-label="t('移除')" @tap="toggleStop(stop.spot_id)"><text class="iconfont icon-close" aria-hidden="true"></text></button>
+                  </view>
                 </view>
+              </scroll-view>
+              <!-- 长按把手后跟手的悬浮条；固定定位，不受列表滚动窗口裁剪。 -->
+              <view v-if="planGhost" class="plan-stop plan-stop-floating" :style="planGhostStyle()" aria-hidden="true">
+                <text class="plan-stop-no">{{ planDragIndex+1 }}</text>
+                <text class="plan-stop-name">{{ planDragSpot ? t(planDragSpot.spot_name) : '' }}</text>
+                <text class="plan-stop-stay">{{ planDragSpot ? planFact(planDragSpot.visit_minutes) : '' }}</text>
+                <view class="plan-stop-grip is-pressed"><text class="iconfont icon-drag"></text></view>
+                <view class="plan-stop-remove"><text class="iconfont icon-close"></text></view>
               </view>
               <view v-if="!planOverview.complete" class="plan-warning"><text>{{ t('部分路段无法确认可步行路径，请调整景点或通行条件。') }}</text></view>
             </template>
@@ -186,7 +197,7 @@ export default {
     catalog:readScenicCatalog(),currentId:null,panel:'',entryPanel:'',statusH:20,introOpen:false,knowledgeTop:0,menuOpen:false,
     loading:true,loadingHintVisible:false,catalogError:'',failedImages:{},stops:[],settings:{spot_ids:[]},draftReady:false,draftError:'',busy:false,
     showRouteDetails:false,dragging:false,itineraryState:{busy:false,error:'',data:null,key:''},gates:GATES,
-    planOverview:null,planBusy:false,planError:'',mapInteracting:false,planDragActive:false,planDragIndex:-1,planDragTarget:-1,planDragY:0,planDragStartY:0,planDragRowH:50,planStopOrder:[],planGhost:null,
+    planOverview:null,planBusy:false,planError:'',mapInteracting:false,planDragActive:false,planDragSettling:false,planDragIndex:-1,planDragTarget:-1,planDragY:0,planDragStartY:0,planDragRowH:50,planStopOrder:[],planGhost:null,planScrollTop:0,planScrollStart:0,
     stationPlanner:{budget:120,start_area:'east',end_area:'east',avoid_steps:false,interest:'',pace:'standard',extra:''},
     timeMode:'preset',
     customMinutes:'',
@@ -197,7 +208,9 @@ export default {
     spInterests:[{v:'',l:'综合'},{v:'history',l:'历史人文'},{v:'nature',l:'自然风光'},{v:'photo',l:'摄影打卡'},{v:'family',l:'亲子轻松'}],
     timeMenuOpen:false,gateMenuOpen:false,
     gateOptions:[{v:'east',l:'东宫门'},{v:'north',l:'北宫门'},{v:'south',l:'新建宫门'},{v:'return',l:'返回本站'}],guides:[],pickedGuide:null,
-    stationPlans:[],stationPlanIndex:0,stationPlanBusy:false,stationPlanError:'',showPlanResult:false,
+    stationPlans:[],stationPlanIndex:0,stationPlanBusy:false,stationPlanError:'',showPlanResult:false,failedGuideImages:{},
+    extraEditorOpen:false,extraEditorValue:'',extraEditorTop:260,extraEditorLift:0,extraEditorFocus:false,extraEditorRect:{left:16,top:260,width:320,height:110},
+    planProgress:{time:false,gate:false,interest:false,pace:false},_savedGuideId:0,
     audioOpen:false,audioLoading:false,audioPlaying:false,audioElapsed:0,audioDuration:0,
   } },
   computed:{
@@ -226,6 +239,7 @@ export default {
     planMapData(){return this.planOverview?roadMap(this.planOverview):null},
     planMarkerLabels(){const labels={};this.planStops.forEach((stop,index)=>{labels[index+1]=this.t(stop.spot_name)});return labels},
     planDistance(){const meters=Number(this.planOverview&&this.planOverview.walking_meters);return Number.isFinite(meters)&&meters>0?(meters>=1000?(meters/1000).toFixed(1)+' km':Math.round(meters)+' m'):this.t('待确认')},
+    planDragSpot(){return this.planStops[this.planDragIndex]||null},
     canContinue(){return this.draftReady&&this.stops.length>0&&!this.busy&&!this.planBusy&&!this.planError&&!!this.planOverview&&!!this.planOverview.complete},
     gateLabels(){return this.gates.map(g=>this.t(g.label))},
     plannerMapData(){
@@ -239,12 +253,28 @@ export default {
     plannerMarkerLabels(){const labels={};(this.catalog||[]).forEach((p,i)=>{labels[i+1]=this.t(p.name)});return labels},
     plannerSelectedMarkers(){const ids=this.selectedIds.map(String);return (this.catalog||[]).map((p,i)=>ids.includes(String(p.id))?i+1:null).filter(Boolean)},
     planSelectedMarkers(){return this.planStops.map((_,i)=>i+1)},
+    canGenerate(){
+      return !!(this.planProgress.time&&this.planProgress.gate&&this.planProgress.interest&&this.planProgress.pace
+        &&this.stops.length>0&&this.pickedGuide&&!this.stationPlanBusy)
+    },
+    missingNeeds(){
+      const needs=[]
+      if(!this.planProgress.time||!this.planProgress.gate)needs.push(this.t('基础条件'))
+      if(!this.planProgress.interest||!this.planProgress.pace)needs.push(this.t('游玩偏好'))
+      if(!this.stops.length)needs.push(this.t('选点方式'))
+      if(!this.pickedGuide)needs.push(this.t('伴游选择'))
+      return needs
+    },
+    extraEditorStyle(){
+      const r=this.extraEditorRect||{}
+      return 'left:'+(r.left||16)+'px;top:'+(r.top||260)+'px;width:'+(r.width||320)+'px;height:'+(r.height||110)+'px'
+    },
     knowledgeSections(){const p=this.current||{};return [{key:'description',title:'景点介绍'},{key:'history_detail',title:'历史与文化'},{key:'tour_tips',title:'值得留意'},{key:'photo_tips',title:'拍照建议'},{key:'best_season',title:'季节建议'}].map(s=>({...s,text:p[s.key]})).filter(s=>s.text)},
   },
   onLoad(query){
-    // #ifdef APP-PLUS
-    try{plus.webview.currentWebview().setStyle({softinputMode:'adjustNothing'})}catch(_){ }
-    // #endif
+    this.restorePlannerProgress()
+    this.applyRoutePrefill()
+    this.applyResumeSnapshot(query)
     this._context=scenicContext();this._disposed=false
     const info=uni.getSystemInfoSync();this.statusH=info.statusBarHeight||20
     this.panel=['catalog','list','plan'].includes(query?.view)?query.view:'';this.entryPanel=this.panel
@@ -266,6 +296,7 @@ export default {
     this.refresh()
   },
   onShow(){
+    if(this._savedGuideId&&!this.pickedGuide)this.loadCompanionGuides()
     const context=scenicContext()
     if(this._context&&context!==this._context){this._context=context;this.busy=false;this.stops=[];this.settings={spot_ids:[]};this.draftReady=false;this.itineraryState={};this.stopAudio();this._loadTask=null;this.refresh()}
     else if(this._loaded&&!this._loadTask)this.refreshDraft()
@@ -274,30 +305,241 @@ export default {
     stationPlan(){return this.stationPlans[this.stationPlanIndex]||null},
     stationPlanTitle(){const p=this.stationPlan;if(!p)return '';return this.tourLanguage==='en'?(p.title_en||p.title):p.title},
     planKey(){if(this.panel==='plan')this.loadPlan()},
-    selectMode(){this.$nextTick(()=>setTimeout(()=>this.updateSegmentUnderline(),30))},
+    selectMode(){this.$nextTick(()=>setTimeout(()=>this.updateSegmentUnderline(),30));this.persistPlannerProgress()},
+    stops(){this.persistPlannerProgress()},
+    showPlanResult(value){if(value)this.$nextTick(()=>this.saveHomeOrbResume())},
     spFilter(value){if(value==='companion')this.loadCompanionGuides();if(value==='spots')this.$nextTick(()=>setTimeout(()=>this.updateSegmentUnderline(),60))},
     panel(value){if(value==='plan')this.loadPlan();else{this._planVersion=(this._planVersion||0)+1;this._planRequest?.abort?.()}},
   },
-  onHide(){this.menuOpen=false;this.stopAudio()},
-  onUnload(){this._disposed=true;clearTimeout(this._hintTimer);this.stopAudio();this._planVersion=(this._planVersion||0)+1;this._planRequest?.abort?.()},
-  onBackPress(){if(this.showPlanResult){this.showPlanResult=false;return true}if(this.showRouteDetails){this.showRouteDetails=false;return true}if(this.menuOpen){this.menuOpen=false;return true}if(this.panel&&this.panel!==this.entryPanel){this.panel='';return true}return false},
+  onHide(){this.menuOpen=false;this.stopAudio();if(this.planDragActive||this.planGhost)this.cancelPlanDrag()},
+  onUnload(){
+    // 从规划页直接点底栏「首页」离开时也会走到这里：记下页面状态给首页悬浮球。
+    if(this.panel==='plan'||this.showPlanResult)this.saveHomeOrbResume()
+    this._disposed=true;clearTimeout(this._hintTimer);clearTimeout(this._planLongPressTimer);clearTimeout(this._planSettleTimer);this.stopPlanAutoScroll();this.stopAudio();this._planVersion=(this._planVersion||0)+1;this._planRequest?.abort?.()
+  },
+  onBackPress(){
+    if(this.showPlanResult){this.showPlanResult=false;return true}
+    if(this.showRouteDetails){this.showRouteDetails=false;return true}
+    if(this.menuOpen){this.menuOpen=false;return true}
+    if(this.panel&&this.panel!==this.entryPanel){this.panel='';return true}
+    // 真正离开规划页回首页：记下当前页面与进度，首页悬浮球可以回来。
+    this.saveHomeOrbResume()
+    return false
+  },
   methods:{
     gateLabel(value){const gate=this.gateOptions.find(g=>g.v===value);return gate?gate.l:'东宫门'},
-    pickStationTime(minutes){this.stationPlanner.budget=minutes;this.timeMode='preset';this.customMinutes=''},
-    onCustomMinutes(e){const raw=(e.detail&&e.detail.value||'').replace(/[^0-9]/g,'');this.customMinutes=raw;this.timeMode='custom';const n=Number(raw);if(Number.isFinite(n)&&n>0)this.stationPlanner.budget=Math.min(480,Math.max(20,Math.round(n)))},
-    pickStationInterest(value){this.stationPlanner.interest=value||''},
-    onExtraFocus(){try{uni.pageScrollTo({scrollTop:0,duration:0})}catch(e){}},
+    pickStationTime(minutes){this.stationPlanner.budget=minutes;this.timeMode='preset';this.customMinutes='';this.planProgress.time=true;this.persistPlannerProgress()},
+    onCustomMinutes(e){const raw=(e.detail&&e.detail.value||'').replace(/[^0-9]/g,'');this.customMinutes=raw;this.timeMode='custom';const n=Number(raw);if(Number.isFinite(n)&&n>0){this.stationPlanner.budget=Math.min(480,Math.max(20,Math.round(n)));this.planProgress.time=true;this.persistPlannerProgress()}},
+    pickStationInterest(value){this.stationPlanner.interest=value||'';this.planProgress.interest=true;this.persistPlannerProgress()},
+    pickStationPace(value){this.stationPlanner.pace=value==='relaxed'?'relaxed':'standard';this.planProgress.pace=true;this.persistPlannerProgress()},
+    pickGuide(guide){this.pickedGuide=guide;this.persistPlannerProgress()},
+    planSignature(){
+      const ids=(this.planStops||[]).map(s=>Number(s.spot_id)).join(',')
+      return JSON.stringify([this.stationPlanner.start_area,this.stationPlanner.end_area,!!this.stationPlanner.avoid_steps,this.stationPlanner.pace,this.stationPlanner.interest||'',this.stationPlanner.extra||'',ids,String(this.stationPlanner.budget)])
+    },
+    onGenerateTap(){
+      if(this.stationPlanBusy)return
+      // 内容没变（包括拖动后的顺序）：直接回到刚才那一页，保留重算后的时长，不再重新优化顺序。
+      if(this.planOverview&&this.planOverview.complete&&this._lastPlanSignature===this.planSignature()){
+        this.applyBudgetMinutes(this._lastPlanTotal||this.planOverview.total_minutes)
+        this.showPlanResult=true
+        this.saveHomeOrbResume()
+        return
+      }
+      if(!this.canGenerate){
+        uni.showToast({title:this.t('还没完成：')+this.missingNeeds.join('、'),icon:'none'})
+        return
+      }
+      this.generateStationPlans()
+    },
+    persistPlannerProgress(){
+      try{
+        let prevGuide=this._savedGuideId||0
+        try{
+          let prev=uni.getStorageSync('planner-progress')
+          if(typeof prev==='string')prev=JSON.parse(prev)
+          if(prev&&prev.guideId)prevGuide=Number(prev.guideId)||prevGuide
+        }catch(_){ }
+        const guideId=this.pickedGuide?Number(this.pickedGuide.guide_id):prevGuide
+        if(guideId)this._savedGuideId=guideId
+        uni.setStorageSync('planner-progress',{
+          progress:{...this.planProgress},
+          planner:{...this.stationPlanner},
+          selectMode:this.selectMode,
+          guideId,
+          savedAt:Date.now()
+        })
+      }catch(_){ }
+    },
+    saveHomeOrbResume(forceKind){
+      try{
+        const kind=forceKind||(this.showPlanResult?'plan-result':'plan-form')
+        // “返回”不算回到浅层：已经到过结果页/导览页时，不被表单页覆盖。
+        const rank={'plan-form':1,'plan-result':2,'tour':3}
+        let existing=null
+        try{existing=uni.getStorageSync('home-orb-resume')}catch(_){ }
+        if(typeof existing==='string'){try{existing=JSON.parse(existing)}catch(_) {existing=null}}
+        if(existing&&existing.kind&&(rank[existing.kind]||0)>(rank[kind]||0))return
+        if(kind==='plan-result'&&!(this.stationPlans&&this.stationPlans.length))return
+        if(kind==='plan-form'&&!this.stops.length)return
+        const payload={
+          kind,
+          progress:{...this.planProgress},
+          planner:{...this.stationPlanner},
+          selectMode:this.selectMode,
+          guideId:this.pickedGuide?this.pickedGuide.guide_id:0,
+          savedAt:Date.now()
+        }
+        if(kind==='plan-result'){
+          payload.plan=this.stationPlan||null
+          payload.planOverview=this.planOverview||null
+          payload.stationPlans=this.stationPlans
+          payload.stationPlanIndex=this.stationPlanIndex
+          payload.spFilter=this.spFilter
+        }
+        uni.setStorageSync('home-orb-resume',payload)
+      }catch(_){ }
+    },
+    applyResumeSnapshot(query){
+      if(!query||!query.resume)return
+      let saved=null
+      try{saved=uni.getStorageSync('home-orb-resume')}catch(_){ }
+      if(!saved)return
+      if(typeof saved==='string'){try{saved=JSON.parse(saved)}catch(_) {saved=null}}
+      if(!saved||Date.now()-(Number(saved.savedAt)||0)>6*3600*1000)return
+      if(saved.progress)this.planProgress={...this.planProgress,...saved.progress}
+      if(saved.planner)this.stationPlanner={...this.stationPlanner,...saved.planner}
+      if(saved.selectMode==='together'||saved.selectMode==='self')this.selectMode=saved.selectMode
+      if(saved.guideId)this._savedGuideId=Number(saved.guideId)||0
+      if(saved.kind==='plan-result'){
+        if(saved.plan){
+          this.stationPlans=[saved.plan]
+          this.stationPlanIndex=0
+          this.planOverview=saved.planOverview||saved.plan.route
+        this._lastPlanTotal=Number(this.planOverview&&this.planOverview.total_minutes)||0
+        this._lastPlanSpotIds=(saved.plan.route&&saved.plan.route.stops?saved.plan.route.stops:[]).map(s=>Number(s.spot_id)).sort((a,b)=>a-b).join(',')
+        this.$nextTick(()=>{this._lastPlanSignature=this.planSignature()})
+          if(saved.spFilter)this.spFilter=saved.spFilter
+          // 先标记数据已就绪再切结果页，避免先闪一下表单/骨架屏。
+          this.draftReady=true
+          this.showPlanResult=true
+        }else{
+          // 没拿到完整快照时按同样的条件重算一次，进入结果页。
+          setTimeout(()=>{try{this.generateStationPlans()}catch(_){ }},700)
+        }
+      }
+      this.persistPlannerProgress()
+    },
+    restorePlannerProgress(){
+      setTimeout(()=>{ if(this._savedGuideId&&!this.pickedGuide)this.loadCompanionGuides() },300)
+      let saved=null
+      try{saved=uni.getStorageSync('planner-progress')}catch(_){ }
+      if(!saved)return
+      if(typeof saved==='string'){try{saved=JSON.parse(saved)}catch(_) {saved=null}}
+      if(!saved||Date.now()-(Number(saved.savedAt)||0)>7*24*3600*1000)return
+      if(saved.progress)this.planProgress={...this.planProgress,...saved.progress}
+      if(saved.planner)this.stationPlanner={...this.stationPlanner,...saved.planner}
+      if(saved.selectMode==='together'||saved.selectMode==='self')this.selectMode=saved.selectMode
+      this._savedGuideId=Number(saved.guideId)||0
+    },
+    applyRoutePrefill(){
+      let prefill=null
+      try{prefill=uni.getStorageSync('planner-route-prefill')}catch(_){ }
+      if(!prefill)return
+      try{uni.removeStorageSync('planner-route-prefill')}catch(_){ }
+      if(typeof prefill==='string'){try{prefill=JSON.parse(prefill)}catch(_) {prefill=null}}
+      if(!prefill||Date.now()-(Number(prefill.savedAt)||0)>10*60*1000)return
+      const budget=Number(prefill.budget)
+      if(Number.isFinite(budget)&&budget>0){
+        this.stationPlanner.budget=Math.min(480,Math.max(20,Math.round(budget)))
+        // 主题路线的时长通常不是整小时：显示为“自定义 N 分钟”。
+        if([60,120,180,240].includes(this.stationPlanner.budget)){
+          this.timeMode='preset';this.customMinutes=''
+        }else{
+          this.timeMode='custom';this.customMinutes=String(this.stationPlanner.budget)
+        }
+      }
+      this.stationPlanner.end_area=this.stationPlanner.end_area||'east'
+      this.stationPlanner.interest=''
+      this.stationPlanner.pace='standard'
+      this.planProgress={time:true,gate:true,interest:true,pace:true}
+      this.selectMode='self'
+      this.persistPlannerProgress()
+    },
+    openExtraEditor(){
+      const query=uni.createSelectorQuery().in(this)
+      query.select('.sp-extra-display').boundingClientRect(rect=>{
+        const info=uni.getSystemInfoSync()
+        this._winH=info.windowHeight||800
+        if(rect){this.extraEditorRect={left:Math.round(rect.left),top:Math.round(rect.top),width:Math.round(rect.width),height:Math.round(rect.height)}}
+        this.extraEditorTop=rect?Math.round(rect.top):260
+        this.extraEditorValue=this.stationPlanner.extra||''
+        this.extraEditorLift=0
+        this.extraEditorOpen=true
+        this.$nextTick(()=>{setTimeout(()=>{this.extraEditorFocus=true},60)})
+      }).exec()
+    },
+    onExtraInput(event){
+      const value=String((event&&event.detail&&event.detail.value)||'')
+      this.extraEditorValue=value
+      this.stationPlanner.extra=value
+    },
+    onExtraEditorFocus(){
+      this.extraEditorFocus=true
+      if(this._kbListener)return
+      try{
+        this._kbListener=true
+        uni.onKeyboardHeightChange(res=>{
+          const h=Number(res&&res.height)||0
+          const info=uni.getSystemInfoSync()
+          const winH=info.windowHeight||this._winH||800
+          const barH=180
+          const maxLift=Math.max(0,this.extraEditorTop-40)
+          const lift=Math.max(0,this.extraEditorTop+barH-(winH-h)+10)
+          this.extraEditorLift=Math.min(lift,maxLift)
+        })
+      }catch(_){this._kbListener=false}
+    },
+    closeExtraEditor(){
+      try{ if(this._kbListener&&uni.offKeyboardHeightChange)uni.offKeyboardHeightChange() }catch(_){ }
+      this._kbListener=false
+      this.extraEditorOpen=false;this.extraEditorFocus=false;this.extraEditorLift=0
+    },
+    onExtraEditorBlur(){
+      // 键盘收起或点到别处就结束输入，内容已经在输入过程中实时写回卡片。
+      setTimeout(()=>{ if(this.extraEditorOpen)this.closeExtraEditor() },100)
+    },
+    mediaUrl(url){
+      const text=String(url||'').trim()
+      if(!text)return ''
+      const marker='/api/v1/files/'
+      if(/^https?:\/\//i.test(text)){
+        const at=text.indexOf(marker)
+        return at>=0?SERVER_ORIGIN+text.slice(at):text
+      }
+      return text.charAt(0)==='/'?SERVER_ORIGIN+text:SERVER_ORIGIN+'/'+text
+    },
+    guideImage(guide){
+      if(!guide||this.failedGuideImages[guide.guide_id])return '/static/guide/default-guide.png'
+      return this.mediaUrl(guide.poster_image||guide.avatar)
+    },
     loadCompanionGuides(){
-      if(this._guidesLoading||this.guides.length)return
+      if(this.guides.length)return
+      if(this._guidesLoading)return
       this._guidesLoading=true
       const token=uni.getStorageSync('token')||''
       uni.request({url:SERVER_ORIGIN+'/tour-session/guides?language='+(this.tourLanguage==='en'?'en':'zh'),timeout:15000,header:token?{Authorization:'Bearer '+token}:{},
         success:res=>{const body=res.data||{};const data=body.data||body;const list=(data.guide_list||data.data?.guide_list||[]).filter(g=>g&&g.guide_id)
+          list.forEach(g=>{g.poster_image=this.mediaUrl(g.poster_image);g.avatar=this.mediaUrl(g.avatar)})
           if(!list.some(g=>Number(g.guide_id)===2))list.push({guide_id:2,name:'文轩',poster_image:SERVER_ORIGIN+'/api/v1/files/digital_guide/covers/wenxuan-transparent.png',render_mode:'xingyun'})
-          this.guides=list},
+          this.guides=list
+          if(this._savedGuideId&&!this.pickedGuide){
+            const saved=list.find(g=>Number(g.guide_id)===Number(this._savedGuideId))
+            if(saved)this.pickedGuide=saved
+          }},
         complete:()=>{this._guidesLoading=false}})
     },
-    pickStationGate(value){this.stationPlanner.end_area=value;this.gateMenuOpen=false;this.plannerFocus=this.gateFocus[value]||null},
+    pickStationGate(value){this.stationPlanner.end_area=value;this.planProgress.gate=true;this.persistPlannerProgress();this.gateMenuOpen=false;this.plannerFocus=this.gateFocus[value]||null},
     updateSegmentUnderline(){
       try{
         const query=uni.createSelectorQuery().in(this)
@@ -355,6 +597,7 @@ export default {
       if(this.showPlanResult){this.showPlanResult=false;return}
       if(this.showRouteDetails){this.showRouteDetails=false;return}
       if(this.panel&&this.panel!==this.entryPanel){this.panel='';return}
+      this.saveHomeOrbResume()
       uni.navigateBack({delta:1,fail:()=>uni.reLaunch({url:'/pages/tabs/tabs?tab=home'})})
     },
     async refresh(){
@@ -501,75 +744,254 @@ export default {
     clearStops(){this.stops=[]},
     generateStationPlans(){
       if(this.stationPlanBusy)return
-      const budget=Math.min(480,Math.max(20,Math.round(Number(this.stationPlanner.budget)||120)))
-      this.stationPlanner.budget=budget
+      const stopKey=this.stops.map(s=>Number(s.id)).sort((a,b)=>a-b).join(',')
+      // 用上一次真正算出来的总时长当预算（重排后顺序变了、但景点集合没变，也认这份总时长）。
+      const knownTotal=(this._lastPlanSpotIds===stopKey&&Number(this._lastPlanTotal)>0)?Number(this._lastPlanTotal):0
+      this.applyBudgetMinutes(knownTotal>0?knownTotal:(Number(this.stationPlanner.budget)||120))
+      const spotIds=this.stops.map(s=>Number(s.id))
       this.stationPlanBusy=true;this.stationPlanError='';this.stationPlans=[];this.stationPlanIndex=0
-      scenicRequest('/plan-walk',{method:'POST',data:{budget,start_area:this.stationPlanner.start_area,end_area:this.stationPlanner.end_area,avoid_steps:!!this.stationPlanner.avoid_steps,spot_ids:this.stops.map(s=>Number(s.id)),interest:this.stationPlanner.interest||'',extra:this.stationPlanner.extra||'',pace:(this.stationPlanner.pace==='relaxed'||this.stationPlanner.avoid_steps)?'relaxed':'standard',interest:this.stationPlanner.interest||''}})
-        .then(data=>{this.stationPlans=Array.isArray(data?.plans)?data.plans:[];if(!this.stationPlans.length)throw new Error(this.t('没有找到合适的方案，请调整时间或终点'));this.stationPlanIndex=0;this.planOverview=this.stationPlans[0].route;this.showPlanResult=true;this.planStopOrder=[];this.savePendingRoute(this.planOverview,{start_area:this.stationPlanner.start_area,end_area:this.stationPlanner.end_area,avoid_steps:!!this.stationPlanner.avoid_steps,pace:(this.stationPlanner.pace==='relaxed'||this.stationPlanner.avoid_steps)?'relaxed':'standard'})})
-        .catch(error=>{this.stationPlanError=error?.data?.detail||error?.message||this.t('规划失败，请重试')})
-        .finally(()=>{this.stationPlanBusy=false})
+      const attempt=(tries)=>{
+        const budget=this.stationPlanner.budget
+        return scenicRequest('/plan-walk',{method:'POST',data:{budget,start_area:this.stationPlanner.start_area,end_area:this.stationPlanner.end_area,avoid_steps:!!this.stationPlanner.avoid_steps,spot_ids:spotIds,interest:this.stationPlanner.interest||'',extra:this.stationPlanner.extra||'',pace:(this.stationPlanner.pace==='relaxed'||this.stationPlanner.avoid_steps)?'relaxed':'standard'}})
+          .then(data=>{
+            const plans=Array.isArray(data&&data.plans)?data.plans:[]
+            if(!plans.length)throw new Error(this.t('没有找到合适的方案，请调整时间或终点'))
+            this.stationPlans=plans;this.stationPlanIndex=0;this.planOverview=plans[0].route
+            this.showPlanResult=true;this.planStopOrder=[]
+            this._lastPlanTotal=Number(this.planOverview&&this.planOverview.total_minutes)||0
+            this._lastPlanSpotIds=stopKey
+            this.$nextTick(()=>{this._lastPlanSignature=this.planSignature()})
+            this.saveHomeOrbResume()
+            this.savePendingRoute(this.planOverview,{start_area:this.stationPlanner.start_area,end_area:this.stationPlanner.end_area,avoid_steps:!!this.stationPlanner.avoid_steps,pace:(this.stationPlanner.pace==='relaxed'||this.stationPlanner.avoid_steps)?'relaxed':'standard'})
+          })
+          .catch(error=>{
+            const msg=String((error&&error.data&&error.data.detail)||(error&&error.message)||'')
+            // 差几分钟时静默上调一次预算，不弹提示、不循环。
+            if(msg.indexOf('超出时间预算')>=0&&tries<2){
+              this.applyBudgetMinutes(Math.min(480,Math.max(Number(this.stationPlanner.budget)+30,knownTotal||0)))
+              return attempt(tries+1)
+            }
+            this.stationPlanError=error?.data?.detail||error?.message||this.t('规划失败，请重试')
+          })
+      }
+      attempt(0).finally(()=>{this.stationPlanBusy=false})
+    },
+    applyBudgetMinutes(value){
+      const minutes=Math.min(480,Math.max(20,Math.round(Number(value)||120)))
+      this.stationPlanner.budget=minutes
+      if([60,120,180,240].includes(minutes)){this.timeMode='preset';this.customMinutes=''}
+      else{this.timeMode='custom';this.customMinutes=String(minutes)}
+      this.persistPlannerProgress()
     },
     chooseStationPlan(index){this.stationPlanIndex=index},
-    planDragStyle(index){
-      if(!this.planDragActive||this.planDragIndex!==index)return ''
-      return 'transform:translateY('+this.planDragY+'px);z-index:8;position:relative;transition:none;background:#fff;box-shadow:0 10px 24px rgba(70,50,130,.18);border-radius:12px'
+    onPlanStopsScroll(event){
+      const top=event&&event.detail&&Number.isFinite(event.detail.scrollTop)?event.detail.scrollTop:(this._planScrollTopNow||0)
+      this._planScrollTopNow=top
     },
-    onPlanStopTouchStart(event){
+    onPlanGripTouchStart(index,event){
+      if(this.busy||this.planDragActive||this.planDragSettling||this.planStops.length<2)return
       const touch=(event&&event.touches&&event.touches[0])||(event&&event.changedTouches&&event.changedTouches[0])
-      if(touch)this._planTouchStartY=touch.clientY
+      if(!touch)return
+      this._planGripIndex=index
+      this._planGripStartX=touch.clientX
+      this._planGripStartY=touch.clientY
+      clearTimeout(this._planLongPressTimer)
+      // 只有按住把手不动 320ms 才抬起条目；快速上下滑仍交给列表滚动。
+      this._planLongPressTimer=setTimeout(()=>{this._planLongPressTimer=null;this.startPlanDrag(index)},320)
     },
-    startPlanDrag(index,event){
-      if(this.busy||this.planStops.length<2)return
+    onPlanGripTouchMove(event){
+      if(this.planDragActive){
+        // 拖动中吞掉浏览器滚动，避免列表跟手势一起跑。
+        if(event&&event.preventDefault)try{event.preventDefault()}catch(_){}
+        this.onPlanDragMove(event)
+        return
+      }
       const touch=(event&&event.touches&&event.touches[0])||(event&&event.changedTouches&&event.changedTouches[0])
-      // longpress 事件通常不带 touches，用 touchstart 记录的坐标兜底，避免起点为 0 导致闪跳
-      this.planDragStartY=touch?touch.clientY:(this._planTouchStartY||0)
+      if(!touch||!this._planLongPressTimer)return
+      if(Math.abs(touch.clientY-(this._planGripStartY||0))>8||Math.abs(touch.clientX-(this._planGripStartX||0))>8){
+        clearTimeout(this._planLongPressTimer);this._planLongPressTimer=null
+      }
+    },
+    onPlanGripTouchEnd(event){
+      clearTimeout(this._planLongPressTimer);this._planLongPressTimer=null
+      if(this.planDragActive)this.onPlanDragEnd(event)
+    },
+    onPlanGripTouchCancel(){
+      clearTimeout(this._planLongPressTimer);this._planLongPressTimer=null
+      if(this.planDragActive)this.cancelPlanDrag()
+    },
+    startPlanDrag(index){
+      if(this.busy||this.planDragActive||this.planDragSettling||this.planStops.length<2)return
+      if(index<0||index>=this.planStops.length)return
+      this.planDragActive=true;this.planDragSettling=false
+      this.planDragIndex=index;this.planDragTarget=index;this.planDragY=0
+      this.planDragStartY=this._planGripStartY||0
       this._planDragStartIndex=index
-      this.planDragIndex=index;this.planDragTarget=index;this.planDragY=0;this.planDragActive=true;this.planGhost=null
+      this._planDragRects=null;this._planDragScrollRect=null;this.planGhost=null
+      // 长按抬起时给一次轻触反馈；不支持震动的端忽略。
+      try{uni.vibrateShort&&uni.vibrateShort({type:'light'})}catch(_){}
       try{
-        uni.createSelectorQuery().in(this).selectAll('.plan-stop').boundingClientRect(rects=>{
+        const query=uni.createSelectorQuery().in(this)
+        query.select('.plan-stops-scroll').boundingClientRect()
+        query.select('.plan-stops-scroll').scrollOffset()
+        query.select('.plan-stops').boundingClientRect()
+        query.selectAll('.plan-stop').boundingClientRect()
+        query.exec(res=>{
+          if(!this.planDragActive||!res)return
+          const scrollRect=res[0],offset=res[1],contentRect=res[2],rects=res[3]
           if(!rects||!rects.length)return
           const rect=rects[index]||rects[0]
+          this._planDragRects=rects.map(r=>({top:r.top,height:r.height}))
+          this._planDragScrollRect=scrollRect?{top:scrollRect.top,bottom:scrollRect.top+scrollRect.height}:null
+          this._planViewportHeight=scrollRect?scrollRect.height:0
+          this._planContentHeight=contentRect?contentRect.height:0
+          this.planScrollStart=Number.isFinite(this._planScrollTopNow)?this._planScrollTopNow:(offset&&Number.isFinite(offset.scrollTop)?offset.scrollTop:0)
+          this.planScrollTop=this.planScrollStart
           this.planDragRowH=rect.height||50
-          this.planGhost={index,top:rect.top,left:rect.left,width:rect.width,height:rect.height}
-        }).exec()
+          if(!this.planDragStartY)this.planDragStartY=rect.top+rect.height/2
+          this.planGhost={top:rect.top,left:rect.left,width:rect.width,height:rect.height}
+        })
       }catch(_){}
     },
     onPlanDragMove(event){
-      if(!this.planDragActive)return
-      const touch=(event.touches&&event.touches[0])||(event.changedTouches&&event.changedTouches[0])
+      if(!this.planDragActive||this.planDragSettling)return
+      const touch=(event&&event.touches&&event.touches[0])||(event&&event.changedTouches&&event.changedTouches[0])
       if(!touch)return
-      // 拖动行跟手；其它行只做视觉让位，数据顺序等松手后再提交。
+      this._planLastTouchY=touch.clientY
       this.planDragY=touch.clientY-this.planDragStartY
-      const step=Math.round(this.planDragY/(this.planDragRowH||50))
-      this.planDragTarget=Math.max(0,Math.min(this.planStops.length-1,this._planDragStartIndex+step))
+      this.updatePlanDragTarget()
+      this.updatePlanAutoScroll(touch.clientY)
+    },
+    updatePlanDragTarget(){
+      const rects=this._planDragRects
+      if(!rects||!rects.length){
+        const step=Math.round(this.planDragY/(this.planDragRowH||50))
+        this.planDragTarget=Math.max(0,Math.min(this.planStops.length-1,this._planDragStartIndex+step))
+        return
+      }
+      // 用悬浮条中心与各条目中线比较，取插入位置；滚动窗口内滚动后按滚动差补偿。
+      const ghostH=(this.planGhost&&this.planGhost.height)||this.planDragRowH||50
+      const base=this.planGhost?this.planGhost.top:(this.planDragStartY-ghostH/2)
+      const centerY=base+this.planDragY+ghostH/2
+      const scrolled=(this.planScrollTop||0)-(this.planScrollStart||0)
+      let insert=0
+      for(let i=0;i<rects.length;i++){
+        if(i===this._planDragStartIndex)continue
+        const mid=rects[i].top-scrolled+rects[i].height/2
+        if(centerY>mid)insert++
+      }
+      this.planDragTarget=Math.max(0,Math.min(this.planStops.length-1,insert))
+    },
+    updatePlanAutoScroll(y){
+      const rect=this._planDragScrollRect
+      if(!rect)return
+      // 只在自己主动拖出一段距离后才启用边缘滚动，避免刚按住边缘条目就连续滚动。
+      if(Math.abs(this.planDragY||0)<24){this.stopPlanAutoScroll();return}
+      const edge=Math.min(56,Math.max(32,(rect.bottom-rect.top)/4))
+      let dir=0
+      if(y<rect.top+edge)dir=-1
+      else if(y>rect.bottom-edge)dir=1
+      this._planAutoScrollDir=dir
+      if(dir&&!this._planAutoScrollTimer)this._planAutoScrollTimer=setInterval(()=>{this.tickPlanAutoScroll()},16)
+      else if(!dir)this.stopPlanAutoScroll()
+    },
+    tickPlanAutoScroll(){
+      if(!this.planDragActive||this.planDragSettling||!this._planAutoScrollDir){this.stopPlanAutoScroll();return}
+      const max=Math.max(0,(this._planContentHeight||0)-(this._planViewportHeight||0))
+      const next=Math.max(0,Math.min(max,(this.planScrollTop||0)+this._planAutoScrollDir*7))
+      if(next===(this.planScrollTop||0)){this.stopPlanAutoScroll();return}
+      this.planScrollTop=next
+      this.updatePlanDragTarget()
+    },
+    stopPlanAutoScroll(){
+      if(this._planAutoScrollTimer){clearInterval(this._planAutoScrollTimer);this._planAutoScrollTimer=null}
+      this._planAutoScrollDir=0
     },
     planShiftStyle(index){
       if(!this.planDragActive||index===this.planDragIndex)return ''
       const from=this.planDragIndex,to=this.planDragTarget
       if(from<0||to<0||from===to)return ''
       const h=this.planDragRowH||50
-      // 拖起来那行从队列里抽掉，其余行按落点重新排队，各自跑一条弹簧过渡
-      const spring='transition:transform 280ms cubic-bezier(.18,.89,.32,1.12);z-index:1'
-      if(to>from&&index>from&&index<=to)return 'transform:translateY(-'+h+'px);'+spring
-      if(to<from&&index>=to&&index<from)return 'transform:translateY('+h+'px);'+spring
+      // 被抬起的条目从队列里抽走，其余条目按落点重新排队；弹簧曲线带一点回弹。
+      const spring='transition:transform 320ms cubic-bezier(.2,1.3,.4,1);will-change:transform'
+      if(to>from&&index>from&&index<=to)return 'transform:translate3d(0,-'+h+'px,0);'+spring
+      if(to<from&&index>=to&&index<from)return 'transform:translate3d(0,'+h+'px,0);'+spring
       return ''
     },
     planGhostStyle(){
       const ghost=this.planGhost
       if(!ghost)return ''
-      return 'position:fixed;left:'+ghost.left+'px;top:'+(ghost.top+this.planDragY)+'px;width:'+ghost.width+'px;height:'+ghost.height+'px;z-index:70;margin:0;box-shadow:0 14px 28px rgba(70,50,130,.22);border-radius:12px;background:#fff;transition:none;box-sizing:border-box;pointer-events:none'
+      const scale=this.planDragSettling?1:1.02
+      const transition=this.planDragSettling?'transition:transform 260ms cubic-bezier(.2,.9,.3,1);':'transition:none;'
+      return 'position:fixed;left:'+ghost.left+'px;top:'+ghost.top+'px;width:'+ghost.width+'px;height:'+ghost.height+'px;z-index:70;margin:0;box-sizing:border-box;pointer-events:none;border-bottom:0;border-radius:12px;background:#fff;box-shadow:0 14px 30px rgba(70,50,130,.24);transform:translate3d(0,'+this.planDragY+'px,0) scale('+scale+');'+transition
     },
     onPlanDragEnd(){
+      if(!this.planDragActive||this.planDragSettling)return
+      this.stopPlanAutoScroll()
+      const from=this.planDragIndex,to=this.planDragTarget
+      if(!this.planGhost){this.finishPlanDrag(from,to);return}
+      // 松手吸附：悬浮条先滑到落点，等它停稳后再提交顺序。
+      this.planDragSettling=true
+      this.planDragY=from>=0&&to>=0?(to-from)*(this.planDragRowH||this.planGhost.height||50):0
+      clearTimeout(this._planSettleTimer)
+      this._planSettleTimer=setTimeout(()=>{this.finishPlanDrag(from,to)},270)
+    },
+    cancelPlanDrag(){
       if(!this.planDragActive)return
-      const from=this.planDragIndex
-      const step=Math.round(this.planDragY/(this.planDragRowH||50))
-      const to=Math.max(0,Math.min(this.planStops.length-1,this._planDragStartIndex+step))
-      this.planDragActive=false;this.planDragIndex=-1;this.planDragTarget=-1;this.planDragY=0;this.planGhost=null
-      if(from<0||to<0||from===to)return
-      const ids=this.planStops.map(stop=>stop.spot_id)
-      const moved=ids.splice(from,1)[0]
-      ids.splice(to,0,moved)
-      this.planStopOrder=ids
+      this.finishPlanDrag(this.planDragIndex,this.planDragIndex)
+    },
+    finishPlanDrag(from,to){
+      clearTimeout(this._planSettleTimer);this._planSettleTimer=null
+      clearTimeout(this._planLongPressTimer);this._planLongPressTimer=null
+      this.stopPlanAutoScroll()
+      if(from>=0&&to>=0&&from!==to){
+        const ids=this.planStops.map(stop=>stop.spot_id)
+        const moved=ids.splice(from,1)[0]
+        ids.splice(to,0,moved)
+        this.planStopOrder=ids
+        // 顺序变了就按新顺序重新算距离/步行时间/总时长（不回写主题路线卡片）。
+        this.$nextTick(()=>{this.recomputePlanOrder(ids)})
+      }
+      this._planDragRects=null;this._planDragScrollRect=null;this._planGripIndex=-1
+      this.planDragActive=false;this.planDragSettling=false
+      this.planDragIndex=-1;this.planDragTarget=-1;this.planDragY=0;this.planGhost=null
+    },
+    async recomputePlanOrder(ids){
+      if(!Array.isArray(ids)||ids.length<2)return
+      const wanted=ids.map(id=>Number(id)).filter(id=>Number.isInteger(id)&&id>0)
+      if(wanted.length<2)return
+      try{
+        const standardPace=(this.stationPlanner.pace==='relaxed'||this.stationPlanner.avoid_steps)?'relaxed':'standard'
+        const request=routeRequest('/tour-experience/route-preview',{
+          spot_ids:wanted,
+          pace:standardPace,
+          start_area:this.stationPlanner.start_area,
+          end_area:this.stationPlanner.end_area,
+          avoid_steps:!!this.stationPlanner.avoid_steps,
+          reserve:0
+        },0,15000)
+        const route=await request.promise
+        if(!route||!Array.isArray(route.stops))throw new Error('empty route')
+        this.planOverview=route
+        this._lastPlanTotal=Number(route.total_minutes)||0
+        this._lastPlanSpotIds=wanted.slice().sort((a,b)=>a-b).join(',')
+        this.$nextTick(()=>{this._lastPlanSignature=this.planSignature()})
+        if(this.stationPlans[this.stationPlanIndex])this.stationPlans[this.stationPlanIndex].route=route
+        // 新路线已经按拖动后的顺序返回，清掉本地排序覆盖。
+        this.planStopOrder=[]
+        // 把重新计算后的总时长同步回「基础条件」的时间。
+        const total=Number(route.total_minutes)
+        if(Number.isFinite(total)&&total>0){
+          const minutes=Math.min(480,Math.max(20,Math.round(total)))
+          this.stationPlanner.budget=minutes
+          if([60,120,180,240].includes(minutes)){this.timeMode='preset';this.customMinutes=''}
+          else{this.timeMode='custom';this.customMinutes=String(minutes)}
+          this.persistPlannerProgress()
+        }
+        this.saveHomeOrbResume()
+      }catch(error){
+        uni.showToast({title:this.t('重新计算路线失败，请重试'),icon:'none'})
+      }
     },
     savePendingRoute(overview, plan){
       try {
@@ -599,6 +1021,7 @@ export default {
       this.busy=true
       try {
         const sid=await startTourSession(ids, plan, this.pickedGuide?this.pickedGuide.guide_id:0)
+        try{uni.setStorageSync('home-orb-resume',{kind:'tour',sid:sid,guideId:this.pickedGuide?this.pickedGuide.guide_id:0,savedAt:Date.now()})}catch(_){ }
         uni.navigateTo({url:'/pages/tour/tour?sessionId='+sid})
       } catch(error) {
         uni.showToast({title:this.t(error.message||'开始导览失败，请重试'),icon:'none'})
@@ -699,13 +1122,19 @@ export default {
 .plan-facts view{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
 .plan-facts text{font-size:12px;color:#6f6685;line-height:1.5}
 .plan-facts .fact-value{font-size:18px;font-weight:600;color:#241c36;font-variant-numeric:tabular-nums;line-height:1.4}
-.plan-stops{margin:0 12px;padding:0 14px;background:#fff;border-radius:16px}
+.plan-stops-scroll{height:clamp(240px,40vh,420px);margin:10px 12px 6px;border-radius:16px;background:#fff;overflow:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.plan-stops{margin:0;padding:0 14px;background:#fff;border-radius:16px}
+.plan-stop-grip{width:34px;height:34px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:10px;color:#241c36;opacity:.5;user-select:none;-webkit-user-select:none;transition:transform .12s ease,opacity .12s ease,background-color .12s ease}
+.plan-stop-grip-on,.plan-stop-grip.is-pressed{background:#f3efff;opacity:.85;transform:scale(.94)}
+.plan-stop-grip .iconfont,.plan-stop-remove .iconfont{font-size:18px;line-height:1;color:inherit}
 .plan-stop{display:flex;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid #f0edf7}
 .plan-stop:last-child{border-bottom:0}
 .plan-stop-no{width:24px;height:24px;flex:none;display:grid;place-items:center;border-radius:50%;background:#ece7fb;color:#5b48a4;font-size:13px;font-variant-numeric:tabular-nums}
 .plan-stop-name{flex:1;min-width:0;font-size:16px;font-weight:500;color:#241c36;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .plan-stop-stay{font-size:14px;color:#6f6685;white-space:nowrap}
-.plan-stop-remove{width:32px;height:32px;min-height:0;flex:none;color:#9b93ab;font-size:20px}
+.plan-stop-remove{width:34px;height:34px;min-height:0;flex:none;padding:0;margin:0;border:0;background:transparent;display:flex;align-items:center;justify-content:center;color:#241c36;opacity:.5;transition:transform .12s ease,opacity .12s ease}
+.plan-stop-remove::after{display:none;border:0}
+.plan-stop-remove:active{transform:scale(.92);opacity:.85}
 .plan-row{display:flex;align-items:center;justify-content:space-between;margin:10px 12px 0;padding:12px 14px;background:#fff;border-radius:16px;font-size:15px;color:#241c36}
 .plan-checks{display:flex;align-items:center;gap:14px}
 .plan-check{display:flex;align-items:center;gap:7px;min-height:32px;font-size:14px;color:#241c36}
@@ -762,12 +1191,10 @@ export default {
 .sp-pick{flex:1;min-height:44px;border:1px solid #8b78e6;border-radius:14px;color:#5b4a9e;background:#fff;font-size:14px}
 .sp-clear{min-height:44px;padding:0 16px;border:1px solid #ece6fa;border-radius:14px;color:#8b8495;background:#fff;font-size:14px}
 .sp-generate{width:100%;height:50px;margin-top:24px;border-radius:16px;background:#6a5ae0;color:#fff;font-size:16px;font-weight:600}
+.sp-generate.incomplete{background:#d9d3ea;color:#fff}
 .sp-generate[disabled]{opacity:.6}
 .sp-error{margin-top:14px;padding:12px 14px;border-radius:12px;background:#fff3f3;color:#b04848;font-size:13px;display:flex;justify-content:space-between;gap:12px}
 .sp-results{margin-top:26px}
-.sp-plan-tabs{display:flex;flex-wrap:wrap;gap:8px}
-.sp-plan-tabs button{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid #e8e2f5;background:#fff;color:#5b5568;font-size:13px}
-.sp-plan-tabs button.on{border-color:#8b78e6;background:#f2edff;color:#5b4a9e;font-weight:600}
 .sp-plan-summary{display:flex;justify-content:space-between;gap:8px;margin-top:18px;padding:14px 0;border-top:1px solid #f0ecf8;border-bottom:1px solid #f0ecf8}
 .sp-plan-summary view{display:flex;flex-direction:column;gap:4px;font-size:12px;color:#8b8495}
 .sp-fact{font-size:16px;font-weight:700;color:#282332}
@@ -776,14 +1203,12 @@ export default {
 .sp-stop-no{width:24px;height:24px;border-radius:50%;background:#efe9ff;color:#6a5ae0;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none}
 .sp-stop-name{flex:1;font-size:15px;color:#282332}
 .sp-stop-time{font-size:12px;color:#8b8495}
-.sp-start{width:100%;height:50px;margin-top:20px;border-radius:16px;background:#6a5ae0;color:#fff;font-size:16px;font-weight:600}
 .native-scenic .station-planner .sp-check{justify-content:flex-start!important;padding:0!important;background:none!important}
 .native-scenic .station-planner .sp-chips button{background:#fff!important;color:#4b4459!important;border:1px solid #e8e2f5!important;border-radius:999px!important;min-height:44px!important;padding:0 18px!important}
 .native-scenic .station-planner .sp-chips button.on{background:#f2edff!important;color:#5b4a9e!important;border-color:#8b78e6!important;font-weight:600}
 .native-scenic .station-planner .sp-generate{background:rgba(255,255,255,.72)!important;color:#5b4a9e!important;border:1px solid #8b78e6!important;border-radius:16px!important;width:100%!important;height:50px!important;font-size:16px!important;font-weight:600!important;margin:18px 0 0!important;box-shadow:0 6px 18px rgba(106,90,224,.12)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
 .native-scenic .station-planner .sp-pick{background:#fff!important;color:#5b4a9e!important;border:1px solid #8b78e6!important;border-radius:14px!important;min-height:44px!important;flex:1}
 .native-scenic .station-planner .sp-clear{background:#fff!important;color:#8b8495!important;border:1px solid #ece6fa!important;border-radius:14px!important;min-height:44px!important;padding:0 16px!important}
-.native-scenic .station-planner .sp-start{background:#6a5ae0!important;color:#fff!important;border-radius:16px!important;width:100%!important;height:50px!important;font-size:16px!important;font-weight:600!important}
 .scenic-nav{position:relative;border-bottom:0!important;box-shadow:none!important}
 .scenic-nav.nav-planner::after{content:"";position:absolute;left:12px;right:12px;top:100%;height:10px;border-left:1px solid #d9cdf8;border-right:1px solid #d9cdf8;border-top:1px solid #d9cdf8;border-radius:12px 12px 0 0;pointer-events:none}
 .nav-center-title{position:absolute;left:50%;bottom:0;height:44px;line-height:44px;transform:translateX(-50%);font-size:17px;font-weight:600;color:#282332;white-space:nowrap;pointer-events:none}
@@ -926,7 +1351,10 @@ export default {
 .sp-segment{display:flex;gap:8px;margin-bottom:10px}
 .sp-segment button{flex:1;min-height:38px;border:1px solid #e8e2f5;border-radius:12px;background:#fff;color:#5b5568;font-size:13px}
 .sp-segment button.on{border-color:#8b78e6;background:#f2edff;color:#5b4a9e;font-weight:600}
-.sp-extra{width:100%;min-height:88px;margin-top:8px;padding:10px 12px;border:1px solid #e8e2f5;border-radius:12px;background:#fff;font-size:13px;color:#3d374d;box-sizing:border-box}
+.sp-extra-display{width:100%;min-height:110px;margin-top:8px;padding:12px 14px;border:1px solid #e8e2f5;border-radius:16px;background:#fff;box-sizing:border-box;display:flex;align-items:flex-start}
+.sp-extra-input{width:100%;height:44px;font-size:14px;color:#3d374d}
+.extra-editor-layer{position:fixed;left:0;right:0;top:0;bottom:0;z-index:3000;pointer-events:none}
+.extra-editor-ghost{position:fixed;box-sizing:border-box;background:#fff;border:1px solid #e8e2f5;border-radius:16px;padding:12px 14px;font-size:14px;line-height:1.6;color:#3d374d}
 .native-scenic .sp-filter{padding:0 18px!important;box-sizing:border-box!important;width:100%!important}
 .native-scenic .sp-filter-inner{display:flex!important;justify-content:space-between!important;width:100%!important;padding:14px 0 2px!important;gap:6px!important}
 .native-scenic .sp-filter-btn{flex:0 1 auto!important;padding:0 10px!important;font-size:12.5px!important}
@@ -996,6 +1424,9 @@ export default {
 .native-scenic .sp-time-custom{min-width:82px!important;max-width:none!important;padding:0 8px!important;gap:2px!important}
 .native-scenic .sp-time-custom .sp-time-input{width:5ch!important;min-width:5ch!important;text-align:center!important}
 .plan-stop.ghosted{opacity:0!important;pointer-events:none!important}
+/* 长按把手后跟手的悬浮条：固定定位，既不被滚动窗口裁剪，也不占据列表排版。 */
+.plan-stop.plan-stop-floating{position:fixed!important;top:0;left:0;margin:0!important;border-bottom:0!important;border-radius:12px!important;background:#fff!important;box-shadow:0 16px 34px rgba(70,50,130,.26)!important;pointer-events:none!important;z-index:70!important;overflow:hidden;will-change:transform}
+.plan-stop.plan-stop-floating .plan-stop-grip{opacity:.9;background:#f3efff}
 .plan-drag-ghost{opacity:1!important;pointer-events:none!important;display:flex!important;align-items:center!important;gap:10px!important}
 .sp-segment{position:relative!important;padding-bottom:8px!important;align-items:flex-end!important}
 .sp-segment-underline{position:absolute!important;left:0;bottom:0;height:3px;border-radius:2px;background:#6a5ae0;transition:left .42s cubic-bezier(.34,1.56,.64,1),width .42s cubic-bezier(.34,1.56,.64,1);z-index:2;pointer-events:none}

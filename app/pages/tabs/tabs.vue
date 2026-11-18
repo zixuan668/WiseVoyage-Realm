@@ -6,7 +6,7 @@
       <swiper-item><view class="panel-slot"><Mine ref="mine" /></view></swiper-item>
     </swiper>
     <TabDock :current="pagerCurrent" :progress="pagerCurrent" :hidden="dockHidden" @select="selectTab" />
-    <FloatingTourButton v-if="tourOrb" label="继续导览" @activate="resumeTour" />
+    <FloatingTourButton v-if="tourOrb && current!==0" label="继续导览" @activate="resumeTour" />
   </view>
 </template>
 <script>
@@ -145,23 +145,20 @@ export default {
     },
     async syncTourOrb() {
       var saved = null
-      try { saved = uni.getStorageSync('active-tour-session') } catch (error) {}
-      if (!saved || !saved.sid) { this.tourOrb = false; return }
-      // 本次打开 App 还没手动选过景点时，绝不显示悬浮球。
-      if (!uni.getStorageSync('scenic-selection-touched')) { this.tourOrb = false; return }
-      // 只有当前规划里确实有景点时才显示悬浮球；清空/没选/规划结束都不显示。
-      try {
-        const draft = await loadScenicDraft()
-        this.tourOrb = !!(draft && draft.stops && draft.stops.length)
-      } catch (error) {
-        this.tourOrb = false
-      }
+      try { saved = uni.getStorageSync('home-orb-resume') } catch (error) {}
+      if (!saved || !saved.kind) { this.tourOrb = false; return }
+      this.tourOrb = saved.kind === 'tour' ? !!saved.sid : true
     },
     resumeTour() {
       var saved = null
-      try { saved = uni.getStorageSync('active-tour-session') } catch (error) {}
-      if (!saved || !saved.sid) { this.tourOrb = false; return }
-      uni.navigateTo({ url: '/pages/tour/tour?sessionId=' + saved.sid })
+      try { saved = uni.getStorageSync('home-orb-resume') } catch (error) {}
+      if (!saved || !saved.kind) { this.tourOrb = false; return }
+      if (saved.kind === 'tour' && saved.sid) {
+        uni.navigateTo({ url: '/pages/tour/tour?sessionId=' + saved.sid })
+        return
+      }
+      var resume = saved.kind === 'plan-result' ? 'result' : '1'
+      uni.navigateTo({ url: '/pages/scenic/scenic?view=plan&resume=' + resume })
     },
     selectTab(index) {
       if (!validIndex(index)) return

@@ -447,7 +447,20 @@ async def get_visitor_routes():
 
             from ..modules.route_presentation import route_overview
             from ..modules.recommended_routes import route_editorial
-            overview=route_overview([s.model_dump() for s in route_members])
+            spots_payload=[s.model_dump() for s in route_members]
+            overview=route_overview(spots_payload)
+            # 卡片时长要和「加入路径规划」后的实际规划一致：按东宫门进出的最优顺序重算。
+            realtime=None
+            try:
+                from ..modules.route_order import optimize_order
+                from ..modules.walking_network import NETWORK
+                anchor=NETWORK['gates']['east']
+                candidate=optimize_order(spots_payload, fixed_start=False, pace='standard',
+                    start_anchor=anchor, end_anchor=anchor, avoid_steps=False)['proposed_route']
+                if candidate and candidate.get('complete'):
+                    realtime=candidate
+            except Exception:
+                realtime=None
 
             route_list.append({
                 "route_id": r.route_id,
@@ -456,10 +469,10 @@ async def get_visitor_routes():
                 "cover_generated": r.cover_generated,
                 "name": r.name,
                 "theme": r.theme,
-                "estimated_time_minutes": overview['total_minutes'],
-                "walking_time_minutes": overview['walking_minutes'],
-                "walking_distance_meters": overview['walking_meters'],
-                "visit_time_minutes": overview['visit_minutes'],
+                "estimated_time_minutes": (realtime or overview)['total_minutes'],
+                "walking_time_minutes": (realtime or overview)['walking_minutes'],
+                "walking_distance_meters": (realtime or overview)['walking_meters'],
+                "visit_time_minutes": (realtime or overview)['visit_minutes'],
                 "description": r.description,
                 "spot_ids": spot_ids,
                 "spot_names": spot_names,
@@ -500,15 +513,26 @@ async def get_visitor_guides(language: str = "zh"):
             return binding.voice_label or ""
         voice_labels = {g.guide_id: _voice_label(g) for g in guides}
 
+    def _media(value):
+        # 数据库里可能存了带旧主机（如 localhost:8000）的绝对地址；统一改回当前部署的文件地址。
+        text = str(value or '')
+        if not text:
+            return ''
+        marker = '/api/v1/files/'
+        if text.startswith(('http://', 'https://')):
+            at = text.find(marker)
+            return (API_CONFIG.REQUEST_FILES_URL.rstrip('/') + '/' + text[at + len(marker):]) if at >= 0 else text
+        return API_CONFIG.REQUEST_FILES_URL.rstrip('/') + '/' + text.lstrip('/')
+
     guide_list = []
     for g in (guides or []):
         guide_list.append({
             "guide_id": g.guide_id,
             "name": (getattr(g, "name_en", "") or g.name) if english_mode else g.name,
             "character": (getattr(g, "character_en", "") or g.character) if english_mode else g.character,
-            "avatar": (API_CONFIG.REQUEST_FILES_URL.rstrip('/') + '/' + g.avatar.lstrip('/')) if g.avatar and not g.avatar.startswith(('http://','https://')) else (g.avatar or ""),
-            "poster_image": (API_CONFIG.REQUEST_FILES_URL.rstrip('/') + '/' + g.poster_image.lstrip('/')) if g.poster_image and not g.poster_image.startswith(('http://','https://')) else (g.poster_image or ""),
-            "base_mp4_path": (API_CONFIG.REQUEST_FILES_URL.rstrip('/') + '/' + g.base_mp4_path.lstrip('/')) if g.base_mp4_path and not g.base_mp4_path.startswith(('http://','https://')) else (g.base_mp4_path or ""),
+            "avatar": _media(g.avatar),
+            "poster_image": _media(g.poster_image),
+            "base_mp4_path": _media(g.base_mp4_path),
             "voice_style": resolve_guide_voice(g.voice_style),
             "voice_speed": g.voice_speed,
             "language": getattr(g, "language", "zh") or "zh",

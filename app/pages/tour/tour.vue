@@ -892,6 +892,7 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
     collapseTour: function() {
       if (this.leavingTour) return
       try { uni.setStorageSync('active-tour-session', { sid: this.sid, guideId: this.guideId, at: Date.now() }) } catch (error) {}
+      try { uni.setStorageSync('home-orb-resume', { kind: 'tour', sid: this.sid, guideId: this.guideId, savedAt: Date.now() }) } catch (error) {}
       this.leaveTour('/pages/tabs/tabs?tab=home')
     },
     // 重建首页并移除导览页；返回不能依赖渲染层回调或云端响应。
@@ -916,6 +917,7 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
       return api.endSession(this.sid).then(function(result){
         if(!result.data||!result.data.success)throw new Error(result.data&&result.data.message||'结束记录保存失败')
         try { uni.removeStorageSync('active-tour-session') } catch (error) {}
+        try { uni.removeStorageSync('home-orb-resume') } catch (error) {}
         // 导览结束：清空景点选择，下次「规划路线」从空白开始
         self.clearScenicSelection()
         self.leaveTour('/pages/tour-summary/tour-summary?sessionId='+self.sid)
@@ -1050,7 +1052,21 @@ guideDisplayName: function() { if (this.tourLanguage === 'en' && this.guideNameE
     stopRecord: function() {this.voicePressing=false;if(this._voiceManager&&this._recordStartedAt)this._voiceManager.stop()},
     cancelRecord: function(){this._recordCancelled=true;this.voicePressing=false;this.recording=false;if(this._voiceManager&&this._recordStartedAt)this._voiceManager.stop()},
   },
-  onBackPress:function(){if(this.repairOpen){if(!this.$refs.routeRepair?.applying)this.repairOpen=false;return true}if(this.showRouteInfo){this.showRouteInfo=false;return true}this.collapseTour();return true},
+  onBackPress:function(){
+    if(this.repairOpen){if(!this.$refs.routeRepair?.applying)this.repairOpen=false;return true}
+    if(this.showRouteInfo){this.showRouteInfo=false;return true}
+    // 返回上一页：从「路径规划」进来的，回到路径规划并保留当时选的景点和填写的内容。
+    var stack=getCurrentPages()
+    if(!this.leavingTour&&stack&&stack.length>1){
+      this.leavingTour=true;this.repairOpen=false;this.showRouteInfo=false
+      this._turnVersion=(this._turnVersion||0)+1;this._liveVersion=(this._liveVersion||0)+1;this._chatTask?.abort()
+      this.showEndConfirm=false
+      this.cancelRecord();this.stopPlayback();this.stopGps();this.closeXingyun()
+      // 交给框架执行默认的“返回上一页”，比在 onBackPress 里手动 navigateBack 可靠。
+      return false
+    }
+    this.collapseTour();return true
+  },
   onUnload:function(){this._translationVersion=(this._translationVersion||0)+1;this._turnVersion=(this._turnVersion||0)+1;this._liveVersion=(this._liveVersion||0)+1;this._chatTask?.abort();this.repairOpen=false;this.tourVisible=false;this.cancelRecord();this.stopPlayback();this.closeXingyun();this.stopGps();if(uni.offKeyboardHeightChange&&this._kbListener)uni.offKeyboardHeightChange(this._kbListener)},
   onHide:function(){this.stopGps();this.keyboardHeight=0;this._turnVersion=(this._turnVersion||0)+1;this._chatTask?.abort();this.loading=false;this.repairOpen=false;this.showRouteInfo=false;this.tourVisible=false;this.cancelRecord();this.stopPlayback();this.closeXingyun();
   },

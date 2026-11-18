@@ -134,8 +134,8 @@ export default {
         uni.showToast({ title: this.t('暂无可加入的景点'), icon: 'none' })
         return
       }
+      const routeMeta = this.detail || {}
       this.detail = null
-      uni.showLoading({ title: this.t('正在加入…'), mask: true })
       try {
         // 直接写进当前路线的草稿，路径规划页之后会自动读到，不跳转。
         const draft = await loadScenicDraft()
@@ -148,12 +148,18 @@ export default {
           if (!ids.includes(stop.id)) await scenicRequest('/scenic-selection/' + stop.id, { method: 'DELETE' })
         }
         await scenicRequest('/scenic-settings', { method: 'PUT', data: { spot_ids: ids } })
+        try {
+          // 主题路线带来的时间/偏好先存好，路径规划页打开时自动套用。
+          uni.setStorageSync('planner-route-prefill', {
+            spotIds: ids,
+            budget: Number(routeMeta.estimated_time_minutes) || 0,
+            savedAt: Date.now()
+          })
+        } catch (_) {}
         try { uni.setStorageSync('scenic-selection-touched', 1) } catch (_) {}
-        uni.hideLoading()
         // 加入成功后不提示，直接进入路径规划页
         uni.navigateTo({ url: '/pages/scenic/scenic?view=plan' })
       } catch (error) {
-        uni.hideLoading()
         uni.showToast({ title: this.t('加入失败，请重试'), icon: 'none' })
       }
     },

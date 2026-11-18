@@ -5,6 +5,8 @@ import { CLAIM_ROUTE, clearPendingClaim, saveClaim } from './common/station-clai
 export default {
   onLaunch: function() {
     console.log('App Launch')
+    // 首页悬浮球只在本次打开 App 内有效，重启后清空。
+    try { uni.removeStorageSync('home-orb-resume') } catch (_) {}
     clearPendingClaim()
     // 每次打开 App，路径规划都从空开始；只有本次手动加入的景点才算。
     try { uni.removeStorageSync('scenic-selection-touched') } catch (_) {}

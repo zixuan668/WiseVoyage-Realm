@@ -97,10 +97,22 @@ export default {
       try {
         const route = uni.getStorageSync('pending-tour-route')
         const ids = Array.isArray(route?.ids) ? route.ids : []
-        this.pendingRoute = ids.length ? route : null
-      } catch (_) { this.pendingRoute = null }
+        let resume = null
+        try { resume = uni.getStorageSync('home-orb-resume') } catch (_) {}
+        this._resume = resume && resume.kind ? resume : null
+        this.pendingRoute = ids.length ? route : (this._resume ? { ids: ['resume'] } : null)
+      } catch (_) { this.pendingRoute = null; this._resume = null }
     },
     resumeRoute() {
+      const resume = this._resume
+      if (resume) {
+        if (resume.kind === 'tour' && resume.sid) {
+          uni.navigateTo({ url: '/pages/tour/tour?sessionId=' + resume.sid })
+          return
+        }
+        uni.navigateTo({ url: '/pages/scenic/scenic?view=plan&resume=' + (resume.kind === 'plan-result' ? 'result' : '1') })
+        return
+      }
       const route = this.pendingRoute
       if (!route?.ids?.length) return
       try {
